@@ -22,7 +22,7 @@ using System;
 using System.Net.Sockets;
 using System.Collections.Generic;
 
-namespace Twisted.Core
+namespace Twisted.Internet
 {
 	public class Protocol
 	{	

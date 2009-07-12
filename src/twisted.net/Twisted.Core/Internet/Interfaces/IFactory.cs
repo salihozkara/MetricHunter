@@ -18,7 +18,7 @@
 //
 // </license'>
 
-namespace Twisted.Core
+namespace Twisted.Internet.Interfaces
 {
 	public interface IFactory
 	{

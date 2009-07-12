@@ -23,13 +23,13 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 
-namespace Twisted.Core
+namespace Twisted.Internet
 {
-	public class SelectReactor : IReactor
+	public class SelectReactor : Interfaces.IReactorCore, Interfaces.IReactorTCP
 	{
 		private delegate void SocketActionDelegate(Socket socket);
 		
-		private Dictionary<Socket, IFactory> _listeners = new Dictionary<Socket, IFactory>();
+		private Dictionary<Socket, Interfaces.IFactory> _listeners = new Dictionary<Socket, Interfaces.IFactory>();
 		private Dictionary<Socket, Protocol> _connections = new Dictionary<Socket, Protocol>();
 		private List<Socket> _pendingWrites = new List<Socket>();
 		private bool _running = false;
@@ -47,7 +47,7 @@ namespace Twisted.Core
 		/// <param name="factory">
 		/// A <see cref="IFactory"/>
 		/// </param>
-		public void ListenTcp(IPAddress ip, int port, IFactory factory)
+		public void ListenTcp(IPAddress ip, int port, Interfaces.IFactory factory)
 		{
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			socket.Bind(new IPEndPoint(ip, port));
@@ -67,7 +67,7 @@ namespace Twisted.Core
 		/// <param name="factory">
 		/// A <see cref="IFactory"/>
 		/// </param>
-		public void ConnectTcp(IPAddress ip, int port, IFactory factory)
+		public void ConnectTcp(IPAddress ip, int port, Interfaces.IFactory factory)
 		{
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
 			socket.Connect(new IPEndPoint(ip, port));
@@ -121,11 +121,11 @@ namespace Twisted.Core
 		private void AcceptConnection(Socket socket)
 		{
 			Socket connection = socket.Accept();
-			IFactory factory = this._listeners[socket];
+			Interfaces.IFactory factory = this._listeners[socket];
 			this.AddConnection(connection, factory);
 		}
 		
-		private void AddConnection(Socket connection, IFactory factory)
+		private void AddConnection(Socket connection, Interfaces.IFactory factory)
 		{
 			Protocol protocol = factory.BuildProtocol();
 			protocol.SetWritesPendingCallback(this.WritesPending);
