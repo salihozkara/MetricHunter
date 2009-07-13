@@ -25,8 +25,44 @@ using System.Net.Sockets;
 
 namespace Twisted.Internet
 {
-	public class SelectReactor : Interfaces.IReactorCore, Interfaces.IReactorTCP
+	public class SelectReactor : ReactorBase, Interfaces.IReactorTCP
 	{
+		private class ListeningPort : Interfaces.IListeningPort
+		{
+			private SelectReactor _reactor = null;
+			private Socket _socket;
+			
+			public ListeningPort(SelectReactor reactor, Socket socket)
+			{
+				this._reactor = reactor;
+				this._socket = socket;
+			}
+				
+			public void stopListening()
+			{
+				this._socket.Close();
+				this._reactor._listeners.Remove(this._socket);
+			}
+		}
+		
+		private class Connector : Interfaces.IConnector
+		{
+			private SelectReactor _reactor = null;
+			private Socket _socket;
+
+			public Connector(SelectReactor reactor, Socket socket)
+			{
+				this._reactor = reactor;
+				this._socket = socket;
+			}
+			
+			public void disconnect()
+			{
+				this._socket.Close();
+				this._reactor._connections.Remove(this._socket);				
+			}
+		}
+		
 		private delegate void SocketActionDelegate(Socket socket);
 		
 		private Dictionary<Socket, Interfaces.IFactory> _listeners = new Dictionary<Socket, Interfaces.IFactory>();
@@ -35,50 +71,28 @@ namespace Twisted.Internet
 		private bool _running = false;
 		private byte[] _buffer = new byte[1048576];
 		
-		/// <summary>
-		/// Makes the reactor listen on ip:port. For each incoming connection factory.buildProtocol() will be called.
-		/// </summary>
-		/// <param name="ip">
-		/// A <see cref="IPAddress"/>
-		/// </param>
-		/// <param name="port">
-		/// A <see cref="System.Int32"/>
-		/// </param>
-		/// <param name="factory">
-		/// A <see cref="IFactory"/>
-		/// </param>
-		public void ListenTcp(IPAddress ip, int port, Interfaces.IFactory factory)
+		public Interfaces.IListeningPort ListenTcp(IPAddress ip, int port, Interfaces.IFactory factory)
 		{
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			socket.Blocking = false;
 			socket.Bind(new IPEndPoint(ip, port));
 			socket.Listen(100);
 			this._listeners.Add(socket, factory);
+			return new ListeningPort(this, socket);
 		}
 		
-		/// <summary>
-		/// Makes the reactor connect to ip:port.
-		/// </summary>
-		/// <param name="ip">
-		/// A <see cref="IPAddress"/>
-		/// </param>
-		/// <param name="port">
-		/// A <see cref="System.Int32"/>
-		/// </param>
-		/// <param name="factory">
-		/// A <see cref="IFactory"/>
-		/// </param>
-		public void ConnectTcp(IPAddress ip, int port, Interfaces.IFactory factory)
+		public Interfaces.IConnector ConnectTcp(IPAddress ip, int port, Interfaces.IFactory factory)
 		{
 			Socket socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+			socket.Blocking = true;
 			socket.Connect(new IPEndPoint(ip, port));
 			this.AddConnection(socket, factory);
+			return new Connector(this, socket);
 		}
 		
-		/// <summary>
-		/// Makes the reactor start processing networking events
-		/// </summary>
-		public void Run()
+		public override void Run()
 		{
+			base.Run();
 			this._running = true;
 			while (this._running)
 			{
@@ -96,12 +110,10 @@ namespace Twisted.Internet
 			}
 		}
 		
-		/// <summary>
-		/// Makes the reactor stop processing networking events
-		/// </summary>
-		public void Stop()
+		public override void Stop()
 		{
 			this._running = false;
+			base.Stop();
 		}
 		
 		private void ProcessSockets(IEnumerable<Socket> sockets, SocketActionDelegate action)

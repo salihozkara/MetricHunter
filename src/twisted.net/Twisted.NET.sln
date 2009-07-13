@@ -5,6 +5,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twisted.Core.Tests", "Twist
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twisted.Core", "Twisted.Core\Twisted.Core.csproj", "{EFC5F7D7-292C-4823-8A5A-8BE7BBC6CBC8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "References", "References", "{5836C5EC-B593-445B-B6C5-879BE18830D5}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,15 +22,17 @@ Global
 		{EFC5F7D7-292C-4823-8A5A-8BE7BBC6CBC8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EFC5F7D7-292C-4823-8A5A-8BE7BBC6CBC8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		version = 0.1
 		StartupItem = Twisted.Core.Tests\Twisted.Core.Tests.csproj
 		Policies = $0
-		$0.StandardHeader = $1
-		$1.Text = @<license type='lgpl' version='2.1'>\n\nCopyright (c) 2009 Geert Audenaert\n\nThis program is free software; you can redistribute it and/or\nmodify it under the terms of version 2 of the Lesser GNU General \nPublic License as published by the Free Software Foundation.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\nLesser General Public License for more details.\n\nYou should have received a copy of the GNU Lesser General Public\nLicense along with this program; if not, write to the\nFree Software Foundation, Inc., 59 Temple Place - Suite 330,\nBoston, MA 02111-1307, USA.\n\n</license'>
-		$1.inheritsSet = MITX11License
-		$0.DotNetNamingPolicy = $2
-		$2.DirectoryNamespaceAssociation = None
-		$2.ResourceNamePolicy = FileFormatDefault
+		$0.DotNetNamingPolicy = $1
+		$1.DirectoryNamespaceAssociation = None
+		$1.ResourceNamePolicy = FileFormatDefault
+		$0.StandardHeader = $2
+		$2.Text = @<license type='lgpl' version='2.1'>\n\nCopyright (c) 2009 Geert Audenaert\n\nThis program is free software; you can redistribute it and/or\nmodify it under the terms of version 2 of the Lesser GNU General \nPublic License as published by the Free Software Foundation.\n\nThis program is distributed in the hope that it will be useful,\nbut WITHOUT ANY WARRANTY; without even the implied warranty of\nMERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU\nLesser General Public License for more details.\n\nYou should have received a copy of the GNU Lesser General Public\nLicense along with this program; if not, write to the\nFree Software Foundation, Inc., 59 Temple Place - Suite 330,\nBoston, MA 02111-1307, USA.\n\n</license'>
+		$2.inheritsSet = MITX11License
 	EndGlobalSection
 EndGlobal

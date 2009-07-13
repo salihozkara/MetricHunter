@@ -18,17 +18,40 @@
 // 
 // </license'>
 
-using System;
+using System.Collections.Generic;
+using System.Threading;
 
-namespace Twisted.Core.Tests
+namespace Twisted.Internet
 {
-	
-	
-	public class MyClass
+	public abstract class ReactorBase : Interfaces.IReactorCore
 	{
+		private static Dictionary<Thread, ReactorBase> _reactors = new Dictionary<Thread, ReactorBase>();
 		
-		public MyClass()
+		protected ReactorBase()
 		{
+		}
+		
+		public virtual void Run()
+		{
+			_reactors.Add(Thread.CurrentThread, this);
+		}
+		
+		public virtual void Stop()
+		{
+			_reactors.Remove(Thread.CurrentThread);
+		}
+		
+		/// <value>
+		/// Returns the running reactor from the current thread or null if there is none.
+		/// </value>
+		public static Interfaces.IReactorCore Reactor
+		{
+			get
+			{
+				if (_reactors.ContainsKey(Thread.CurrentThread))
+				    return _reactors[Thread.CurrentThread];
+				return null;
+			}
 		}
 	}
 }

@@ -39,6 +39,9 @@
     <Compile Include="Internet\Protocol.cs" />
     <Compile Include="Internet\SelectReactor.cs" />
     <Compile Include="Internet\Interfaces\IReactorTCP.cs" />
+    <Compile Include="Internet\Interfaces\IConnector.cs" />
+    <Compile Include="Internet\Interfaces\IListeningPort.cs" />
+    <Compile Include="Internet\ReactorBase.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

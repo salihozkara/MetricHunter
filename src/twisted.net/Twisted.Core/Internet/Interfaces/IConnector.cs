@@ -18,38 +18,13 @@
 // 
 // </license'>
 
-using System.Net;
-
 namespace Twisted.Internet.Interfaces
 {
-	public interface IReactorTCP
+	public interface IConnector
 	{
 		/// <summary>
-		/// Connect a TCP client.
+		/// Disconnect regardless of the connection state.
 		/// </summary>
-		/// <param name="ip">
-		/// A <see cref="IPAddress"/>
-		/// </param>
-		/// <param name="port">
-		/// A <see cref="System.Int32"/>
-		/// </param>
-		/// <param name="factory">
-		/// A <see cref="IFactory"/>
-		/// </param>
-		IConnector ConnectTcp(IPAddress ip, int port, IFactory factory);
-		
-		/// <summary>
-		/// Connects a given protocol factory to the given numeric TCP/IP port.
-		/// </summary>
-		/// <param name="ip">
-		/// A <see cref="IPAddress"/>
-		/// </param>
-		/// <param name="port">
-		/// A <see cref="System.Int32"/>
-		/// </param>
-		/// <param name="factory">
-		/// A <see cref="IFactory"/>
-		/// </param>
-		IListeningPort ListenTcp(IPAddress ip, int port, IFactory factory);
+		void disconnect();
 	}
 }
