@@ -151,7 +151,9 @@ namespace Twisted.Core.Tests
 			Deferred d = GetDummyData(5);
 			d.AddCallback(new PrintDataDelegate(PrintData));
 			d.AddErrback(new PrintDataDelegate(PrintDataError));
-			d.AddCallback(new PrintDataDelegate(PrintDataSuccess));
+			Deferred dToChain = new Deferred();
+			d.ChainDeferred(dToChain);
+			dToChain.AddCallback(new PrintDataDelegate(PrintDataSuccess));
 			
 			d = new Deferred();
 			d.AddCallback(new StopReactorDelegate(StopReactor));

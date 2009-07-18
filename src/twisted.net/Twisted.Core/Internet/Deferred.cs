@@ -65,7 +65,9 @@ namespace Twisted.Internet
 
 		public bool called = false;
 		public object result = null;
-		private delegate object PassThroughDelegate(object parameter);		
+		private delegate object PassThroughDelegate(object parameter);
+		private delegate void CallBackDelegate(object result);
+		private delegate void ErrBackDelegate(Exception failure);
 		private Queue<CallbackPair> _callbacks = new Queue<CallbackPair>();
 		private bool _runningCallbacks = false;
 		
@@ -212,6 +214,25 @@ namespace Twisted.Internet
 			if (failure == null)
 				throw new ArgumentNullException("failure");
 			this.StartRunCallbacks(failure);
+		}
+		
+		/// <summary>
+		/// Chain another Deferred to this Deferred.
+		/// This method adds callbacks to this Deferred to call d's callback or
+		/// errback, as appropriate. 
+		/// 
+		/// When you chain a deferred d2 to another deferred d1 with
+		/// d1.ChainDeferred(d2), you are making d2 participate in the callback
+		/// chain of d1. Thus any event that fires d1 will also fire d2.
+		/// However, the converse is B{not} true; if d2 is fired d1 will not be
+		/// affected.
+		/// </summary>
+		/// <param name="deferred">
+		/// A <see cref="Deferred"/>
+		/// </param>
+		public void ChainDeferred(Deferred deferred)
+		{
+			this.AddCallbacks(new CallBackDelegate(deferred.Callback), new ErrBackDelegate(deferred.Errback), new object[]{}, new object[]{});
 		}
 		
 		private void StartRunCallbacks(object result)
