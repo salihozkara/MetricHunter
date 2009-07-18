@@ -21,6 +21,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Twisted.Internet
 {
@@ -245,9 +246,9 @@ namespace Twisted.Internet
 						this._runningCallbacks = false;
 					}
 				}
-				catch (Exception e)
+				catch (TargetInvocationException e)
 				{
-					this.result = e;
+					this.result = e.InnerException;
 				}
 			}
 		}

@@ -101,14 +101,15 @@ namespace Twisted.Core.Tests
 	[TestFixture()]
 	public class ReactorBasicTest
 	{
-		private SelectReactor reactor = new SelectReactor();
+		private SelectReactor _reactor = new SelectReactor();
+		private bool _testDeferredSuceeded = false;
 		
 		[Test()]
 		public void TestReactorTCP()
 		{
-			reactor.ListenTcp(new IPAddress(new byte[]{127,0,0,1}), 1234, new ServerFactory());
-			reactor.ConnectTcp(new IPAddress(new byte[]{127,0,0,1}), 1234, new ClientFactory());
-			reactor.Run();
+			this._reactor.ListenTcp(new IPAddress(new byte[]{127,0,0,1}), 1234, new ServerFactory());
+			this._reactor.ConnectTcp(new IPAddress(new byte[]{127,0,0,1}), 1234, new ClientFactory());
+			this._reactor.Run();
 		}
 		
 		private Deferred GetDummyData(int x)
@@ -118,10 +119,24 @@ namespace Twisted.Core.Tests
 			return d;
 		}
 		
-		private delegate void PrintDataDelegate(object data);
-		private void PrintData(object data)
+		private delegate object PrintDataDelegate(object data);
+		private object PrintData(object data)
 		{
 			Console.WriteLine(data.ToString());
+			throw new InvalidOperationException();
+		}
+		
+		private object PrintDataError(object data)
+		{
+			Assert.IsInstanceOfType(typeof(InvalidOperationException), data);
+			return "some data";
+		}
+		
+		private object PrintDataSuccess(object data)
+		{
+			Assert.AreEqual(data, "some data");
+			this._testDeferredSuceeded = true;
+			return null;
 		}
 		
 		private delegate void StopReactorDelegate(object dummy);
@@ -135,11 +150,14 @@ namespace Twisted.Core.Tests
 		{
 			Deferred d = GetDummyData(5);
 			d.AddCallback(new PrintDataDelegate(PrintData));
+			d.AddErrback(new PrintDataDelegate(PrintDataError));
+			d.AddCallback(new PrintDataDelegate(PrintDataSuccess));
 			
 			d = new Deferred();
 			d.AddCallback(new StopReactorDelegate(StopReactor));
-			reactor.CallLater(d, null, 4000);
-			reactor.Run();
+			_reactor.CallLater(d, null, 4000);
+			_reactor.Run();
+			Assert.IsTrue(this._testDeferredSuceeded);
 		}
 	}
 }
