@@ -22,6 +22,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 
 namespace Twisted.Internet
 {
@@ -92,10 +93,16 @@ namespace Twisted.Internet
 		
 		public override void Run()
 		{
-			base.Run();
 			this._running = true;
 			while (this._running)
 			{
+				// 1 tick = 100 nano seconds
+				// ==> 10 ticks = 1 micro second
+				int timeout = this.TicksToNextCallLater() / 10;
+				if (timeout < 0)
+					timeout = -1;
+				if (! this._running)
+					break;
 				List<Socket> readSockets = new List<Socket>();
 				readSockets.AddRange(this._listeners.Keys);
 				readSockets.AddRange(this._connections.Keys);
@@ -103,7 +110,17 @@ namespace Twisted.Internet
 				writeSockets.AddRange(this._pendingWrites);
 				List<Socket> errorSockets = new List<Socket>();
 				errorSockets.AddRange(this._connections.Keys);
-				Socket.Select(readSockets, writeSockets, errorSockets, 100000);
+				if (readSockets.Count == 0 && writeSockets.Count == 0 && errorSockets.Count == 0)
+				{
+					if (timeout < 0)
+						throw new InvalidOperationException("Reactor comes in infinitive wait state!");
+					timeout = timeout / 1000;
+					if (timeout == 0)
+						timeout = 1;
+					Thread.Sleep(timeout);
+				}
+				else
+					Socket.Select(readSockets, writeSockets, errorSockets, timeout);
 				ProcessSockets(readSockets, CheckAcceptOrRead);
 				ProcessSockets(writeSockets, ProcessWrite);
 				ProcessSockets(errorSockets, ProcessError);
@@ -113,7 +130,6 @@ namespace Twisted.Internet
 		public override void Stop()
 		{
 			this._running = false;
-			base.Stop();
 		}
 		
 		private void ProcessSockets(IEnumerable<Socket> sockets, SocketActionDelegate action)

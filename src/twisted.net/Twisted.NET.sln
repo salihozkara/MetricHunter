@@ -7,12 +7,18 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twisted.Core", "Twisted.Cor
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "References", "References", "{5836C5EC-B593-445B-B6C5-879BE18830D5}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Twisted.Play", "Twisted.Play\Twisted.Play.csproj", "{11AC0293-6D1F-4573-A229-166E8D12BDD9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{11AC0293-6D1F-4573-A229-166E8D12BDD9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11AC0293-6D1F-4573-A229-166E8D12BDD9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11AC0293-6D1F-4573-A229-166E8D12BDD9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11AC0293-6D1F-4573-A229-166E8D12BDD9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{CD40CE15-1141-4924-A132-1AE849E510F1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CD40CE15-1141-4924-A132-1AE849E510F1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CD40CE15-1141-4924-A132-1AE849E510F1}.Release|Any CPU.ActiveCfg = Release|Any CPU

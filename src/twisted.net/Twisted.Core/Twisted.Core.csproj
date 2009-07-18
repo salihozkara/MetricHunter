@@ -42,6 +42,7 @@
     <Compile Include="Internet\Interfaces\IConnector.cs" />
     <Compile Include="Internet\Interfaces\IListeningPort.cs" />
     <Compile Include="Internet\ReactorBase.cs" />
+    <Compile Include="Internet\Deferred.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

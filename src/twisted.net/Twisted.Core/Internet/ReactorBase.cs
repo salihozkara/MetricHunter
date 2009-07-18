@@ -18,6 +18,7 @@
 // 
 // </license'>
 
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -25,20 +26,78 @@ namespace Twisted.Internet
 {
 	public abstract class ReactorBase : Interfaces.IReactorCore
 	{
+		internal class NoDeferredScheduledException : Exception
+		{
+		}
+		
+		private class CallLaterItem
+		{
+			public Deferred deferred;
+			public object result;
+			
+			public CallLaterItem(Deferred deferred, object result)
+			{
+				this.deferred = deferred;
+				this.result = result;
+			}
+		}
+		
 		private static Dictionary<Thread, ReactorBase> _reactors = new Dictionary<Thread, ReactorBase>();
+		private SortedList<long, CallLaterItem> _callLaterItems = new SortedList<long, CallLaterItem>();
 		
 		protected ReactorBase()
 		{
+			if (!_reactors.ContainsKey(Thread.CurrentThread))
+				_reactors.Add(Thread.CurrentThread, this);
 		}
 		
-		public virtual void Run()
+		public abstract void Run();
+		
+		public abstract void Stop();
+		
+		/// <summary>
+		/// Executes the callback of the deferred in timeout milliseconds.
+		/// result is the first parameter of the first callback in the deferred.
+		/// </summary>
+		/// <param name="deferred">
+		/// A <see cref="Deferred"/>
+		/// </param>
+		/// <param name="result">
+		/// A <see cref="System.Object"/>
+		/// </param>
+		/// <param name="timeout">
+		/// A <see cref="System.Int32"/>
+		/// </param>
+		public void CallLater(Deferred deferred, object result, int timeout)
 		{
-			_reactors.Add(Thread.CurrentThread, this);
+			this._callLaterItems.Add((timeout * TimeSpan.TicksPerMillisecond) + DateTime.Now.Ticks, new CallLaterItem(deferred, result));
 		}
 		
-		public virtual void Stop()
+		protected int TicksToNextCallLater()
 		{
-			_reactors.Remove(Thread.CurrentThread);
+			List<int> indexesToBeRemoved = new List<int>();
+			try
+			{
+				int i = 0;
+				foreach (KeyValuePair<long, CallLaterItem> kvp in this._callLaterItems)
+				{
+					long timeout = kvp.Key - DateTime.Now.Ticks;
+					if (timeout <= 0)
+					{
+						indexesToBeRemoved.Add(i);
+						kvp.Value.deferred.Callback(kvp.Value.result);
+					}
+					else
+						return (int)timeout;
+					i++;
+				}
+				return -1;
+			}
+			finally
+			{
+				for (int i = indexesToBeRemoved.Count - 1; i >= 0 ; i--)
+					this._callLaterItems.RemoveAt(indexesToBeRemoved[i]);
+			}
 		}
 		
 		/// <value>

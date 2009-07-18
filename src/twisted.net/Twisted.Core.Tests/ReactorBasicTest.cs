@@ -101,13 +101,44 @@ namespace Twisted.Core.Tests
 	[TestFixture()]
 	public class ReactorBasicTest
 	{
+		private SelectReactor reactor = new SelectReactor();
 		
 		[Test()]
-		public void TestCase()
+		public void TestReactorTCP()
 		{
-			SelectReactor reactor = new SelectReactor();
 			reactor.ListenTcp(new IPAddress(new byte[]{127,0,0,1}), 1234, new ServerFactory());
 			reactor.ConnectTcp(new IPAddress(new byte[]{127,0,0,1}), 1234, new ClientFactory());
+			reactor.Run();
+		}
+		
+		private Deferred GetDummyData(int x)
+		{
+			Deferred d = new Deferred();
+			ReactorBase.Reactor.CallLater(d, x*3, 2000);
+			return d;
+		}
+		
+		private delegate void PrintDataDelegate(object data);
+		private void PrintData(object data)
+		{
+			Console.WriteLine(data.ToString());
+		}
+		
+		private delegate void StopReactorDelegate(object dummy);
+		private void StopReactor(object dummy)
+		{
+			ReactorBase.Reactor.Stop();
+		}
+		
+		[Test()]
+		public void TestDefferedSystem()
+		{
+			Deferred d = GetDummyData(5);
+			d.AddCallback(new PrintDataDelegate(PrintData));
+			
+			d = new Deferred();
+			d.AddCallback(new StopReactorDelegate(StopReactor));
+			reactor.CallLater(d, null, 4000);
 			reactor.Run();
 		}
 	}
