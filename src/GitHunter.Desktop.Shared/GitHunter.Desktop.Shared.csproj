@@ -10,8 +10,4 @@
       <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <PackageReference Include="Volo.Abp.Core" Version="7.0.0-rc.3" />
-    </ItemGroup>
-
 </Project>

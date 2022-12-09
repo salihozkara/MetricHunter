@@ -21,7 +21,7 @@ public class Program
             .CreateLogger();
 
 
-        using var application = AbpApplicationFactory.Create<DesktopWindowsFormModule>(
+        using var application = await AbpApplicationFactory.CreateAsync<DesktopWindowsFormModule>(
             options =>
             {
                 options.UseAutofac();
