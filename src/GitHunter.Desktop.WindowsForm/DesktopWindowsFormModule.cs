@@ -12,7 +12,14 @@ public class DesktopWindowsFormModule : GitHunterModule
 
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<ProcessDependencyOptions>(o=>o.StartupModule = typeof(DesktopWindowsFormModule));
+        Configure<ProcessDependencyOptions>(o=>
+        {
+            o.StartupModule = typeof(DesktopWindowsFormModule);
+            o.ErrorAction = () =>
+            {
+                MessageBox.Show("Error");
+            };
+        });
 
         base.ConfigureServices(context);
     }
