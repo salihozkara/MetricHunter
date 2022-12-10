@@ -1,6 +1,6 @@
 using Volo.Abp.DependencyInjection;
 
-namespace GitHunter.Desktop.WindowsForm;
+namespace GitHunter.Desktop;
 
 public partial class MainForm : Form, ISingletonDependency
 {

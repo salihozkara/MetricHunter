@@ -1,4 +1,4 @@
-﻿namespace GitHunter.Desktop.WindowsForm;
+﻿namespace GitHunter.Desktop;
 
 partial class MainForm
 {
