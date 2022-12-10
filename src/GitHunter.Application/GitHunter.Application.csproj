@@ -12,4 +12,8 @@
       <ProjectReference Include="..\GitHunter.Core\GitHunter.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Octokit" Version="4.0.3" />
+    </ItemGroup>
+
 </Project>

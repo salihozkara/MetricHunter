@@ -32,7 +32,7 @@ public class CoreModule : GitHunterModule
         
         using (var scope = context.ServiceProvider.CreateScope())
         {
-            var processDependencyChecker = scope.ServiceProvider.GetRequiredService<ProcessDependencyChecker>();
+            var processDependencyChecker = scope.ServiceProvider.GetRequiredService<IProcessDependencyChecker>();
             var processDependencyOptions = scope.ServiceProvider.GetRequiredService<IOptions<ProcessDependencyOptions>>().Value;
             var modules = ModuleHelper.FindGitHunterModuleTypes(processDependencyOptions.StartupModule);
                 
