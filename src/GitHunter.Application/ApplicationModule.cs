@@ -1,5 +1,5 @@
-﻿using GitHunter.Application.Shared;
-using GitHunter.Core;
+﻿using GitHunter.Core;
+using GitHunter.Core.Modules;
 using Volo.Abp.Modularity;
 
 namespace GitHunter.Application;
@@ -8,6 +8,6 @@ namespace GitHunter.Application;
     typeof(ApplicationSharedModule),
     typeof(CoreModule)
 )]
-public class ApplicationModule : AbpModule
+public class ApplicationModule : GitHunterModule
 {
 }

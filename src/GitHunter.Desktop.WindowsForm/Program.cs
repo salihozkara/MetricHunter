@@ -3,7 +3,7 @@ using Serilog;
 using Serilog.Events;
 using Volo.Abp;
 
-namespace GitHunter.Desktop.WindowsForm;
+namespace GitHunter.Desktop;
 
 public class Program
 {

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
+        <RootNamespace>GitHunter.Application</RootNamespace>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
     </PropertyGroup>
@@ -9,6 +10,10 @@
     <ItemGroup>
       <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj" />
       <ProjectReference Include="..\GitHunter.Core\GitHunter.Core.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Octokit" Version="4.0.3" />
     </ItemGroup>
 
 </Project>

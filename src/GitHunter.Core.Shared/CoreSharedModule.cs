@@ -1,13 +1,14 @@
-﻿using Volo.Abp.Autofac;
+﻿using GitHunter.Core.Modules;
+using Volo.Abp.Autofac;
 using Volo.Abp.AutoMapper;
 using Volo.Abp.Modularity;
 
-namespace GitHunter.Core.Shared;
+namespace GitHunter.Core;
 
 [DependsOn(
     typeof(AbpAutofacModule),
     typeof(AbpAutoMapperModule)
 )]
-public class CoreSharedModule : AbpModule
+public class CoreSharedModule : GitHunterModule
 {
 }

@@ -1,9 +1,10 @@
-﻿using GitHunter.Application.Shared;
+﻿using GitHunter.Application;
+using GitHunter.Core.Modules;
 using Volo.Abp.Modularity;
 
-namespace GitHunter.Desktop.Shared;
+namespace GitHunter.Desktop;
 
 [DependsOn(typeof(ApplicationSharedModule))]
-public class DesktopSharedModule : AbpModule
+public class DesktopSharedModule : GitHunterModule
 {
 }
