@@ -6,7 +6,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace GitHunter.Application.LanguageStatistics;
 
-public class LanguageStatisticsFactory : ISingletonDependency
+public class LanguageStatisticsFactory : ILanguageStatisticsFactory, ISingletonDependency
 {
     private readonly ILogger<LanguageStatisticsFactory> _logger;
     private readonly IServiceProvider _serviceProvider;

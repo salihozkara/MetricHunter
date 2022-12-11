@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<sourcemonitor_metrics>
+    <project version="1.3">
+        <project_name>MyStocks</project_name>
+        <project_directory>src</project_directory>
+        <project_language>Java</project_language>
+        <metric_names name_count="14">
+            <metric_name id="M0">Lines</metric_name>
+            <metric_name id="M1">Statements</metric_name>
+            <metric_name id="M2">Percent Branch Statements</metric_name>
+            <metric_name id="M3">Method Call Statements</metric_name>
+            <metric_name id="M4">Percent Lines with Comments</metric_name>
+            <metric_name id="M5">Classes and Interfaces</metric_name>
+            <metric_name id="M6">Methods per Class</metric_name>
+            <metric_name id="M7">Average Statements per Method</metric_name>
+            <metric_name id="M8">Name of Biggest Method</metric_name>
+            <metric_name id="M9">Line Number of Biggest Method</metric_name>
+            <metric_name id="M10">Statements in Biggest Method</metric_name>
+            <metric_name id="M11">Line Number of Deepest Block</metric_name>
+            <metric_name id="M12">Maximum Block Depth</metric_name>
+            <metric_name id="M13">Average Block Depth</metric_name>
+        </metric_names>
+        <checkpoints checkpoint_count="1">
+            <checkpoint checkpoint_name="Checkpoint1" checkpoint_date="2004-07-17" checkpoint_files="10">
+                <metrics metric_count="14">
+                    <metric id="M0">4,710</metric>
+                    <metric id="M1">1,692</metric>
+                    <metric id="M2">26.7</metric>
+                    <metric id="M3">981</metric>
+                    <metric id="M4">38.1</metric>
+                    <metric id="M5">11</metric>
+                    <metric id="M6">9.18</metric>
+                    <metric id="M7">15.05</metric>
+                    <metric id="M8">StockCanvas.keyPressed()</metric>
+                    <metric id="M9"></metric>
+                    <metric id="M10">121</metric>
+                    <metric id="M11"></metric>
+                    <metric id="M12">8</metric>
+                    <metric id="M13">2.86</metric>
+                </metrics>
+                <block_depths depth_count="10">
+                    <block_depth level="0">37</block_depth>
+                    <block_depth level="1">272</block_depth>
+                    <block_depth level="2">621</block_depth>
+                    <block_depth level="3">403</block_depth>
+                    <block_depth level="4">251</block_depth>
+                    <block_depth level="5">143</block_depth>
+                    <block_depth level="6">83</block_depth>
+                    <block_depth level="7">39</block_depth>
+                    <block_depth level="8">16</block_depth>
+                    <block_depth level="9+">0</block_depth>
+                </block_depths>
+            </checkpoint>
+        </checkpoints>
+    </project>
+</sourcemonitor_metrics>

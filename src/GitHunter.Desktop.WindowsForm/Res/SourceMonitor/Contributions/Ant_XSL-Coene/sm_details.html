@@ -1,0 +1,875 @@
+<html>
+<head>
+    <META content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <title>SourceMonitor Analysis</title>
+    <style type="text/css">
+        body {
+            font: normal 68% verdana, arial, helvetica;
+            color: #000000;
+        }
+
+        table tr td, tr th {
+            font-size: 68%;
+        }
+
+        table.details tr th {
+            font-weight: bold;
+            text-align: left;
+            background: #a6caf0;
+        }
+
+        table.details tr td {
+            background: #eeeee0;
+        }
+
+        p {
+            line-height: 1.5em;
+            margin-top: 0.5em;
+            margin-bottom: 1.0em;
+            margin-left: 2em;
+            margin-right: 2em;
+        }
+
+        h1 {
+            margin: 0px 0px 5px;
+            font: 165% verdana, arial, helvetica
+        }
+
+        h2 {
+            margin-top: 1em;
+            margin-bottom: 0.5em;
+            font: bold 125% verdana, arial, helvetica
+        }
+
+        h3 {
+            margin-bottom: 0.5em;
+            font: bold 115% verdana, arial, helvetica
+        }
+
+        h4 {
+            margin-bottom: 0.5em;
+            font: bold 100% verdana, arial, helvetica
+        }
+
+        h5 {
+            margin-bottom: 0.5em;
+            font: bold 100% verdana, arial, helvetica
+        }
+
+        h6 {
+            margin-bottom: 0.5em;
+            font: bold 100% verdana, arial, helvetica
+        }
+
+        .Error {
+            font-weight: bold;
+            color: red;
+        }
+
+        .Failure {
+            font-weight: bold;
+            color: purple;
+        }
+
+        .Properties {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<h1>SourceMonitor Analysis</h1>
+<p align="right">Designed for use with <a href="http://www.campwoodsw.com/sourcemonitor.html">SourceMonitor</a> and <a
+        href="http://jakarta.apache.org">Ant</a>.</p>
+<hr size="2">
+<h2>File About.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>92</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>20</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>15.0</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>10</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>55.4</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>2.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>7.00</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>About.showAbout()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>46</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>14</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>56</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>4</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>1.90</td>
+    </tr>
+</table>
+<p></p>
+<h2>File ConfirmationForm.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>147</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>46</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>6.5</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>27</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>48.3</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>11.00</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>ConfirmationForm.paint()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>77</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>18</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>102</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>1.79</td>
+    </tr>
+</table>
+<p></p>
+<h2>File CurrencyList.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>113</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>29</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>17.2</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>7</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>54.9</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>6.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>CurrencyList.setDefault()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>47</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>5</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>34</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>3</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>1.77</td>
+    </tr>
+</table>
+<p></p>
+<h2>File EditCanvas.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>289</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>95</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>28.4</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>64</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>38.1</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>6.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>14.17</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>EditCanvas.keyPressed()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>138</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>33</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>170</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>6</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>2.41</td>
+    </tr>
+</table>
+<p></p>
+<h2>File SplashScreen.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>144</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>54</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>13.0</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>24</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>23.6</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>6.50</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>SplashScreen.paint()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>91</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>23</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>73</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>5</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>1.95</td>
+    </tr>
+</table>
+<p></p>
+<h2>File Stock.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>911</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>280</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>24.6</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>107</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>49.6</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>25.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>9.44</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>Stock.setValue()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>466</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>43</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>506</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>6</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>2.48</td>
+    </tr>
+</table>
+<p></p>
+<h2>File StockCanvas.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>1,149</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>509</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>27.9</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>300</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>28.3</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>15.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>31.93</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>StockCanvas.keyPressed()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>321</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>121</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>436</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>8</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>3.15</td>
+    </tr>
+</table>
+<p></p>
+<h2>File StockMIDlet.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>945</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>358</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>27.4</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>231</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>38.9</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>14.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>23.29</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>StockMIDlet.commandAction()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>692</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>119</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>887</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>8</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>3.06</td>
+    </tr>
+</table>
+<p></p>
+<h2>File StockTableModel.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>844</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>284</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>34.5</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>143</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>36.0</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>21.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>13.29</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>StockTableModel.getNumberAt()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>424</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>87</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>346</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>6</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>3.21</td>
+    </tr>
+</table>
+<p></p>
+<h2>File StockTest.java</h2>
+<table border="0" class="details" width="100%">
+    <tr>
+        <th width="10%">ID</th>
+        <th width="60%">Metric</th>
+        <th>Value</th>
+    </tr>
+    <tr>
+        <td>M0</td>
+        <td>Lines</td>
+        <td>76</td>
+    </tr>
+    <tr>
+        <td>M1</td>
+        <td>Statements</td>
+        <td>17</td>
+    </tr>
+    <tr>
+        <td>M2</td>
+        <td>Percent Branch Statements</td>
+        <td>0.0</td>
+    </tr>
+    <tr>
+        <td>M3</td>
+        <td>Method Call Statements</td>
+        <td>68</td>
+    </tr>
+    <tr>
+        <td>M4</td>
+        <td>Percent Lines with Comments</td>
+        <td>23.7</td>
+    </tr>
+    <tr>
+        <td>M5</td>
+        <td>Classes and Interfaces</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M6</td>
+        <td>Methods per Class</td>
+        <td>3.00</td>
+    </tr>
+    <tr>
+        <td>M7</td>
+        <td>Average Statements per Method</td>
+        <td>3.67</td>
+    </tr>
+    <tr>
+        <td>M8</td>
+        <td>Name of Biggest Method</td>
+        <td>StockTest.setUp()</td>
+    </tr>
+    <tr>
+        <td>M9</td>
+        <td>Line Number of Biggest Method</td>
+        <td>16</td>
+    </tr>
+    <tr>
+        <td>M10</td>
+        <td>Statements in Biggest Method</td>
+        <td>1</td>
+    </tr>
+    <tr>
+        <td>M11</td>
+        <td>Line Number of Deepest Block</td>
+        <td>13</td>
+    </tr>
+    <tr>
+        <td>M12</td>
+        <td>Maximum Block Depth</td>
+        <td>2</td>
+    </tr>
+    <tr>
+        <td>M13</td>
+        <td>Average Block Depth</td>
+        <td>1.68</td>
+    </tr>
+</table>
+<p></p>
+</body>
+</html>

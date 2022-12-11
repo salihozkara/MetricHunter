@@ -31,34 +31,56 @@ public class GitManager : IGitManager, ITransientDependency
 
     public async Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
     {
-        if(token.IsCancellationRequested)
+        if (token.IsCancellationRequested)
         {
             return false;
         }
-        _logger.LogInformation($"Cloning {repository.FullName}...");
-        var path = PathHelper.BuildFullPath(repository.Language, "Repositories", repository.FullName);
 
-        var repositoryPath = Path.Combine(path, repository.FullName);
+        _logger.LogInformation($"Cloning {repository.FullName}...");
+        var path = PathHelper.BuildAndCreateFullPath(repository.Language, "Repositories", repository.Owner.Login);
+
+        var repositoryPath = Path.Combine(path, repository.Name);
         if (Directory.Exists(repositoryPath))
         {
-            var directoryInfo = new DirectoryInfo(repositoryPath);
-            var dirs = directoryInfo.GetDirectories().Where(d => d.Name != ".git").ToList();
-            var dirSize =
-                dirs.Sum(d => d.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length)) / 1024;
-            if (dirSize < repository.Size)
+            try
             {
-                _logger.LogInformation(
-                    $"Repository {repository.FullName} already exists, but is smaller than expected. Deleting and cloning again...");
-                Directory.Delete(repositoryPath, true);
+                var files = Directory.GetFiles(repositoryPath, "*", SearchOption.AllDirectories).Select(f=>new FileInfo(f));
+                
+                foreach (var file in files)
+                {
+                    file.Delete();
+                }
+                
+                var directories = Directory.GetDirectories(repositoryPath, "*", SearchOption.AllDirectories).Select(f=>new DirectoryInfo(f));
+                
+                foreach (var directory in directories)
+                {
+                    directory.Delete(true);
+                }
+                
             }
-            else
+            catch (Exception e)
             {
-                _logger.LogInformation($"Repository {repository.FullName} already exists. Skipping...");
-                return true;
+                _logger.LogError(e, $"Failed to delete {repositoryPath}");
             }
+            // var directoryInfo = new DirectoryInfo(repositoryPath);
+            // var dirs = directoryInfo.GetDirectories().Where(d => d.Name != ".git").ToList();
+            // var dirSize =
+            //     dirs.Sum(d => d.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length)) / 1024;
+            // if (dirSize < repository.Size)
+            // {
+            //     _logger.LogInformation(
+            //         $"Repository {repository.FullName} already exists, but is smaller than expected. Deleting and cloning again...");
+            //     Directory.Delete(repositoryPath, true);
+            // }
+            // else
+            // {
+            //     _logger.LogInformation($"Repository {repository.FullName} already exists. Skipping...");
+            //     return true;
+            // }
         }
 
-        var result = await _processManager.RunAsync("git", $"clone {repository.CloneUrl}", path);
+        var result = await _processManager.RunAsync("git", $"clone -c core.longpaths=true {repository.CloneUrl}", path);
 
         if (result.ExitCode == 0)
         {
@@ -118,7 +140,9 @@ public class GitManager : IGitManager, ITransientDependency
             if (cancellationToken.IsCancellationRequested)
                 break;
 
-            range = Range.LessThanOrEquals(results.Min(x => x.Items.Min(x => x.StargazersCount)));
+            range = input.Order == SortDirection.Descending
+                ? Range.LessThanOrEquals(results.Min(x => x.Items.Min(repository => repository.StargazersCount)))
+                : Range.GreaterThanOrEquals(results.Max(x => x.Items.Max(repository => repository.StargazersCount)));
         }
 
         return new GitOutput(results.SelectMany(t => t.Items).ToList(), results[0].TotalCount,
@@ -185,7 +209,8 @@ public class GitManager : IGitManager, ITransientDependency
             SortField = RepoSearchSort.Stars,
             Stars = stars,
             Page = page,
-            PerPage = input.Count < 100 ? input.Count : 100
+            PerPage = input.Count < 100 ? input.Count : 100,
+            Order = input.Order
         };
         var task = Client.Search.SearchRepo(request);
         _errorSearchRepositoriesRequests.Add(task, request);

@@ -20,13 +20,11 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
 
     private readonly ILogger<SourceMonitorLanguageStatistics> _logger;
     private readonly IProcessManager _processManager;
-    private readonly IGitManager _gitManager;
 
 
-    public SourceMonitorLanguageStatistics(IGitManager gitManager, IProcessManager processManager,
+    public SourceMonitorLanguageStatistics(IProcessManager processManager,
         ILogger<SourceMonitorLanguageStatistics> logger)
     {
-        _gitManager = gitManager;
         _processManager = processManager;
         _logger = logger;
     }
@@ -41,46 +39,42 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
     {
         if (token.IsCancellationRequested)
             return;
-        var reportsPath = Path.Combine(repository.Language, "Reports", repository.Name + ".xml");
+        var reportsPath = Path.Combine(repository.Language, "Reports", repository.FullName + ".xml");
         if (File.Exists(reportsPath))
         {
-            _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.Name);
+            _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.FullName);
             return;
         }
-
-        var isSuccess = await _gitManager.CloneRepository(repository, token);
-
-        if (!isSuccess) return;
 
         await CalculateStatisticsUsingSourceMonitor(repository);
     }
 
     private async Task CalculateStatisticsUsingSourceMonitor(Repository repository)
     {
-        _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.Name);
+        _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.FullName);
         var xmlPath = await CreateSourceMonitorXml(repository);
 
         var result = await _processManager.RunAsync(Resource.SourceMonitor.SourceMonitorExe.Value, $"/C \"{xmlPath}\"");
         if (result.ExitCode == 0)
-            _logger.LogInformation("Statistics for {RepositoryName} calculated successfully", repository.Name);
+            _logger.LogInformation("Statistics for {RepositoryName} calculated successfully", repository.FullName);
         else
-            _logger.LogError("Error while calculating statistics for {RepositoryName}", repository.Name);
+            _logger.LogError("Error while calculating statistics for {RepositoryName}", repository.FullName);
     }
 
     private async Task<string> CreateSourceMonitorXml(Repository repository)
     {
-        var xmlDirectory = PathHelper.BuildFullPath(repository.Language, "SourceMonitor", repository.Name);
+        var xmlDirectory = PathHelper.BuildAndCreateFullPath(repository.Language, "SourceMonitor",repository.Owner.Login);
 
-        var reportsPath = PathHelper.BuildFullPath(repository.Language, "Reports");
+        var reportsPath = PathHelper.BuildAndCreateFullPath(repository.Language, "Reports", repository.Owner.Login);
 
-        var projectDirectory = PathHelper.BuildFullPath(repository.Language, "Repositories", repository.Name);
+        var projectDirectory = PathHelper.BuildFullPath(repository.Language, "Repositories", repository.FullName);
 
         var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
 
         if (File.Exists(xmlPath))
         {
             _logger.LogInformation("SourceMonitor xml file already exists for {RepositoryName}. Skipping...",
-                repository.Name);
+                repository.FullName);
             return xmlPath;
         }
 

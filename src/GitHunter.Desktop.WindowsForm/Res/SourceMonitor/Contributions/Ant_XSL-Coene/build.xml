@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="MyProject" default="all" basedir=".">
+
+    <description>
+        Build file sample showing use of SourceMonitor and JavaNCSS with Ant
+        and creating of JUnit-like reports and SVG charts.
+    </description>
+
+    <property name="ncss.home" value="c:\Program Files\javancss21.41"/>
+    <property name="sm.home" value="c:\Program Files\SourceMonitor1316"/>
+
+    <property name="docs.dir" value="docs"/>
+    <property name="src.dir" value="src"/>
+    <property name="build.dir" value="build"/>
+    <property name="classes.dir" value="${build.dir}/classes"/>
+    <property name="test.dir" value="${build.dir}/test"/>
+    <property name="metrics.dir" value="${docs.dir}/metrics"/>
+    <property name="final.dir" location="bin"/>
+    <property name="resources.dir" location="res"/>
+
+
+    <target name="init">
+        <mkdir dir="${final.dir}"/>
+        <mkdir dir="${build.dir}"/>
+        <mkdir dir="${classes.dir}"/>
+        <mkdir dir="${test.dir}"/>
+        <mkdir dir="${docs.dir}"/>
+        <mkdir dir="${metrics.dir}"/>
+
+    </target>
+
+    <target name="clean"
+            description="Remove files that can be regenerated">
+        <delete dir="${docs.dir}"/>
+        <delete dir="${final.dir}"/>
+        <delete dir="${build.dir}"/>
+        <delete file=".log"/>         <!-- created by SourceMonitor -->
+    </target>
+
+
+    <!-- PART 4: DOCUMENTATION -->
+
+
+    <target name="sm" depends="init"
+            description="Run SourceMonitor">
+
+        <!-- Create command file -->
+        <concat destfile="${metrics.dir}\cmd.xml" append="false">
+            <![CDATA[
+<?xml version="1.0" encoding="UTF-8" ?>
+<sourcemonitor_commands>
+    <write_log>false</write_log>
+    <command>
+        <project_file>${metrics.dir}\${ant.project.name}.smp</project_file>
+        <project_language>Java</project_language>
+        <source_directory>${src.dir}</source_directory>
+        <file_extensions>*.java</file_extensions>
+        <include_subdirectories>true</include_subdirectories>
+        <export>
+            <export_file>${metrics.dir}\sm_summary.xml</export_file>
+            <export_type>1</export_type>
+        </export>
+    </command>
+    <command>
+        <project_file>${metrics.dir}\${ant.project.name}.smp</project_file>
+        <export>
+	    <export_file>${metrics.dir}\sm_details.xml</export_file>
+	    <export_type>2</export_type>
+        </export>
+    </command>   
+</sourcemonitor_commands>	
+	]]>
+        </concat>
+
+
+        <!-- SourceMonitor needs a command file to run in batch mode -->
+        <!-- The application only runs on Windows.                   -->
+        <exec dir="${basedir}" executable="${sm.home}\SourceMonitor" os="Windows XP">
+            <arg value="/C"/>
+            <arg file="${metrics.dir}\cmd.xml"/>
+        </exec>
+
+        <!-- Remove temporary files created by SourceMonitor, but keep reports -->
+        <delete file=".log"/>
+        <delete file="${metrics.dir}\cmd.xml"/>
+        <delete file="${metrics.dir}\${ant.project.name}.smp"/>
+
+        <!-- generate 3 HTML reports -->
+        <style basedir="${metrics.dir}" destdir="${metrics.dir}"
+               includes="sm_*.xml" style="${sm.home}/xslt/group_by_file.xsl"/>
+
+        <style in="${metrics.dir}/sm_details.xml" out="${metrics.dir}/sm_by_metric.html"
+               style="${sm.home}/xslt/group_by_metric.xsl"/>
+
+    </target>
+
+
+    <taskdef name="javancss"
+             classname="javancss.JavancssAntTask">
+        <classpath>
+            <fileset dir="${ncss.home}/lib">
+                <include name="*.jar"/>
+            </fileset>
+        </classpath>
+    </taskdef>
+
+
+    <target name="javancss" depends="init"
+            description="Generate NCSS metrics in HTML format">
+
+        <javancss srcdir="${src.dir}"
+                  excludes="**/*Test.java"
+                  generateReport="true"
+                  outputfile="${metrics.dir}/javancss.xml"
+                  format="xml"/>
+
+        <style basedir="${metrics.dir}" destdir="${metrics.dir}"
+               includes="javancss.xml" style="${ncss.home}/xslt/javancss2html.xsl"/>
+    </target>
+
+
+    <target name="sm-svg" depends="sm"
+            description="Generate graphs for SourceMonitor metrics">
+
+        <!-- style tasks generate errors but produces correct result anyway -->
+        <!-- XMLSpy and XT do not generate errors for same stylesheet.      -->
+        <style in="${metrics.dir}/sm_details.xml" out="${metrics.dir}/sm_m1_statements.svg"
+               style="${sm.home}/xslt/barchart.xsl"/>
+
+        <!-- change stylesheet to display M5 instead of M1-->
+        <copy file="${sm.home}/xslt/barchart.xsl" toFile="${metrics.dir}/barchart.xsl" overwrite="true">
+            <filterset begintoken="'" endtoken="'">
+                <filter token="M1" value="'M5'"/>
+            </filterset>
+        </copy>
+
+        <style in="${metrics.dir}/sm_details.xml" out="${metrics.dir}/sm_m5_classes.svg"
+               style="${metrics.dir}/barchart.xsl"/>
+
+        <!-- change stylesheet to display M6 instead of M1-->
+        <copy file="${sm.home}/xslt/barchart.xsl" toFile="${metrics.dir}/barchart.xsl" overwrite="true">
+            <filterset begintoken="'" endtoken="'">
+                <filter token="M1" value="'M6'"/>
+            </filterset>
+        </copy>
+
+        <style in="${metrics.dir}/sm_details.xml" out="${metrics.dir}/sm_m6_methods.svg"
+               style="${metrics.dir}/barchart.xsl"/>
+
+    </target>
+
+    <target name="svg" depends="javancss"
+            description="Generate graphs for NCSS metrics">
+
+        <!-- style tasks generate errors but produces correct result anyway -->
+        <style in="${metrics.dir}/javancss.xml" out="${metrics.dir}/chart_ccn.svg"
+               style="${ncss.home}/xslt/svg/chart_ccn.xsl"/>
+        <style in="${metrics.dir}/javancss.xml" out="${metrics.dir}/chart_ncss.svg"
+               style="${ncss.home}/xslt/svg/chart_ncss.xsl"/>
+        <style in="${metrics.dir}/javancss.xml" out="${metrics.dir}/chart_ncss_package.svg"
+               style="${ncss.home}/xslt/svg/chart_ncss_package.xsl"/>
+        <style in="${metrics.dir}/javancss.xml" out="${metrics.dir}/chart_function_package.svg"
+               style="${ncss.home}/xslt/svg/chart_function_package.xsl"/>
+
+    </target>
+
+
+</project>

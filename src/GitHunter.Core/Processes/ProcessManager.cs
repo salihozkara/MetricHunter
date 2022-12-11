@@ -23,6 +23,14 @@ public class ProcessManager : IProcessManager, IScopedDependency
         
         string? output = null;
         string? error = null;
+        
+        process.StartInfo.Arguments = arguments;
+        process.StartInfo.WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
+        process.StartInfo.UseShellExecute = false;
+        process.StartInfo.RedirectStandardOutput = true;
+        process.StartInfo.RedirectStandardError = true;
+        process.StartInfo.CreateNoWindow = true;
+        process.StartInfo.WindowStyle = ProcessWindowStyle.Normal;
 
         process.ErrorDataReceived += (sender, args) =>
         {
@@ -48,11 +56,13 @@ public class ProcessManager : IProcessManager, IScopedDependency
             tcs.SetResult(result);
         };
         
+        
+        
+        process.Start();
+        
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         
-        process.Start();
-
         _processes.Add(process);
 
         return tcs.Task;
@@ -102,10 +112,12 @@ public class ProcessManager : IProcessManager, IScopedDependency
             tcs.SetResult(result);
         };
         
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
+        
         
         process.Start();
+        
+        process.BeginOutputReadLine();
+        process.BeginErrorReadLine();
 
         _processes.Add(process);
 
@@ -124,7 +136,7 @@ public class ProcessManager : IProcessManager, IScopedDependency
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow = true
+                CreateNoWindow = true,
             },
             EnableRaisingEvents = true
         };

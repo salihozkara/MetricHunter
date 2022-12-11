@@ -1,0 +1,26 @@
+SourceMonitor (TM) Version 3.5
+
+Campwood Software LLC, Burlington, Vermont 05401. www.campwoodsw.com.
+Copyright © Campwood Software LLC. All Rights Reserved.
+
+Freeware License Agreement
+
+Please read the following terms and conditions before you use SourceMonitor Version 3.5.  Your use of this Freeware version of SourceMonitor indicates your acceptance of this license agreement and warranty.
+
+Permission
+
+Campwood Software LLC grants to you a limited, non-exclusive license to install and use SourceMonitor Version 3.5 in the form of a binary executable for your internal use only. That is, you may use this executable as part of your own software development endeavors (commercial or otherwise) but you may not sell it, either by itself or bundled with any other products. All Title, ownership rights, and intellectual property rights to SourceMonitor Version 3.5 belong to Campwood Software LLC. You are not permitted to modify the Software or attempt to decipher, decompile, disassemble or reverse engineer this product.
+
+Distribution
+
+You are hereby licensed to make as many copies of the Freeware version of SourceMonitor as you like and to give exact copies of this Freeware version to anyone in its unmodified form by any means, without any charge.
+
+You are specifically prohibited from charging, or requesting donations, for any such copies, however made; and from distributing the SourceMonitor software and/or documentation with other products (commercial or otherwise) without prior permission in writing from Campwood Software LLC.
+
+Governing Law
+
+This agreement shall be governed by the laws of the State of Vermont.
+
+Disclaimer of Warranty
+
+THIS SOFTWARE AND THE ACCOMPANYING FILES ARE PROVIDED "AS IS" AND WITHOUT WARRANTIES AS TO PERFORMANCE OR MERCHANTABILITY OR ANY OTHER WARRANTIES WHETHER EXPRESSED OR IMPLIED. Because of the many different hardware and software environments on which SourceMonitor may be operated, NO WARRANTY OF FITNESS FOR A PARTICULAR PURPOSE IS OFFERED.

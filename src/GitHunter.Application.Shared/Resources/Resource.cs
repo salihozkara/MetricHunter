@@ -46,18 +46,18 @@ public static class Resource
     public static class SourceMonitor
     {
         public static readonly ResValue<string> TemplateXml = new($"{DynamicResFolder}/SourceMonitor/template.xml",
-            $"{DynamicResFolder}/SourceMonitor/template.xml");
+            File.ReadAllText($"{DynamicResFolder}/SourceMonitor/template.xml"));
 
         public static ResValue<Process> SourceMonitorExe => new($"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe", new Process
         {
             StartInfo = new ProcessStartInfo
             {
-                FileName = $"{ResFolder}/SourceMonitor/SourceMonitor.exe",
+                FileName = "SourceMonitor.exe",
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 CreateNoWindow = true,
-                WorkingDirectory = $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe"
+                WorkingDirectory = $"{DynamicResFolder}/SourceMonitor"
             }
         });
     }

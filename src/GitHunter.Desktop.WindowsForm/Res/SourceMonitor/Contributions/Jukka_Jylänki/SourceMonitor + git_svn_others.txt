@@ -1,0 +1,10 @@
+A C# program is available that pulls source code file names from git and populates an XML file that can be used to define Checkpoints in SourceMonitor. The code is free.
+
+Note from Jukka Jylänki:
+
+Ok, I have now put up the C# code. It can be found here: https://github.com/juj/GitSourceMonitor
+ 
+I also implemented an incremental update mechanism that the tool won't try to always recreate each commit as a new checkpoint from scratch, but instead checks the project file date to detect where to continue updating.
+Thanks for the help on this, it made the effort quite fast and painless.
+ 
+   Jukka
