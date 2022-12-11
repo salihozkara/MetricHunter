@@ -8,6 +8,7 @@ using Range = Octokit.Range;
 
 namespace GitHunter.Application.Git;
 
+// TODO: GetRepositories and CloneRepositories should be in separate classes
 [ProcessDependency<GitProcessDependency>]
 public class GitManager : IGitManager, ITransientDependency
 {
@@ -149,6 +150,7 @@ public class GitManager : IGitManager, ITransientDependency
             results.Any(x => x.IncompleteResults));
     }
 
+    // TODO: Refactor this, get error repositories
     public async Task<GitOutput> TryGetRepositories(GitInput input, Action rateLimitCallBack2)
     {
         CancellationTokenSource cancellationTokenSource = new();

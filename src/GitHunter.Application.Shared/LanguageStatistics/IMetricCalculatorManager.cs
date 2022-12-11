@@ -2,9 +2,9 @@
 
 namespace GitHunter.Application.LanguageStatistics;
 
-public interface ILanguageStatisticsFactory
+public interface IMetricCalculatorManager
 {
-    ILanguageStatistics GetLanguageStatistics(Language language);
+    IMetricCalculator FindMetricCalculator(Language language);
     
     Language[] GetSupportedLanguages();
 }

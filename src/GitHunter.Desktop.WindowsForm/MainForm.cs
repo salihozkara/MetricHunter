@@ -8,12 +8,12 @@ namespace GitHunter.Desktop;
 public partial class MainForm : Form, ISingletonDependency
 {
     private readonly IGitManager _githubManager;
-    private readonly ILanguageStatisticsFactory _languageStatisticsFactory;
+    private readonly IMetricCalculatorManager _metricCalculatorManager;
 
-    public MainForm(IGitManager githubManager, ILanguageStatisticsFactory languageStatisticsFactory)
+    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager)
     {
         _githubManager = githubManager;
-        _languageStatisticsFactory = languageStatisticsFactory;
+        _metricCalculatorManager = metricCalculatorManager;
         Load += MainForm_Load;
 
         InitializeComponent();
@@ -32,7 +32,7 @@ public partial class MainForm : Form, ISingletonDependency
         });
 
         await _githubManager.CloneRepository(results.Repositories[0]);
-        var languageStatistics = _languageStatisticsFactory.GetLanguageStatistics(Language.CSharp);
-        await languageStatistics.GetStatisticsAsync(results.Repositories[0]);
+        var languageStatistics = _metricCalculatorManager.FindMetricCalculator(Language.CSharp);
+        await languageStatistics.CalculateMetricsAsync(results.Repositories[0]);
     }
 }

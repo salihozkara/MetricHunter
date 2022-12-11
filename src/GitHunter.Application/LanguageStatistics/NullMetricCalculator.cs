@@ -3,16 +3,16 @@ using Octokit;
 
 namespace GitHunter.Application.LanguageStatistics;
 
-public class NullLanguageStatistics : ILanguageStatistics
+public class NullMetricCalculator : IMetricCalculator
 {
-    private readonly ILogger<NullLanguageStatistics> _logger;
+    private readonly ILogger<NullMetricCalculator> _logger;
 
-    public NullLanguageStatistics(ILogger<NullLanguageStatistics> logger)
+    public NullMetricCalculator(ILogger<NullMetricCalculator> logger)
     {
         _logger = logger;
     }
 
-    public Task GetStatisticsAsync(Repository repository, CancellationToken token = default)
+    public Task CalculateMetricsAsync(Repository repository, CancellationToken token = default)
     {
         _logger.LogInformation("No language statistics available for {Repository}", repository.Name);
         return Task.CompletedTask;

@@ -1,16 +1,15 @@
-﻿using GitHunter.Application.Git;
-using GitHunter.Application.Resources;
+﻿using GitHunter.Application.Resources;
 using GitHunter.Core.DependencyProcesses;
 using GitHunter.Core.Helpers;
 using GitHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
 using Octokit;
 
-namespace GitHunter.Application.LanguageStatistics;
+namespace GitHunter.Application.LanguageStatistics.SourceMonitor;
 
 [Language(Language.CSharp, Language.CPlusPlus, Language.Java)]
 [ProcessDependency<SourceMonitorProcessDependency>]
-public class SourceMonitorLanguageStatistics : ILanguageStatistics
+public class SourceMonitorMetricCalculator : IMetricCalculator
 {
     private const string ProjectNameReplacement = "{{project_name}}";
     private const string ProjectDirectoryReplacement = "{{project_directory}}";
@@ -18,19 +17,19 @@ public class SourceMonitorLanguageStatistics : ILanguageStatistics
     private const string ProjectLanguageReplacement = "{{project_language}}";
     private const string ReportsPathReplacement = "{{reports_path}}";
 
-    private readonly ILogger<SourceMonitorLanguageStatistics> _logger;
+    private readonly ILogger<SourceMonitorMetricCalculator> _logger;
     private readonly IProcessManager _processManager;
 
 
-    public SourceMonitorLanguageStatistics(IProcessManager processManager,
-        ILogger<SourceMonitorLanguageStatistics> logger)
+    public SourceMonitorMetricCalculator(IProcessManager processManager,
+        ILogger<SourceMonitorMetricCalculator> logger)
     {
         _processManager = processManager;
         _logger = logger;
     }
 
 
-    public Task GetStatisticsAsync(Repository repository, CancellationToken token = default)
+    public Task CalculateMetricsAsync(Repository repository, CancellationToken token = default)
     {
         return ProcessRepository(repository, token);
     }

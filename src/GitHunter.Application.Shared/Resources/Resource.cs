@@ -9,6 +9,7 @@ using JsonNet.ContractResolvers;
 
 namespace GitHunter.Application.Resources;
 
+// TODO: Refactor
 public static class Resource
 {
     private const string ResFolder = "Res";

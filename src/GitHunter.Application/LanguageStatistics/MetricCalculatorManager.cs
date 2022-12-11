@@ -6,27 +6,27 @@ using Volo.Abp.DependencyInjection;
 
 namespace GitHunter.Application.LanguageStatistics;
 
-public class LanguageStatisticsFactory : ILanguageStatisticsFactory, ISingletonDependency
+public class MetricCalculatorManager : IMetricCalculatorManager, ISingletonDependency
 {
-    private readonly ILogger<LanguageStatisticsFactory> _logger;
+    private readonly ILogger<MetricCalculatorManager> _logger;
     private readonly IServiceProvider _serviceProvider;
 
-    public LanguageStatisticsFactory(IServiceProvider serviceProvider, ILogger<LanguageStatisticsFactory> logger)
+    public MetricCalculatorManager(IServiceProvider serviceProvider, ILogger<MetricCalculatorManager> logger)
     {
         _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
-    public ILanguageStatistics GetLanguageStatistics(Language language)
+    public IMetricCalculator FindMetricCalculator(Language language)
     {
-        var languageStatistics = _serviceProvider.GetRequiredService<IEnumerable<ILanguageStatistics>>()
+        var languageStatistics = _serviceProvider.GetRequiredService<IEnumerable<IMetricCalculator>>()
             .SingleOrDefault(t =>
                 t.GetType().GetCustomAttribute<LanguageAttribute>()?.Languages.Contains(language) ?? false);
 
         if (languageStatistics == null)
         {
             _logger.LogWarning($"No language statistics found for language {language}");
-            return _serviceProvider.GetRequiredService<NullLanguageStatistics>();
+            return _serviceProvider.GetRequiredService<NullMetricCalculator>();
         }
 
         return languageStatistics;
@@ -34,7 +34,7 @@ public class LanguageStatisticsFactory : ILanguageStatisticsFactory, ISingletonD
 
     public Language[] GetSupportedLanguages()
     {
-        return _serviceProvider.GetRequiredService<IEnumerable<ILanguageStatistics>>()
+        return _serviceProvider.GetRequiredService<IEnumerable<IMetricCalculator>>()
             .SelectMany(t => t.GetType().GetCustomAttribute<LanguageAttribute>()?.Languages ?? Array.Empty<Language>())
             .Distinct()
             .ToArray();
