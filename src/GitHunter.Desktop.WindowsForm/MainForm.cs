@@ -10,7 +10,7 @@ public partial class MainForm : Form, ISingletonDependency
     private readonly IGitManager _githubManager;
     private readonly IGitManager _githubManager2;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
-    private GitOutput? result;
+    private GitOutput? _result;
 
     public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager, IGitManager githubManager2)
     {
@@ -52,33 +52,29 @@ public partial class MainForm : Form, ISingletonDependency
             gitInput.Count = repositoryCount;
         }
         
-        result = await _githubManager.GetRepositories(gitInput);
+        _result = await _githubManager.GetRepositories(gitInput);
 
-        repositoryDataGrid.DataSource = result.Repositories;
+        repositoryDataGrid.DataSource = _result.Repositories;
     }
 
     private async void downloadButton_Click(object sender, EventArgs e)
     {
-        if (result != null)
-            foreach (var item in result.Repositories)
-            {
-                await _githubManager.CloneRepository(item);
-            }
+        if (_result == null) return;
+        foreach (var item in _result.Repositories)
+        {
+            await _githubManager.CloneRepository(item);
+        }
     }
 
     private async void calculateMetricButton_Click(object sender, EventArgs e)
     {
-        var selectedLanguage = (languageComboBox.SelectedValue as Language?);
+        if (languageComboBox.SelectedValue is not Language selectedLanguage) return;
+        var manager = _metricCalculatorManager.FindMetricCalculator(selectedLanguage);
 
-        if (selectedLanguage != null)
+        if (_result == null) return;
+        foreach (var item in _result.Repositories)
         {
-            var manager = _metricCalculatorManager.FindMetricCalculator(selectedLanguage.Value);
-
-            if (result != null)
-                foreach (var item in result.Repositories)
-                {
-                    await manager.CalculateMetricsAsync(item);
-                }
+            await manager.CalculateMetricsAsync(item);
         }
     }
 }
