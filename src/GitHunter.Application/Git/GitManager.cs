@@ -14,12 +14,33 @@ public class GitManager : IGitManager, ITransientDependency
 {
     private readonly ILogger<GitManager> _logger;
     private readonly IProcessManager _processManager;
+    private readonly Dictionary<SearchRepositoriesRequest, Exception?> _errorSearchRepositoriesRequests = new();
+    private readonly Dictionary<SearchRepositoriesRequest, IReadOnlyList<Repository>> _successRepositories = new();
     private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
+
+
+    public event EventHandler<SearchRepositoriesRequestErrorEventArgs>? SearchRepositoriesRequestError;
+    public event EventHandler<SearchRepositoriesRequestSuccessEventArgs>? SearchRepositoriesRequestSuccess;
 
     public GitManager(ILogger<GitManager> logger, IProcessManager processManager)
     {
         _logger = logger;
         _processManager = processManager;
+
+        SearchRepositoriesRequestError += OnSearchRepositoriesRequestError;
+        SearchRepositoriesRequestSuccess += OnSearchRepositoriesRequestSuccess;
+    }
+
+    private void OnSearchRepositoriesRequestSuccess(object? sender, SearchRepositoriesRequestSuccessEventArgs e)
+    {
+        _errorSearchRepositoriesRequests.Remove(e.SearchRepositoriesRequest);
+        _successRepositories.Add(e.SearchRepositoriesRequest, e.Repositories);
+    }
+
+    private void OnSearchRepositoriesRequestError(object? sender, SearchRepositoriesRequestErrorEventArgs e)
+    {
+        _logger.LogError(e.Exception, "Error while searching repositories");
+        _errorSearchRepositoriesRequests.Add(e.SearchRepositoriesRequest, e.Exception);
     }
 
     private static void Initialize(Credentials? credentials = null)
@@ -29,6 +50,9 @@ public class GitManager : IGitManager, ITransientDependency
             Client.Credentials = credentials;
         }
     }
+
+    public IReadOnlyList<Repository> GetAllSuccessRepositories() =>
+        _successRepositories.Values.SelectMany(x => x).ToList();
 
     // TODO: Add path to parameters
     public async Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
@@ -46,20 +70,21 @@ public class GitManager : IGitManager, ITransientDependency
         {
             try
             {
-                var files = Directory.GetFiles(repositoryPath, "*", SearchOption.AllDirectories).Select(f=>new FileInfo(f));
-                
+                var files = Directory.GetFiles(repositoryPath, "*", SearchOption.AllDirectories)
+                    .Select(f => new FileInfo(f));
+
                 foreach (var file in files)
                 {
                     file.Delete();
                 }
-                
-                var directories = Directory.GetDirectories(repositoryPath, "*", SearchOption.AllDirectories).Select(f=>new DirectoryInfo(f));
-                
+
+                var directories = Directory.GetDirectories(repositoryPath, "*", SearchOption.AllDirectories)
+                    .Select(f => new DirectoryInfo(f));
+
                 foreach (var directory in directories)
                 {
                     directory.Delete(true);
                 }
-                
             }
             catch (Exception e)
             {
@@ -97,49 +122,40 @@ public class GitManager : IGitManager, ITransientDependency
         return result.ExitCode == 0;
     }
 
-    public async Task<GitOutput> GetRepositories(GitInput input, Action rateLimitCallBack2)
+    public async Task<GitOutput> GetRepositories(GitInput input)
     {
         CancellationTokenSource cancellationTokenSource = new();
-        CancellationToken cancellationToken = cancellationTokenSource.Token;
-        var rateLimitCallBack = () => { cancellationTokenSource.Cancel(); };
 
-        rateLimitCallBack += rateLimitCallBack2;
-
-
-        var inputRanges = Enumerable.Range(1, input.Count)
-            .GroupBy(x => x / 1000)
-            .Select(x => x.Select(i => i % 1000).Where(i => i > 1).ToList())
-            .ToList();
-
-        // inputRanges[0].RemoveAt(0);
+        var inputRanges = GetInputRanges(input.Count);
 
         var results = new List<SearchRepositoryResult>();
 
         var range = Range.LessThanOrEquals(int.MaxValue);
 
+        var requests = new List<SearchRepositoriesRequest>();
+
         foreach (var inputRange in inputRanges)
         {
-            var firstPage = await TaskRun(CreateTask(input, 1, range), rateLimitCallBack,
-                cancellationToken);
+            var request = CreateRequest(input, 1, range);
+            var firstPage = await TaskRun(request,
+                cancellationTokenSource);
 
-            if (cancellationToken.IsCancellationRequested)
+            if (cancellationTokenSource.IsCancellationRequested)
                 break;
 
-            var tasks = new List<Task<SearchRepositoryResult?>>();
+            // foreach (var index in inputRange.Take(firstPage!.TotalCount / 100))
+            // {
+            //     requests.Add(CreateRequest(input, index, range));
+            // }
+            requests.AddRange(inputRange.Take(firstPage!.TotalCount / 100)
+                .Select(index => CreateRequest(input, index, range)));
 
-            foreach (var index in inputRange.Take(firstPage!.TotalCount / 100))
-            {
-                tasks.Add(CreateTask(input, index,
-                    range));
-            }
-
-            var inputResults = await Task.WhenAll(tasks.Select(x => TaskRun(x, rateLimitCallBack, cancellationToken)));
-            results.AddRange(inputResults.Append(firstPage).Where(x => x != null)!);
+            await AddRequestResult(requests, cancellationTokenSource, results, firstPage);
 
             if (results.Any(x => x.IncompleteResults))
                 break;
 
-            if (cancellationToken.IsCancellationRequested)
+            if (cancellationTokenSource.IsCancellationRequested)
                 break;
 
             range = input.Order == SortDirection.Descending
@@ -151,49 +167,66 @@ public class GitManager : IGitManager, ITransientDependency
             results.Any(x => x.IncompleteResults));
     }
 
-    // TODO: Refactor this, get error repositories
-    public async Task<GitOutput> TryGetRepositories(GitInput input, Action rateLimitCallBack2)
+    private static List<List<int>> GetInputRanges(int count)
+    {
+        return Enumerable.Range(1, count)
+            .GroupBy(x => x / 1000)
+            .Select(x => x.Select(i => i % 1000).Where(i => i > 1).ToList())
+            .ToList();
+    }
+
+    private async Task AddRequestResult(List<SearchRepositoriesRequest> requests,
+        CancellationTokenSource cancellationTokenSource,
+        List<SearchRepositoryResult> results, SearchRepositoryResult? firstPage)
+    {
+        var inputResults = await Task.WhenAll(requests.Select(x => TaskRun(x, cancellationTokenSource)));
+        results.AddRange(inputResults.Append(firstPage).Where(x => x != null)!);
+    }
+
+    public async Task<GitOutput> RetryFailedRequest()
     {
         CancellationTokenSource cancellationTokenSource = new();
-        CancellationToken cancellationToken = cancellationTokenSource.Token;
-        var rateLimitCallBack = () => { cancellationTokenSource.Cancel(); };
 
-        rateLimitCallBack += rateLimitCallBack2;
+        var results = new List<SearchRepositoryResult>();
 
-        var tasks = _errorSearchRepositoriesRequests.Values.Select(value =>
-            TaskRun(Client.Search.SearchRepo(value), rateLimitCallBack, cancellationToken)).ToList();
+        var requests = _errorSearchRepositoriesRequests.Keys.ToList();
 
         _errorSearchRepositoriesRequests.Clear();
 
-        var inputResults = await Task.WhenAll(tasks);
-        inputResults = inputResults.Where(i => i != null).ToArray();
+        await AddRequestResult(requests, cancellationTokenSource, results,
+            null!);
 
-        return new GitOutput(inputResults.SelectMany(t => t!.Items).ToList(),
-            inputResults[0]!.TotalCount,
-            inputResults.Any(x => x is { IncompleteResults: true }));
+        return new GitOutput(results.SelectMany(t => t.Items).ToList(), results[0].TotalCount,
+            results.Any(x => x is { IncompleteResults: true }));
     }
 
-    private async Task<SearchRepositoryResult?> TaskRun(Task<SearchRepositoryResult?> task, Action rateLimitCallBack,
-        CancellationToken cancellationToken = default)
+    private async Task<SearchRepositoryResult?> TaskRun(SearchRepositoriesRequest request,
+        CancellationTokenSource cancellationTokenSource)
     {
-        if (cancellationToken.IsCancellationRequested)
+        if (cancellationTokenSource.IsCancellationRequested)
             return null;
 
         SearchRepositoryResult? result;
 
+        var task = CreateTask(request);
         try
         {
             result = await task;
-            _errorSearchRepositoriesRequests.Remove(task);
+            if (result == null)
+            {
+                OnSearchRepositoriesRequestError(
+                    new SearchRepositoriesRequestErrorEventArgs(request, cancellationTokenSource, task.Exception));
+            }
+            else
+            {
+                OnSearchRepositoriesRequestSuccess(
+                    new SearchRepositoriesRequestSuccessEventArgs(request, result.Items));
+            }
         }
         catch (Exception e)
         {
-            if (cancellationToken.IsCancellationRequested)
-                return null;
-            if (e.Message.Contains("API rate limit exceeded"))
-            {
-                rateLimitCallBack();
-            }
+            OnSearchRepositoriesRequestError(
+                new SearchRepositoriesRequestErrorEventArgs(request, cancellationTokenSource, e));
 
             result = null;
         }
@@ -201,9 +234,13 @@ public class GitManager : IGitManager, ITransientDependency
         return result;
     }
 
-    private readonly Dictionary<Task, SearchRepositoriesRequest> _errorSearchRepositoriesRequests = new();
 
-    private Task<SearchRepositoryResult?> CreateTask(GitInput input, int page, Range stars)
+    private Task<SearchRepositoryResult?> CreateTask(SearchRepositoriesRequest request)
+    {
+        return Client.Search.SearchRepo(request);
+    }
+
+    private SearchRepositoriesRequest CreateRequest(GitInput input, int page, Range stars)
     {
         var request = new SearchRepositoriesRequest
         {
@@ -215,9 +252,7 @@ public class GitManager : IGitManager, ITransientDependency
             PerPage = input.Count < 100 ? input.Count : 100,
             Order = input.Order
         };
-        var task = Client.Search.SearchRepo(request);
-        _errorSearchRepositoriesRequests.Add(task, request);
-        return task;
+        return request;
     }
 
     public void Initialize(string username, string password)
@@ -228,5 +263,16 @@ public class GitManager : IGitManager, ITransientDependency
     public void Initialize(string token)
     {
         Initialize(new Credentials(token));
+    }
+
+    protected virtual void OnSearchRepositoriesRequestError(SearchRepositoriesRequestErrorEventArgs e)
+    {
+        e.CancellationTokenSource.Cancel();
+        SearchRepositoriesRequestError?.Invoke(this, e);
+    }
+
+    protected virtual void OnSearchRepositoriesRequestSuccess(SearchRepositoriesRequestSuccessEventArgs e)
+    {
+        SearchRepositoriesRequestSuccess?.Invoke(this, e);
     }
 }
