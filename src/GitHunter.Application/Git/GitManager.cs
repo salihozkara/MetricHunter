@@ -30,6 +30,7 @@ public class GitManager : IGitManager, ITransientDependency
         }
     }
 
+    // TODO: Add path to parameters
     public async Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
     {
         if (token.IsCancellationRequested)
