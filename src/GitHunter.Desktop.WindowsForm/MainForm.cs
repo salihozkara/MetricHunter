@@ -8,15 +8,13 @@ namespace GitHunter.Desktop;
 public partial class MainForm : Form, ISingletonDependency
 {
     private readonly IGitManager _githubManager;
-    private readonly IGitManager _githubManager2;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private GitOutput? _result;
 
-    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager, IGitManager githubManager2)
+    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager)
     {
         _githubManager = githubManager;
         _metricCalculatorManager = metricCalculatorManager;
-        _githubManager2 = githubManager2;
         Load += MainForm_Load;
         _githubManager.SearchRepositoriesRequestError += GithubManager_SearchRepositoriesRequestError;
         _githubManager.SearchRepositoriesRequestSuccess += GithubManager_SearchRepositoriesRequestSuccess;
