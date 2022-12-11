@@ -8,16 +8,29 @@ namespace GitHunter.Desktop;
 public partial class MainForm : Form, ISingletonDependency
 {
     private readonly IGitManager _githubManager;
+    private readonly IGitManager _githubManager2;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private GitOutput? result;
 
-    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager)
+    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager, IGitManager githubManager2)
     {
         _githubManager = githubManager;
         _metricCalculatorManager = metricCalculatorManager;
+        _githubManager2 = githubManager2;
         Load += MainForm_Load;
-
+        _githubManager.SearchRepositoriesRequestError += GithubManager_SearchRepositoriesRequestError;
+        _githubManager.SearchRepositoriesRequestSuccess += GithubManager_SearchRepositoriesRequestSuccess;
         InitializeComponent();
+    }
+
+    private void GithubManager_SearchRepositoriesRequestSuccess(object? sender, SearchRepositoriesRequestSuccessEventArgs e)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void GithubManager_SearchRepositoriesRequestError(object? sender, SearchRepositoriesRequestErrorEventArgs e)
+    {
+        throw new NotImplementedException();
     }
 
     private void MainForm_Load(object? sender, EventArgs e)
@@ -39,10 +52,7 @@ public partial class MainForm : Form, ISingletonDependency
             gitInput.Count = repositoryCount;
         }
         
-        result = await _githubManager.GetRepositories(gitInput, () =>
-        {
-            MessageBox.Show("Rate limit exceeded!");
-        });
+        result = await _githubManager.GetRepositories(gitInput);
 
         repositoryDataGrid.DataSource = result.Repositories;
     }
