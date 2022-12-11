@@ -17,13 +17,16 @@ public class CoreModule : GitHunterModule
         {
             var processDependencyChecker = scope.ServiceProvider.GetRequiredService<IProcessDependencyChecker>();
             var processDependencyOptions = scope.ServiceProvider.GetRequiredService<IOptions<ProcessDependencyOptions>>().Value;
-            var modules = ModuleHelper.FindGitHunterModuleTypes(processDependencyOptions.StartupModule);
-                
-            foreach (var assembly in modules.Select(m=>m.Assembly))
+            if (processDependencyOptions.StartupModule != null)
             {
-                if (!processDependencyChecker.CheckDependency(assembly))
+                var modules = ModuleHelper.FindGitHunterModuleTypes(processDependencyOptions.StartupModule);
+                
+                foreach (var assembly in modules.Select(m=>m.Assembly))
                 {
-                    processDependencyOptions.ErrorAction?.Invoke();
+                    if (!processDependencyChecker.CheckDependency(assembly))
+                    {
+                        processDependencyOptions.ErrorAction?.Invoke();
+                    }
                 }
             }
         }

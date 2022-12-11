@@ -16,4 +16,12 @@ public class TaskManager
             }
         });
     }
+    
+    public void CancelAllTasks()
+    {
+        foreach (var t in _tasks.SelectMany(task => task.Value))
+        {
+            t.Dispose();
+        }
+    }
 }

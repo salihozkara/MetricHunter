@@ -3,7 +3,7 @@
 
 public abstract class ProcessDependencyAttribute : Attribute
 {
-    public Type DependencyProcess { get; protected set; }
+    public Type? DependencyProcess { get; protected init; }
 }
 
 [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
