@@ -1,6 +1,4 @@
-﻿using GitHunter.Core.DependencyProcesses;
-
-namespace GitHunter.Application.Git;
+﻿namespace GitHunter.Application.Git;
 
 public class GitProcessDependency : IGitProcessDependency
 {
@@ -10,8 +8,4 @@ public class GitProcessDependency : IGitProcessDependency
         var paths = environmentVariable?.Split(';');
         return paths != null && paths.Any(path => File.Exists(Path.Combine(path, "git.exe")));
     }
-}
-
-public interface IGitProcessDependency : IProcessDependency
-{
 }

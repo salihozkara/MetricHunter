@@ -14,4 +14,10 @@
       <ProjectReference Include="..\GitHunter.Desktop.Shared\GitHunter.Desktop.Shared.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+        <Content Include="Res\**\*.*">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Content>
+    </ItemGroup>
+
 </Project>
