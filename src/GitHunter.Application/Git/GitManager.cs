@@ -1,6 +1,4 @@
-﻿using GitHunter.Core.DependencyProcesses;
-using GitHunter.Core.Helpers;
-using GitHunter.Core.Processes;
+﻿using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Octokit;
 using Volo.Abp.DependencyInjection;
@@ -8,39 +6,43 @@ using Range = Octokit.Range;
 
 namespace GitHunter.Application.Git;
 
-// TODO: GetRepositories and CloneRepositories should be in separate classes
-[ProcessDependency<GitProcessDependency>]
 public class GitManager : IGitManager, ITransientDependency
 {
     private readonly ILogger<GitManager> _logger;
-    private readonly IProcessManager _processManager;
-    private readonly Dictionary<SearchRepositoriesRequest, Exception?> _errorSearchRepositoriesRequests = new();
-    private readonly Dictionary<SearchRepositoriesRequest, IReadOnlyList<Repository>> _successRepositories = new();
-    private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
 
+    private readonly List<List<SearchRepositoriesRequest>> _waitSearchRepositoriesRequests = new();
+
+    private readonly ConcurrentDictionary<SearchRepositoriesRequest, Exception?> _errorSearchRepositoriesRequests =
+        new();
+
+    private readonly ConcurrentDictionary<SearchRepositoriesRequest, IReadOnlyList<Repository>> _successRepositories =
+        new();
+
+    private Range _range = Range.LessThanOrEquals(int.MaxValue);
+
+    private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
 
     public event EventHandler<SearchRepositoriesRequestErrorEventArgs>? SearchRepositoriesRequestError;
     public event EventHandler<SearchRepositoriesRequestSuccessEventArgs>? SearchRepositoriesRequestSuccess;
+    public event EventHandler<SearchRepositoriesRequestFinishedEventArgs>? SearchRepositoriesRequestFinished;
 
-    public GitManager(ILogger<GitManager> logger, IProcessManager processManager)
+    public GitManager(ILogger<GitManager> logger)
     {
         _logger = logger;
-        _processManager = processManager;
-
         SearchRepositoriesRequestError += OnSearchRepositoriesRequestError;
         SearchRepositoriesRequestSuccess += OnSearchRepositoriesRequestSuccess;
     }
 
     private void OnSearchRepositoriesRequestSuccess(object? sender, SearchRepositoriesRequestSuccessEventArgs e)
     {
-        _errorSearchRepositoriesRequests.Remove(e.SearchRepositoriesRequest);
-        _successRepositories.Add(e.SearchRepositoriesRequest, e.Repositories);
+        _errorSearchRepositoriesRequests.TryRemove(e.SearchRepositoriesRequest, out _);
+        _successRepositories.TryAdd(e.SearchRepositoriesRequest, e.Repositories);
     }
 
     private void OnSearchRepositoriesRequestError(object? sender, SearchRepositoriesRequestErrorEventArgs e)
     {
         _logger.LogError(e.Exception, "Error while searching repositories");
-        _errorSearchRepositoriesRequests.Add(e.SearchRepositoriesRequest, e.Exception);
+        _errorSearchRepositoriesRequests.TryAdd(e.SearchRepositoriesRequest, e.Exception);
     }
 
     private static void Initialize(Credentials? credentials = null)
@@ -50,137 +52,73 @@ public class GitManager : IGitManager, ITransientDependency
             Client.Credentials = credentials;
         }
     }
+    
+    public void Clear()
+    {
+        _waitSearchRepositoriesRequests.Clear();
+        _errorSearchRepositoriesRequests.Clear();
+        _successRepositories.Clear();
+        _range = Range.LessThanOrEquals(int.MaxValue);
+    }
 
-    public IReadOnlyList<Repository> GetAllSuccessRepositories() =>
+    public IReadOnlyList<Repository> GetAllSuccessRepositories =>
         _successRepositories.Values.SelectMany(x => x).ToList();
 
-    // TODO: Add path to parameters
-    public async Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
-    {
-        if (token.IsCancellationRequested)
-        {
-            return false;
-        }
-
-        _logger.LogInformation($"Cloning {repository.FullName}...");
-        var path = PathHelper.BuildAndCreateFullPath(repository.Language, "Repositories", repository.Owner.Login);
-
-        var repositoryPath = Path.Combine(path, repository.Name);
-        if (Directory.Exists(repositoryPath))
-        {
-            try
-            {
-                var files = Directory.GetFiles(repositoryPath, "*", SearchOption.AllDirectories)
-                    .Select(f => new FileInfo(f));
-
-                foreach (var file in files)
-                {
-                    file.Delete();
-                }
-
-                var directories = Directory.GetDirectories(repositoryPath, "*", SearchOption.AllDirectories)
-                    .Select(f => new DirectoryInfo(f));
-
-                foreach (var directory in directories)
-                {
-                    directory.Delete(true);
-                }
-            }
-            catch (Exception e)
-            {
-                _logger.LogError(e, $"Failed to delete {repositoryPath}");
-            }
-            // var directoryInfo = new DirectoryInfo(repositoryPath);
-            // var dirs = directoryInfo.GetDirectories().Where(d => d.Name != ".git").ToList();
-            // var dirSize =
-            //     dirs.Sum(d => d.EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length)) / 1024;
-            // if (dirSize < repository.Size)
-            // {
-            //     _logger.LogInformation(
-            //         $"Repository {repository.FullName} already exists, but is smaller than expected. Deleting and cloning again...");
-            //     Directory.Delete(repositoryPath, true);
-            // }
-            // else
-            // {
-            //     _logger.LogInformation($"Repository {repository.FullName} already exists. Skipping...");
-            //     return true;
-            // }
-        }
-
-        var result = await _processManager.RunAsync("git", $"clone -c core.longpaths=true {repository.CloneUrl}", path);
-
-        if (result.ExitCode == 0)
-        {
-            _logger.LogInformation($"Cloned {repository.FullName} successfully.");
-        }
-        else
-        {
-            _logger.LogError($"Failed to clone {repository.FullName}.");
-            token.ThrowIfCancellationRequested();
-        }
-
-        return result.ExitCode == 0;
-    }
 
     public async Task<GitOutput> GetRepositories(GitInput input)
     {
         CancellationTokenSource cancellationTokenSource = new();
 
-        var inputRanges = GetInputRanges(input.Count);
+        var inputRanges = GetInputRanges(input.Count, out var lastPerPage);
 
         var results = new List<SearchRepositoryResult>();
 
-        var range = Range.LessThanOrEquals(int.MaxValue);
+        _range = Range.LessThanOrEquals(int.MaxValue);
 
-        var requests = new List<SearchRepositoriesRequest>();
+        var requests = inputRanges.Select(x => x.Select(x2 => CreateRequest(input, x2, _range)).ToList()).ToList();
+        requests.Last().Last().PerPage = lastPerPage;
 
-        foreach (var inputRange in inputRanges)
+        _waitSearchRepositoriesRequests.AddRange(requests);
+
+        foreach (var request in requests)
         {
-            var request = CreateRequest(input, 1, range);
-            var firstPage = await TaskRun(request,
-                cancellationTokenSource);
-
+            await AddRequestResult(request, cancellationTokenSource, results);
+            _waitSearchRepositoriesRequests.Remove(request);
             if (cancellationTokenSource.IsCancellationRequested)
                 break;
-
-            // foreach (var index in inputRange.Take(firstPage!.TotalCount / 100))
-            // {
-            //     requests.Add(CreateRequest(input, index, range));
-            // }
-            requests.AddRange(inputRange.Take(firstPage!.TotalCount / 100)
-                .Select(index => CreateRequest(input, index, range)));
-
-            await AddRequestResult(requests, cancellationTokenSource, results, firstPage);
-
-            if (results.Any(x => x.IncompleteResults))
-                break;
-
-            if (cancellationTokenSource.IsCancellationRequested)
-                break;
-
-            range = input.Order == SortDirection.Descending
-                ? Range.LessThanOrEquals(results.Min(x => x.Items.Min(repository => repository.StargazersCount)))
-                : Range.GreaterThanOrEquals(results.Max(x => x.Items.Max(repository => repository.StargazersCount)));
         }
 
-        return new GitOutput(results.SelectMany(t => t.Items).ToList(), results[0].TotalCount,
+        var resultItems = results.SelectMany(x => x.Items).ToList();
+        var totalCount = results.Any() ? results.Max(x => x.TotalCount) : 0;
+        OnSearchRepositoriesRequestFinished(new SearchRepositoriesRequestFinishedEventArgs(
+            resultItems, _errorSearchRepositoriesRequests.Keys.ToList(), _waitSearchRepositoriesRequests));
+        return new GitOutput(resultItems, totalCount,
             results.Any(x => x.IncompleteResults));
     }
 
-    private static List<List<int>> GetInputRanges(int count)
+    private async Task AddRequestResult(List<SearchRepositoriesRequest> requests,
+        CancellationTokenSource cancellationTokenSource, List<SearchRepositoryResult> results)
     {
-        return Enumerable.Range(1, count)
-            .GroupBy(x => x / 1000)
-            .Select(x => x.Select(i => i % 1000).Where(i => i > 1).ToList())
-            .ToList();
+        var tasks = requests.Select(x => TaskRun(x, cancellationTokenSource)).ToList();
+        var results2 = await Task.WhenAll(tasks);
+        var nonNullResults = results2.Where(x => x != null).Select(r => r!).ToList();
+        results.AddRange(nonNullResults);
+        if (nonNullResults.Any())
+        {
+            _range = requests[0].Order == SortDirection.Descending
+                ? Range.LessThanOrEquals(results.Min(x => x.Items.Min(repository => repository.StargazersCount)))
+                : Range.GreaterThanOrEquals(results.Max(x => x.Items.Max(repository => repository.StargazersCount)));
+        }
     }
 
-    private async Task AddRequestResult(List<SearchRepositoriesRequest> requests,
-        CancellationTokenSource cancellationTokenSource,
-        List<SearchRepositoryResult> results, SearchRepositoryResult? firstPage)
+    private static List<List<int>> GetInputRanges(int count, out int lastPerPage)
     {
-        var inputResults = await Task.WhenAll(requests.Select(x => TaskRun(x, cancellationTokenSource)));
-        results.AddRange(inputResults.Append(firstPage).Where(x => x != null)!);
+        lastPerPage = count % 100;
+        count /= 100;
+        return Enumerable.Range(1, count + 1)
+            .GroupBy(x => x / 11)
+            .Select(x => x.Select(i => i % 11).Where(i => i > 0).ToList())
+            .ToList();
     }
 
     public async Task<GitOutput> RetryFailedRequest()
@@ -191,12 +129,24 @@ public class GitManager : IGitManager, ITransientDependency
 
         var requests = _errorSearchRepositoriesRequests.Keys.ToList();
 
-        _errorSearchRepositoriesRequests.Clear();
+        await AddRequestResult(requests, cancellationTokenSource, results);
 
-        await AddRequestResult(requests, cancellationTokenSource, results,
-            null!);
+        var waitRequests = _waitSearchRepositoriesRequests.Select(x => x).ToList();
 
-        return new GitOutput(results.SelectMany(t => t.Items).ToList(), results[0].TotalCount,
+        foreach (var waitSearchRepositoriesRequest in waitRequests)
+        {
+            if (cancellationTokenSource.IsCancellationRequested)
+                break;
+            await AddRequestResult(waitSearchRepositoriesRequest, cancellationTokenSource, results);
+            _waitSearchRepositoriesRequests.Remove(waitSearchRepositoriesRequest);
+        }
+
+        var resultItems = results.Where(r => r is { Items: { } }).SelectMany(x => x.Items).ToList();
+        var totalCount = results.Count == 0 ? 0 : results.Max(x => x.TotalCount);
+        OnSearchRepositoriesRequestFinished(new SearchRepositoriesRequestFinishedEventArgs(
+            resultItems, _errorSearchRepositoriesRequests.Keys.ToList(), _waitSearchRepositoriesRequests));
+
+        return new GitOutput(resultItems, totalCount,
             results.Any(x => x is { IncompleteResults: true }));
     }
 
@@ -274,5 +224,10 @@ public class GitManager : IGitManager, ITransientDependency
     protected virtual void OnSearchRepositoriesRequestSuccess(SearchRepositoriesRequestSuccessEventArgs e)
     {
         SearchRepositoriesRequestSuccess?.Invoke(this, e);
+    }
+
+    protected virtual void OnSearchRepositoriesRequestFinished(SearchRepositoriesRequestFinishedEventArgs e)
+    {
+        SearchRepositoriesRequestFinished?.Invoke(this, e);
     }
 }

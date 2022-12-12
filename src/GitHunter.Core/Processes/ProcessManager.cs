@@ -1,9 +1,10 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Volo.Abp.DependencyInjection;
 
 namespace GitHunter.Core.Processes;
 
-public class ProcessManager : IProcessManager, IScopedDependency
+public class ProcessManager : IProcessManager, ISingletonDependency
 {
     private readonly List<Process> _processes = new();
 
@@ -145,11 +146,15 @@ public class ProcessManager : IProcessManager, IScopedDependency
     public Task<bool> KillAllProcessesAsync()
     {
         _killAllProcessesRequested = true;
-        foreach (var process in _processes.Where(process => !process.HasExited))
+        var processes = _processes.Where(process => !process.HasExited).ToImmutableArray();
+        foreach (var process in processes)
         {
-            process.Kill();
+            process.Kill(true);
+            process.WaitForExit();
+            process.Close();
+            process.Dispose();
+            _processes.Remove(process);
         }
-
         return Task.FromResult(true);
     }
 }

@@ -1,3 +1,4 @@
+using GitHunter.Core.Processes;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -34,6 +35,9 @@ public class Program
         
         System.Windows.Forms.Application.Run(mainForm);
         
+        var processManager = application.ServiceProvider
+            .GetRequiredService<IProcessManager>();
+        await processManager.KillAllProcessesAsync();
         await application.ShutdownAsync();
     }
 }
