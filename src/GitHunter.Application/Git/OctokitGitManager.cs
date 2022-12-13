@@ -91,7 +91,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
 
     private async Task RunRequests(IEnumerable<SearchRepositoriesRequest> requests)
     {
-        var tasks = requests.Select(x => Task.Run(async () => { await RunRequest(x); }));
+        var tasks = requests.Select(RunRequest);
 
         await RateLimitWait();
 
@@ -156,7 +156,8 @@ public class OctokitGitManager : IGitManager, ITransientDependency
                     var resetTime = rateLimits.Resources.Search.Reset;
                     var waitTime = resetTime - DateTimeOffset.Now;
                     _logger.LogWarning("Rate limit exceeded, waiting {0} seconds", waitTime.TotalSeconds);
-                    await Task.Delay(waitTime);
+                    if(waitTime.TotalSeconds > 0)
+                        await Task.Delay(waitTime);
                     _logger.LogWarning("Rate limit reset");
                 }
             }
