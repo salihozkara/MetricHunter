@@ -5,20 +5,16 @@ using Volo.Abp.Modularity;
 
 namespace GitHunter.Desktop;
 
-[DependsOn(typeof(DesktopSharedModule), 
+[DependsOn(typeof(DesktopSharedModule),
     typeof(ApplicationModule))]
 public class DesktopWindowsFormModule : GitHunterModule
 {
-
     public override void ConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<ProcessDependencyOptions>(o=>
+        Configure<ProcessDependencyOptions>(o =>
         {
             o.StartupModule = typeof(DesktopWindowsFormModule);
-            o.ErrorAction = () =>
-            {
-                MessageBox.Show("Error");
-            };
+            o.ErrorAction = () => { MessageBox.Show("Error"); };
         });
 
         base.ConfigureServices(context);
@@ -26,7 +22,7 @@ public class DesktopWindowsFormModule : GitHunterModule
 
     public override void PreConfigureServices(ServiceConfigurationContext context)
     {
-        Configure<ProcessDependencyOptions>(o=>o.StartupModule = typeof(DesktopWindowsFormModule));
+        Configure<ProcessDependencyOptions>(o => o.StartupModule = typeof(DesktopWindowsFormModule));
 
         base.PreConfigureServices(context);
     }

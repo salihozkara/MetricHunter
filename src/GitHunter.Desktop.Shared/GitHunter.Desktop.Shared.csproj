@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj" />
+        <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj"/>
     </ItemGroup>
 
 </Project>

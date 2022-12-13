@@ -7,10 +7,9 @@ internal static class ModuleHelper
 {
     public static IEnumerable<Type> FindGitHunterModuleTypes(Type startupModuleType)
     {
-        if(!GitHunterModule.IsGitHunterModule(startupModuleType))
-        {
-            throw new ArgumentException("Given type is not an GitHunter module: " + startupModuleType.AssemblyQualifiedName);
-        }
+        if (!GitHunterModule.IsGitHunterModule(startupModuleType))
+            throw new ArgumentException("Given type is not an GitHunter module: " +
+                                        startupModuleType.AssemblyQualifiedName);
         var moduleTypes = new List<Type>();
         AddModuleAndDependenciesRecursively(moduleTypes, startupModuleType);
         return moduleTypes;
@@ -25,12 +24,8 @@ internal static class ModuleHelper
             .OfType<IDependedTypesProvider>();
 
         foreach (var descriptor in dependencyDescriptors)
-        {
-            foreach (var dependedModuleType in descriptor.GetDependedTypes())
-            {
-                dependencies.AddIfNotContains(dependedModuleType);
-            }
-        }
+        foreach (var dependedModuleType in descriptor.GetDependedTypes())
+            dependencies.AddIfNotContains(dependedModuleType);
 
         return dependencies;
     }
@@ -39,20 +34,15 @@ internal static class ModuleHelper
         ICollection<Type> moduleTypes,
         Type moduleType)
     {
-        if(!GitHunterModule.IsGitHunterModule(moduleType))
+        if (!GitHunterModule.IsGitHunterModule(moduleType))
             return;
-        
-        if (moduleTypes.Contains(moduleType))
-        {
-            return;
-        }
+
+        if (moduleTypes.Contains(moduleType)) return;
 
 
         moduleTypes.Add(moduleType);
 
         foreach (var dependedModuleType in FindDependedModuleTypes(moduleType))
-        {
             AddModuleAndDependenciesRecursively(moduleTypes, dependedModuleType);
-        }
     }
 }

@@ -11,10 +11,11 @@ public partial class MainForm : Form, ISingletonDependency
     private readonly IGitManager _githubManager;
     private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
+    private readonly List<GitOutput> _results = new();
     private GitOutput? _result;
-    List<GitOutput> _results = new List<GitOutput>();
 
-    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager, IGitProvider gitProvider)
+    public MainForm(IGitManager githubManager, IMetricCalculatorManager metricCalculatorManager,
+        IGitProvider gitProvider)
     {
         _githubManager = githubManager;
         _metricCalculatorManager = metricCalculatorManager;
@@ -26,20 +27,19 @@ public partial class MainForm : Form, ISingletonDependency
         InitializeComponent();
     }
 
-    private void GithubManager_SearchRepositoriesRequestFinished(object? sender, SearchRepositoriesRequestFinishedEventArgs e)
+    private void GithubManager_SearchRepositoriesRequestFinished(object? sender,
+        SearchRepositoriesRequestFinishedEventArgs e)
     {
         if (e.FailedRequests.Any())
         {
-            var result = MessageBox.Show("Rate limit exceeded. Please try again later or use a vpn.", "Error", MessageBoxButtons.CancelTryContinue, MessageBoxIcon.Error);
+            var result = MessageBox.Show("Rate limit exceeded. Please try again later or use a vpn.", "Error",
+                MessageBoxButtons.CancelTryContinue, MessageBoxIcon.Error);
             if (result == DialogResult.TryAgain)
             {
                 var thread = new Thread(async () =>
                 {
-                    var r =await _githubManager.RetryFailedRequest();
-                    Invoke((() =>
-                    {
-                        _results.Add(r);
-                    }));
+                    var r = await _githubManager.RetryFailedRequest();
+                    Invoke(() => { _results.Add(r); });
                 });
                 thread.Start();
             }
@@ -49,17 +49,15 @@ public partial class MainForm : Form, ISingletonDependency
             File.WriteAllText("result.json", JsonConvert.SerializeObject(_githubManager.GetAllSuccessRepositories));
             MessageBox.Show("Finished");
         }
-        
     }
 
-    private void GithubManager_SearchRepositoriesRequestSuccess(object? sender, SearchRepositoriesRequestSuccessEventArgs e)
+    private void GithubManager_SearchRepositoriesRequestSuccess(object? sender,
+        SearchRepositoriesRequestSuccessEventArgs e)
     {
-        
     }
 
     private void GithubManager_SearchRepositoriesRequestError(object? sender, SearchRepositoriesRequestErrorEventArgs e)
     {
-        
     }
 
     private void MainForm_Load(object? sender, EventArgs e)
@@ -68,29 +66,23 @@ public partial class MainForm : Form, ISingletonDependency
         orderTypeComboBox.DataSource = Enum.GetValues<SortDirection>();
     }
 
-    private async void searchButton_Click(object sender, EventArgs e)
+    private void searchButton_Click(object sender, EventArgs e)
     {
-        var gitInput = new GitInput()
+        var gitInput = new GitInput
         {
             Language = languageComboBox.SelectedValue as Language?,
-            Order = (orderTypeComboBox.SelectedValue as SortDirection?) ?? SortDirection.Descending
+            Order = orderTypeComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending
         };
 
         _githubManager.Clear();
-        if (int.TryParse(repositoryCountTextBox.Text, out var repositoryCount))
-        {
-            gitInput.Count = repositoryCount;
-        }
+        if (int.TryParse(repositoryCountTextBox.Text, out var repositoryCount)) gitInput.Count = repositoryCount;
         var thread = new Thread(async () =>
         {
             _result = await _githubManager.GetRepositories(gitInput);
-            Invoke(new Action(() =>
+            Invoke(() =>
             {
-                if (_result != null)
-                {
-                    repositoryDataGrid.DataSource = _result.Repositories;
-                }
-            }));
+                if (_result != null) repositoryDataGrid.DataSource = _result.Repositories;
+            });
         });
         thread.Start();
     }
@@ -98,10 +90,7 @@ public partial class MainForm : Form, ISingletonDependency
     private async void downloadButton_Click(object sender, EventArgs e)
     {
         if (_result == null) return;
-        foreach (var item in _result.Repositories)
-        {
-            await _gitProvider.CloneRepository(item);
-        }
+        foreach (var item in _result.Repositories) await _gitProvider.CloneRepository(item);
     }
 
     private async void calculateMetricButton_Click(object sender, EventArgs e)
@@ -110,9 +99,6 @@ public partial class MainForm : Form, ISingletonDependency
         var manager = _metricCalculatorManager.FindMetricCalculator(selectedLanguage);
 
         if (_result == null) return;
-        foreach (var item in _result.Repositories)
-        {
-            await manager.CalculateMetricsAsync(item);
-        }
+        foreach (var item in _result.Repositories) await manager.CalculateMetricsAsync(item);
     }
 }

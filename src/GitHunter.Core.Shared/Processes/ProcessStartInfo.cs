@@ -13,10 +13,10 @@ public class ProcessStartInfo
         ErrorDataReceived = errorDataReceived;
     }
 
-    public string Command { get; private set; }
-    public string Arguments { get; private set; }
-    public string? WorkingDirectory { get; private set; }
-    public Action<string>? OutputDataReceived { get; private set; }
-    public Action<string>? ErrorDataReceived { get; private set; }
-    public Action? Exited { get; private set; }
+    public string Command { get; }
+    public string Arguments { get; }
+    public string? WorkingDirectory { get; }
+    public Action<string>? OutputDataReceived { get; }
+    public Action<string>? ErrorDataReceived { get; }
+    public Action? Exited { get; }
 }

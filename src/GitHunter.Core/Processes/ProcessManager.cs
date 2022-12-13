@@ -10,21 +10,21 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
     private bool _killAllProcessesRequested;
 
-    public Task<ProcessResult> RunAsync(string command, string arguments, string? workingDirectory = null) =>
-        RunAsync(new ProcessStartInfo(command, arguments, workingDirectory));
+    public Task<ProcessResult> RunAsync(string command, string arguments, string? workingDirectory = null)
+    {
+        return RunAsync(new ProcessStartInfo(command, arguments, workingDirectory));
+    }
 
     public Task<ProcessResult> RunAsync(Process process, string arguments, string? workingDirectory = null)
     {
         if (_killAllProcessesRequested)
-        {
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
-        }
         var tcs = new TaskCompletionSource<ProcessResult>();
-        
+
         string? output = null;
         string? error = null;
-        
+
         process.StartInfo.Arguments = arguments;
         process.StartInfo.WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
         process.StartInfo.UseShellExecute = false;
@@ -56,33 +56,29 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
             tcs.SetResult(result);
         };
-        
-        
-        
+
+
         process.Start();
-        
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        
+
         _processes.Add(process);
 
         return tcs.Task;
-        
     }
 
 
     public Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo)
     {
         if (_killAllProcessesRequested)
-        {
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
-        }
 
         var process = CreateProcess(processStartInfo);
 
         var tcs = new TaskCompletionSource<ProcessResult>();
-        
+
         string? output = null;
         string? error = null;
 
@@ -112,35 +108,16 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
             tcs.SetResult(result);
         };
-        
-        
-        
+
+
         process.Start();
-        
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
         _processes.Add(process);
 
         return tcs.Task;
-    }
-
-    private Process CreateProcess(ProcessStartInfo processStartInfo)
-    {
-        return new Process
-        {
-            StartInfo =
-            {
-                Arguments = processStartInfo.Arguments,
-                FileName = processStartInfo.Command,
-                WorkingDirectory = processStartInfo.WorkingDirectory ?? Directory.GetCurrentDirectory(),
-                UseShellExecute = false,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                CreateNoWindow = true,
-            },
-            EnableRaisingEvents = true
-        };
     }
 
     public Task<bool> KillAllProcessesAsync()
@@ -155,6 +132,25 @@ public class ProcessManager : IProcessManager, ISingletonDependency
             process.Dispose();
             _processes.Remove(process);
         }
+
         return Task.FromResult(true);
+    }
+
+    private Process CreateProcess(ProcessStartInfo processStartInfo)
+    {
+        return new Process
+        {
+            StartInfo =
+            {
+                Arguments = processStartInfo.Arguments,
+                FileName = processStartInfo.Command,
+                WorkingDirectory = processStartInfo.WorkingDirectory ?? Directory.GetCurrentDirectory(),
+                UseShellExecute = false,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+                CreateNoWindow = true
+            },
+            EnableRaisingEvents = true
+        };
     }
 }

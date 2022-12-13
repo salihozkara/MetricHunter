@@ -10,8 +10,8 @@ namespace GitHunter.Application.Git;
 [ProcessDependency<GitProcessDependency>]
 public class GitProvider : IGitProvider, ISingletonDependency
 {
-    private readonly IProcessManager _processManager;
     private readonly ILogger<GitProvider> _logger;
+    private readonly IProcessManager _processManager;
 
     public GitProvider(IProcessManager processManager, ILogger<GitProvider> logger)
     {
@@ -34,10 +34,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
     {
         try
         {
-            if (token.IsCancellationRequested)
-            {
-                return false;
-            }
+            if (token.IsCancellationRequested) return false;
 
             _logger.LogInformation($"Cloning {repository.FullName}...");
             var path = PathHelper.BuildAndCreateFullPath(repository.Language, "Repositories", repository.Owner.Login);
@@ -63,22 +60,14 @@ public class GitProvider : IGitProvider, ISingletonDependency
             var result =
                 await _processManager.RunAsync("git", $"clone -c core.longpaths=true {repository.CloneUrl}", path);
             if (result.ExitCode == 0)
-            {
                 _logger.LogInformation($"Cloned {repository.FullName} successfully.");
-            }
             else
-            {
                 _logger.LogError($"Failed to clone {repository.FullName}.");
-            }
 
             if (result.ExitCode == 0)
-            {
                 OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository));
-            }
             else
-            {
                 OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, null));
-            }
 
             return result.ExitCode == 0;
         }
@@ -104,10 +93,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
     public Task<bool> DeleteLocalRepository(string path, CancellationToken token = default)
     {
-        if (token.IsCancellationRequested)
-        {
-            return Task.FromResult(false);
-        }
+        if (token.IsCancellationRequested) return Task.FromResult(false);
 
         if (Directory.Exists(path))
         {
