@@ -1,3 +1,4 @@
+using GitHunter.Core.Processes;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -11,7 +12,7 @@ public class Program
     public static async Task Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
-        
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Volo.Abp", LogEventLevel.Warning)
@@ -28,12 +29,15 @@ public class Program
                 options.Services.AddLogging(c => c.AddSerilog());
             });
         await application.InitializeAsync();
-        
+
         var mainForm = application.ServiceProvider
             .GetRequiredService<MainForm>();
-        
+
         System.Windows.Forms.Application.Run(mainForm);
-        
+
+        var processManager = application.ServiceProvider
+            .GetRequiredService<IProcessManager>();
+        await processManager.KillAllProcessesAsync();
         await application.ShutdownAsync();
     }
 }
