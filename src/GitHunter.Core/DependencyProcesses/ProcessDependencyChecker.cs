@@ -13,8 +13,9 @@ public class ProcessDependencyChecker : IProcessDependencyChecker, ISingletonDep
         _serviceProvider = serviceProvider;
     }
 
-    public bool CheckDependency(Assembly assembly)
+    public bool CheckDependency(Assembly assembly, out IProcessDependency? processDependency)
     {
+        processDependency = null;
         var dependenciesTypes = assembly.GetTypes().Where(t =>
             t.GetCustomAttributes(typeof(ProcessDependencyAttribute<>)) is { } attributes && attributes.Any());
         var dependenciesAttributes = dependenciesTypes
@@ -26,6 +27,15 @@ public class ProcessDependencyChecker : IProcessDependencyChecker, ISingletonDep
             return null;
         });
 
-        return dependencies.All(d => d != null && d.Check());
+        foreach (var dependency in dependencies)
+        {
+            if (dependency == null)
+                continue;
+            if (dependency.Check()) continue;
+            processDependency = dependency;
+            return false;
+        }
+
+        return true;
     }
 }
