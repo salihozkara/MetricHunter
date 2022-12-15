@@ -1,29 +1,30 @@
-﻿using System.Diagnostics;
+﻿using System.Collections.Immutable;
+using System.Diagnostics;
 using Volo.Abp.DependencyInjection;
 
 namespace GitHunter.Core.Processes;
 
-public class ProcessManager : IProcessManager, IScopedDependency
+public class ProcessManager : IProcessManager, ISingletonDependency
 {
     private readonly List<Process> _processes = new();
 
     private bool _killAllProcessesRequested;
 
-    public Task<ProcessResult> RunAsync(string command, string arguments, string? workingDirectory = null) =>
-        RunAsync(new ProcessStartInfo(command, arguments, workingDirectory));
+    public Task<ProcessResult> RunAsync(string command, string arguments, string? workingDirectory = null)
+    {
+        return RunAsync(new ProcessStartInfo(command, arguments, workingDirectory));
+    }
 
     public Task<ProcessResult> RunAsync(Process process, string arguments, string? workingDirectory = null)
     {
         if (_killAllProcessesRequested)
-        {
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
-        }
         var tcs = new TaskCompletionSource<ProcessResult>();
-        
+
         string? output = null;
         string? error = null;
-        
+
         process.StartInfo.Arguments = arguments;
         process.StartInfo.WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
         process.StartInfo.UseShellExecute = false;
@@ -55,33 +56,29 @@ public class ProcessManager : IProcessManager, IScopedDependency
 
             tcs.SetResult(result);
         };
-        
-        
-        
+
+
         process.Start();
-        
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
-        
+
         _processes.Add(process);
 
         return tcs.Task;
-        
     }
 
 
     public Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo)
     {
         if (_killAllProcessesRequested)
-        {
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
-        }
 
         var process = CreateProcess(processStartInfo);
 
         var tcs = new TaskCompletionSource<ProcessResult>();
-        
+
         string? output = null;
         string? error = null;
 
@@ -111,17 +108,32 @@ public class ProcessManager : IProcessManager, IScopedDependency
 
             tcs.SetResult(result);
         };
-        
-        
-        
+
+
         process.Start();
-        
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
         _processes.Add(process);
 
         return tcs.Task;
+    }
+
+    public Task<bool> KillAllProcessesAsync()
+    {
+        _killAllProcessesRequested = true;
+        var processes = _processes.Where(process => !process.HasExited).ToImmutableArray();
+        foreach (var process in processes)
+        {
+            process.Kill(true);
+            process.WaitForExit();
+            process.Close();
+            process.Dispose();
+            _processes.Remove(process);
+        }
+
+        return Task.FromResult(true);
     }
 
     private Process CreateProcess(ProcessStartInfo processStartInfo)
@@ -136,20 +148,9 @@ public class ProcessManager : IProcessManager, IScopedDependency
                 UseShellExecute = false,
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
-                CreateNoWindow = true,
+                CreateNoWindow = true
             },
             EnableRaisingEvents = true
         };
-    }
-
-    public Task<bool> KillAllProcessesAsync()
-    {
-        _killAllProcessesRequested = true;
-        foreach (var process in _processes.Where(process => !process.HasExited))
-        {
-            process.Kill();
-        }
-
-        return Task.FromResult(true);
     }
 }

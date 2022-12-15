@@ -12,7 +12,7 @@ public static class PathHelper
     {
         return Path.GetFullPath(BuildPath(paths));
     }
-    
+
     public static string BuildAndCreateFullPath(params string[] paths)
     {
         var path = BuildFullPath(paths);

@@ -62,7 +62,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
     private async Task<string> CreateSourceMonitorXml(Repository repository)
     {
-        var xmlDirectory = PathHelper.BuildAndCreateFullPath(repository.Language, "SourceMonitor",repository.Owner.Login);
+        var xmlDirectory =
+            PathHelper.BuildAndCreateFullPath(repository.Language, "SourceMonitor", repository.Owner.Login);
 
         var reportsPath = PathHelper.BuildAndCreateFullPath(repository.Language, "Reports", repository.Owner.Login);
 

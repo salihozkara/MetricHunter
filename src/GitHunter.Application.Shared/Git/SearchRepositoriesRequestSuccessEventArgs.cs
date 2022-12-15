@@ -4,13 +4,13 @@ namespace GitHunter.Application.Git;
 
 public class SearchRepositoriesRequestSuccessEventArgs : EventArgs
 {
-    public SearchRepositoriesRequest SearchRepositoriesRequest { get; }
-    public IReadOnlyList<Repository> Repositories { get; }
-
     public SearchRepositoriesRequestSuccessEventArgs(SearchRepositoriesRequest searchRepositoriesRequest,
-        IReadOnlyList<Repository> repositories)
+        SearchRepositoryResult searchRepositoryResult)
     {
         SearchRepositoriesRequest = searchRepositoriesRequest;
-        Repositories = repositories;
+        SearchRepositoryResult = searchRepositoryResult;
     }
+
+    public SearchRepositoriesRequest SearchRepositoriesRequest { get; }
+    public SearchRepositoryResult SearchRepositoryResult { get; }
 }
