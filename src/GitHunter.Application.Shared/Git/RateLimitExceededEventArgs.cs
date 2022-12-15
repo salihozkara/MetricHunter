@@ -2,12 +2,12 @@
 
 public class RateLimitExceededEventArgs
 {
-    public RateLimitExceededEventArgs(DateTimeOffset reset)
+    public RateLimitExceededEventArgs(DateTimeOffset resetTimeOffset)
     {
-        Reset = reset;
+        ResetTimeOffset = resetTimeOffset;
         Wait = true;
     }
 
     public bool Wait { get; set; }
-    public DateTimeOffset Reset { get; }
+    public DateTimeOffset ResetTimeOffset { get; }
 }

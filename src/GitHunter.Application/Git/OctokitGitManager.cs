@@ -7,108 +7,168 @@ namespace GitHunter.Application.Git;
 
 public class OctokitGitManager : IGitManager, ITransientDependency
 {
-    private readonly GitHubClient _client = new(new ProductHeaderValue("GitHunter"));
-    private readonly List<SearchRepositoriesRequest> _failedRequests = new();
+    private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
     private readonly ILogger<OctokitGitManager> _logger;
-    private List<Repository> _repositories = new();
 
-
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="OctokitGitManager" /> class.
+    /// </summary>
+    /// <param name="logger"></param>
     public OctokitGitManager(ILogger<OctokitGitManager> logger)
     {
         _logger = logger;
-        SearchRepositoriesRequestSuccess += OnSearchRepositoriesRequestSuccess;
-        SearchRepositoriesRequestError += OnSearchRepositoriesRequestError;
     }
 
 
-    public event EventHandler<SearchRepositoriesRequestErrorEventArgs>? SearchRepositoriesRequestError;
-    public event EventHandler<SearchRepositoriesRequestSuccessEventArgs>? SearchRepositoriesRequestSuccess;
-    public event EventHandler<SearchRepositoriesRequestFinishedEventArgs>? SearchRepositoriesRequestFinished;
+    /// <summary>
+    ///     This event is triggered when a request fails.
+    /// </summary>
+    public event EventHandler<RequestErrorEventArgs>? SearchRepositoriesRequestError;
+
+    /// <summary>
+    ///     This event is triggered when a request succeeds.
+    /// </summary>
+    public event EventHandler<RequestSuccessEventArgs>? SearchRepositoriesRequestSuccess;
+
+    /// <summary>
+    ///     This event is triggered when rate limit is reached.
+    /// </summary>
     public event EventHandler<RateLimitExceededEventArgs>? RateLimitExceeded;
+
+    /// <summary>
+    ///     This event is triggered when there is an unknown error in a request.
+    /// </summary>
     public event EventHandler<ExceptionEventArgs>? OnException;
 
+    /// <summary>
+    ///     User login
+    /// </summary>
+    /// <param name="username"></param>
+    /// <param name="password"></param>
     public void Initialize(string username, string password)
     {
-        _client.Credentials = new Credentials(username, password);
+        Client.Credentials = new Credentials(username, password);
     }
 
+    /// <summary>
+    ///     User login
+    /// </summary>
+    /// <param name="token"></param>
     public void Initialize(string token)
     {
-        _client.Credentials = new Credentials(token);
+        Client.Credentials = new Credentials(token);
     }
 
+    /// <summary>
+    ///     Lists repository information from github by input
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public async Task<GitOutput> GetRepositories(GitInput input)
     {
-        var result = await GetRepositories(input, null);
-        SearchRepositoriesRequestFinished?.Invoke(this,
-            new SearchRepositoriesRequestFinishedEventArgs(_repositories, _failedRequests));
-        return result;
+        HashSet<SearchRepositoriesRequest> failedRequests = new();
+        var result = await GetRepositories(input, null, failedRequests);
+        return new GitOutput(result.Repositories.Take(input.Count).ToList(), result.FailedRequests);
     }
 
-    public async Task<GitOutput> RetryFailedRequest()
+    /// <summary>
+    ///     Reruns failed requests
+    /// </summary>
+    /// <param name="failedRequests"></param>
+    /// <returns></returns>
+    public async Task<GitOutput> RetryFailedRequest(HashSet<SearchRepositoriesRequest> failedRequests)
     {
         _logger.LogWarning("Retrying failed requests");
-        await RunRequests(_failedRequests);
+        var requests = failedRequests.ToList();
+        failedRequests.Clear();
+        var results = await RunRequests(requests, failedRequests);
         _logger.LogWarning("Retrying finished");
-        return new GitOutput(_repositories, int.MaxValue, true);
+        return new GitOutput(ConvertToRepositories(results), failedRequests);
     }
 
-    public IReadOnlyList<Repository> GetAllSuccessRepositories => _repositories;
-
-    public void Clear()
+    /// <summary>
+    ///     Converts search results to repositories
+    /// </summary>
+    /// <param name="results"></param>
+    /// <returns></returns>
+    private IReadOnlyList<Repository> ConvertToRepositories(params SearchRepositoryResult?[] results)
     {
-        _repositories.Clear();
+        return results.Where(r => r is { Items.Count: > 0 }).SelectMany(r => r!.Items).ToList();
     }
 
-    private void OnSearchRepositoriesRequestError(object? sender, SearchRepositoriesRequestErrorEventArgs e)
+    /// <summary>
+    ///     Generates page numbers based on the requested repository number
+    /// </summary>
+    /// <param name="count"></param>
+    /// <returns></returns>
+    private IEnumerable<int> GetPageNumbers(int count)
     {
-        _failedRequests.Add(e.SearchRepositoriesRequest);
+        var pages = count / 100;
+        pages += count % 100 == 0 ? 0 : 1;
+        for (var i = 1; i <= pages; i++) yield return i;
     }
 
-    private void OnSearchRepositoriesRequestSuccess(object? sender, SearchRepositoriesRequestSuccessEventArgs e)
-    {
-        _failedRequests.Remove(e.SearchRepositoriesRequest);
-        _repositories.AddRange(e.SearchRepositoryResult.Items ?? new List<Repository>());
-    }
-
-    private async Task<GitOutput> GetRepositories(GitInput input, Range? range)
+    /// <summary>
+    ///     Recursively pulls repository information based on input value
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="range"></param>
+    /// <param name="failedRequests"></param>
+    /// <returns></returns>
+    private async Task<GitOutput> GetRepositories(GitInput input, Range? range,
+        HashSet<SearchRepositoriesRequest> failedRequests)
     {
         var stars = range;
-        var requests = Enumerable.Range(1, 10)
+        var repositories = new List<Repository>();
+        var requests = GetPageNumbers(input.Count)
             .Select(x => CreateRequest(input, x, stars));
 
-        await RunRequests(requests);
-        if (_repositories.Count >= input.Count)
-            return new GitOutput(_repositories.Take(input.Count).ToList(), int.MaxValue, true);
+        var results = await RunRequests(requests, failedRequests);
+        repositories.AddRange(ConvertToRepositories(results));
+        if (repositories.Count >= input.Count)
+            return new GitOutput(repositories, failedRequests);
 
-        if (_repositories.Any())
+        // Updating range as only the first 1000 search results are available in Github requests
+        if (repositories.Any())
             range = input.Order == SortDirection.Descending
-                ? Range.LessThanOrEquals(_repositories.Min(x => x.StargazersCount))
-                : Range.GreaterThanOrEquals(_repositories.Max(x => x.StargazersCount));
+                ? Range.LessThanOrEquals(repositories.Min(x => x.StargazersCount))
+                : Range.GreaterThanOrEquals(repositories.Max(x => x.StargazersCount));
 
-        return await GetRepositories(input, range);
+        var result = await GetRepositories(input, range, failedRequests);
+        repositories.AddRange(result.Repositories);
+        return new GitOutput(repositories, failedRequests);
     }
 
-    private async Task RunRequests(IEnumerable<SearchRepositoriesRequest> requests)
+    /// <summary>
+    ///     Runs requests
+    /// </summary>
+    /// <param name="requests"></param>
+    /// <param name="failedRequests"></param>
+    /// <returns></returns>
+    private async Task<SearchRepositoryResult?[]> RunRequests(IEnumerable<SearchRepositoriesRequest> requests,
+        HashSet<SearchRepositoriesRequest> failedRequests)
     {
-        var tasks = requests.Select(RunRequest);
+        var tasks = requests.Select(r => RunRequest(r, failedRequests));
 
         await RateLimitWait();
 
-        await Task.WhenAll(tasks);
-
-        _repositories = _repositories.DistinctBy(x => x.CloneUrl).ToList();
+        return await Task.WhenAll(tasks);
     }
 
-    private async Task<SearchRepositoryResult?> RunRequest(SearchRepositoriesRequest x)
+    /// <summary>
+    ///     Runs a single request
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="failedRequests"></param>
+    /// <returns></returns>
+    private async Task<SearchRepositoryResult?> RunRequest(SearchRepositoriesRequest request,
+        HashSet<SearchRepositoriesRequest> failedRequests)
     {
+        failedRequests.Add(request);
         SearchRepositoryResult? result = null;
         try
         {
-            result = await _client.Search.SearchRepo(x);
-            if (result != null)
-                SearchRepositoriesRequestSuccess?.Invoke(this,
-                    new SearchRepositoriesRequestSuccessEventArgs(x, result));
+            result = await Client.Search.SearchRepo(request);
         }
         catch (RateLimitExceededException)
         {
@@ -116,36 +176,37 @@ public class OctokitGitManager : IGitManager, ITransientDependency
             try
             {
                 _logger.LogWarning("Retrying request");
-                result = await _client.Search.SearchRepo(x);
-                if (result != null)
-                    SearchRepositoriesRequestSuccess?.Invoke(this,
-                        new SearchRepositoriesRequestSuccessEventArgs(x, result));
+                result = await Client.Search.SearchRepo(request);
             }
             catch (Exception exception)
             {
                 _logger.LogError(exception, "Retrying failed");
-                SearchRepositoriesRequestError?.Invoke(this, new SearchRepositoriesRequestErrorEventArgs(x, exception));
+                SearchRepositoriesRequestError?.Invoke(this, new RequestErrorEventArgs(request, exception));
             }
         }
         catch (Exception e)
         {
             _logger.LogError(e, "Request failed");
-            SearchRepositoriesRequestError?.Invoke(this, new SearchRepositoriesRequestErrorEventArgs(x, e));
-            var args = new ExceptionEventArgs(e);
-            OnException?.Invoke(this, args);
-            if (args.ThrowException)
-                throw;
-            if (args.Retry) result = await RunRequest(x);
+            SearchRepositoriesRequestError?.Invoke(this, new RequestErrorEventArgs(request, e));
+        }
+
+        if (result is not null)
+        {
+            failedRequests.Remove(request);
+            SearchRepositoriesRequestSuccess?.Invoke(this, new RequestSuccessEventArgs(request, result));
         }
 
         return result;
     }
 
+    /// <summary>
+    ///     Waits for rate limit to reset or client handle to be available
+    /// </summary>
     private async Task RateLimitWait()
     {
         try
         {
-            var rateLimits = await _client.RateLimit.GetRateLimits();
+            var rateLimits = await Client.RateLimit.GetRateLimits();
             // wait rate limit
             if (rateLimits.Resources.Search.Remaining == 0)
             {
@@ -156,7 +217,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
                     var resetTime = rateLimits.Resources.Search.Reset;
                     var waitTime = resetTime - DateTimeOffset.Now;
                     _logger.LogWarning("Rate limit exceeded, waiting {0} seconds", waitTime.TotalSeconds);
-                    if(waitTime.TotalSeconds > 0)
+                    if (waitTime.TotalSeconds > 0)
                         await Task.Delay(waitTime);
                     _logger.LogWarning("Rate limit reset");
                 }

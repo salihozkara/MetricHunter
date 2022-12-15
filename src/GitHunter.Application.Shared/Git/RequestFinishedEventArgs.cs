@@ -2,11 +2,12 @@
 
 namespace GitHunter.Application.Git;
 
-public class GitOutput
+public class RequestFinishedEventArgs
 {
-    public GitOutput(IReadOnlyList<Repository> resultItems, HashSet<SearchRepositoriesRequest> failedRequests)
+    public RequestFinishedEventArgs(IReadOnlyList<Repository> repositories,
+        HashSet<SearchRepositoriesRequest> failedRequests)
     {
-        Repositories = resultItems;
+        Repositories = repositories;
         FailedRequests = failedRequests;
     }
 
