@@ -27,12 +27,8 @@ public class Program
                 options.UseAutofac();
                 options.Services.AddLogging(c => c.AddSerilog());
             });
+        
         await application.InitializeAsync();
-        
-        var mainForm = application.ServiceProvider
-            .GetRequiredService<MainForm>();
-        
-        System.Windows.Forms.Application.Run(mainForm);
         
         await application.ShutdownAsync();
     }
