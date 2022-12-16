@@ -12,6 +12,7 @@ public class ViewMainPresenter : IViewMainPresenter
 {
     private readonly IApplicationController _controller;
     private readonly IGitManager _gitManager;
+    private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private GitOutput? _gitOutput;
 
@@ -24,6 +25,7 @@ public class ViewMainPresenter : IViewMainPresenter
         View.Presenter = this;
         
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
+        _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
     }
 
@@ -61,5 +63,28 @@ public class ViewMainPresenter : IViewMainPresenter
         }).ToList();
         
         View.ShowRepositories(repositoryModelList);
+    }
+
+    public async Task CalculateMetrics()
+    {
+        if (View.SelectedLanguage is null || _gitOutput is null) return;
+
+        var manager = _metricCalculatorManager.FindMetricCalculator(View.SelectedLanguage.Value);
+        
+        foreach (var item in _gitOutput.Repositories)
+        {
+            await manager.CalculateMetricsAsync(item);
+        }
+    }
+
+    public async Task DownloadMetrics()
+    {
+        if (_gitOutput is  null) 
+            return;
+        
+        foreach (var item in _gitOutput.Repositories)
+        {
+            await _gitProvider.CloneRepository(item);
+        }
     }
 }

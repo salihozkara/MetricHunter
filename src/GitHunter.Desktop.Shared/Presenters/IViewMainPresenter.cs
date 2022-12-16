@@ -7,4 +7,6 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
 {
      void LoadForm();
      Task SearchRepositories();
+     Task CalculateMetrics();
+     Task DownloadMetrics();
 }

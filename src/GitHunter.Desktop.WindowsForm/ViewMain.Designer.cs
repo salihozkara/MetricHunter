@@ -34,8 +34,8 @@ partial class ViewMain
             this._repositoryCountTextBox = new System.Windows.Forms.TextBox();
             this._sortDirectionComboBox = new System.Windows.Forms.ComboBox();
             this._searchButton = new System.Windows.Forms.Button();
-            this._downloadButton = new System.Windows.Forms.Button();
-            this._calculateMetricButton = new System.Windows.Forms.Button();
+            this._downloadMetricsButton = new System.Windows.Forms.Button();
+            this._calculateMetricsButton = new System.Windows.Forms.Button();
             this._topicsLabel = new System.Windows.Forms.Label();
             this._countRepositoryLabel = new System.Windows.Forms.Label();
             this._languageLabel = new System.Windows.Forms.Label();
@@ -87,25 +87,25 @@ partial class ViewMain
             this._searchButton.UseVisualStyleBackColor = true;
             this._searchButton.Click += new System.EventHandler(this._searchButton_Click);
             // 
-            // _downloadButton
+            // _downloadMetricsButton
             // 
-            this._downloadButton.Location = new System.Drawing.Point(431, 235);
-            this._downloadButton.Name = "_downloadButton";
-            this._downloadButton.Size = new System.Drawing.Size(112, 34);
-            this._downloadButton.TabIndex = 6;
-            this._downloadButton.Text = "İndir";
-            this._downloadButton.UseVisualStyleBackColor = true;
-            this._downloadButton.Click += new System.EventHandler(this._downloadButton_Click);
+            this._downloadMetricsButton.Location = new System.Drawing.Point(431, 235);
+            this._downloadMetricsButton.Name = "_downloadMetricsButton";
+            this._downloadMetricsButton.Size = new System.Drawing.Size(112, 34);
+            this._downloadMetricsButton.TabIndex = 6;
+            this._downloadMetricsButton.Text = "İndir";
+            this._downloadMetricsButton.UseVisualStyleBackColor = true;
+            this._downloadMetricsButton.Click += new System.EventHandler(this._downloadMetricsButton_Click);
             // 
-            // _calculateMetricButton
+            // _calculateMetricsButton
             // 
-            this._calculateMetricButton.Location = new System.Drawing.Point(595, 235);
-            this._calculateMetricButton.Name = "_calculateMetricButton";
-            this._calculateMetricButton.Size = new System.Drawing.Size(234, 34);
-            this._calculateMetricButton.TabIndex = 7;
-            this._calculateMetricButton.Text = "Metrik Hesapla";
-            this._calculateMetricButton.UseVisualStyleBackColor = true;
-            this._calculateMetricButton.Click += new System.EventHandler(this._calculateMetricButton_Click);
+            this._calculateMetricsButton.Location = new System.Drawing.Point(595, 235);
+            this._calculateMetricsButton.Name = "_calculateMetricsButton";
+            this._calculateMetricsButton.Size = new System.Drawing.Size(234, 34);
+            this._calculateMetricsButton.TabIndex = 7;
+            this._calculateMetricsButton.Text = "Metrik Hesapla";
+            this._calculateMetricsButton.UseVisualStyleBackColor = true;
+            this._calculateMetricsButton.Click += new System.EventHandler(this._calculateMetricsButton_Click);
             // 
             // _topicsLabel
             // 
@@ -194,8 +194,8 @@ partial class ViewMain
             this.Controls.Add(this._languageLabel);
             this.Controls.Add(this._countRepositoryLabel);
             this.Controls.Add(this._topicsLabel);
-            this.Controls.Add(this._calculateMetricButton);
-            this.Controls.Add(this._downloadButton);
+            this.Controls.Add(this._calculateMetricsButton);
+            this.Controls.Add(this._downloadMetricsButton);
             this.Controls.Add(this._searchButton);
             this.Controls.Add(this._repositoryDataGridView);
             this.Controls.Add(this._sortDirectionComboBox);
@@ -218,8 +218,8 @@ partial class ViewMain
     private TextBox _repositoryCountTextBox;
     private ComboBox _sortDirectionComboBox;
     private Button _searchButton;
-    private Button _downloadButton;
-    private Button _calculateMetricButton;
+    private Button _downloadMetricsButton;
+    private Button _calculateMetricsButton;
     private Label _topicsLabel;
     private Label _countRepositoryLabel;
     private Label _languageLabel;
