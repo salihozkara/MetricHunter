@@ -1,6 +1,7 @@
 ﻿using GitHunter.Application.Git;
 using GitHunter.Application.LanguageStatistics;
 using GitHunter.Desktop.Core;
+using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Octokit;
@@ -48,6 +49,17 @@ public class ViewMainPresenter : IViewMainPresenter
         };
         
         _gitOutput = await _gitManager.GetRepositories(gitInput);
-        View.ShowRepositories(_gitOutput.Repositories);
+        
+        var repositoryModelList = _gitOutput.Repositories.Select(x => new RepositoryModel()
+        {
+            Name = x.Name,
+            Description = x.Description,
+            Stars = x.StargazersCount,
+            Url = x.HtmlUrl,
+            License = x.License?.Name ?? "Lisans Yok",
+            Owner = x.Owner.Login
+        }).ToList();
+        
+        View.ShowRepositories(repositoryModelList);
     }
 }

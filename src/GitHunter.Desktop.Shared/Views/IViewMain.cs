@@ -1,4 +1,5 @@
 ﻿using GitHunter.Desktop.Core;
+using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Presenters;
 using Octokit;
 
@@ -12,5 +13,5 @@ public interface IViewMain : IView<IViewMainPresenter>
     SortDirection SortDirection { get;}
     int RepositoryCount { get; }
     string Topics { get; }
-    void ShowRepositories(IEnumerable<Repository> repositories);
+    void ShowRepositories(IEnumerable<RepositoryModel> repositories);
 }

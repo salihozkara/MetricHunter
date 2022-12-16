@@ -2,6 +2,7 @@ using System.ComponentModel;
 using System.Data;
 using GitHunter.Application.Git;
 using GitHunter.Application.LanguageStatistics;
+using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Presenters;
 using GitHunter.Desktop.Views;
 using Octokit;
@@ -31,9 +32,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         set => _sortDirectionComboBox.DataSource = value;
     }
 
-    public void ShowRepositories(IEnumerable<Repository> repositories)
+    public void ShowRepositories(IEnumerable<RepositoryModel> repositories)
     {
-        var bindingList = new BindingList<Repository>(repositories.ToList());
+        var bindingList = new BindingList<RepositoryModel>(repositories.ToList());
         _repositoryDataGridView.DataSource = new BindingSource(bindingList, null);
     }
 
