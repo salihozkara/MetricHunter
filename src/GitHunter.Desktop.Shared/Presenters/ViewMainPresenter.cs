@@ -1,6 +1,6 @@
 ﻿using GitHunter.Application.Git;
 using GitHunter.Application.LanguageStatistics;
-using GitHunter.Core.Desktop;
+using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Octokit;

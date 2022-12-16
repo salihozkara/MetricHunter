@@ -1,7 +1,7 @@
 ﻿using GitHunter.Application;
 using GitHunter.Core.DependencyProcesses;
-using GitHunter.Core.Desktop;
 using GitHunter.Core.Modules;
+using GitHunter.Desktop.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Volo.Abp.Modularity;
 using ApplicationInitializationContext = Volo.Abp.ApplicationInitializationContext;

@@ -9,7 +9,6 @@
 
     <ItemGroup>
         <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj" />
-        <ProjectReference Include="..\GitHunter.Desktop.Core.Shared\GitHunter.Desktop.Core.Shared.csproj" />
     </ItemGroup>
 
 </Project>

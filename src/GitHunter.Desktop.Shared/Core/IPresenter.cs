@@ -1,4 +1,4 @@
-﻿namespace GitHunter.Core.Desktop;
+﻿namespace GitHunter.Desktop.Core;
 
 public interface IPresenter<TView>
 {

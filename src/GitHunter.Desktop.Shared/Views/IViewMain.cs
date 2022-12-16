@@ -1,4 +1,4 @@
-﻿using GitHunter.Core.Desktop;
+﻿using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Presenters;
 using Octokit;
 

@@ -1,5 +1,5 @@
 ﻿using GitHunter.Application.Git;
-using GitHunter.Core.Desktop;
+using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Presenters;
 using GitHunter.Desktop.Views;
 using Volo.Abp.DependencyInjection;
