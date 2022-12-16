@@ -9,7 +9,7 @@ namespace GitHunter.Desktop;
 public class Program
 {
     [STAThread]
-    public static async Task Main(string[] args)
+    public static void Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
 
@@ -22,19 +22,19 @@ public class Program
             .CreateLogger();
 
 
-        using var application = await AbpApplicationFactory.CreateAsync<DesktopWindowsFormModule>(
+        using var application =  AbpApplicationFactory.Create<DesktopWindowsFormModule>(
             options =>
             {
                 options.UseAutofac();
                 options.Services.AddLogging(c => c.AddSerilog());
             });
         
-        await application.InitializeAsync();
+        application.Initialize();
 
         var processManager = application.ServiceProvider
             .GetRequiredService<IProcessManager>();
-        await processManager.KillAllProcessesAsync();
+        // await processManager.KillAllProcessesAsync();
         
-        await application.ShutdownAsync();
+        application.Shutdown();
     }
 }

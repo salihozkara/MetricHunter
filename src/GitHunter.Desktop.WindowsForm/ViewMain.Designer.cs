@@ -30,10 +30,9 @@ partial class ViewMain
     private void InitializeComponent()
     {
             this._languageComboBox = new System.Windows.Forms.ComboBox();
-            this._topicTextBox = new System.Windows.Forms.TextBox();
+            this._topicsTextBox = new System.Windows.Forms.TextBox();
             this._repositoryCountTextBox = new System.Windows.Forms.TextBox();
             this._sortDirectionComboBox = new System.Windows.Forms.ComboBox();
-            this._repositoryDataGridView = new System.Windows.Forms.DataGridView();
             this._searchButton = new System.Windows.Forms.Button();
             this._downloadButton = new System.Windows.Forms.Button();
             this._calculateMetricButton = new System.Windows.Forms.Button();
@@ -44,6 +43,7 @@ partial class ViewMain
             this._jsonPathTextBox = new System.Windows.Forms.TextBox();
             this._jsonPathSelectButton = new System.Windows.Forms.Button();
             this._jsonPathLabel = new System.Windows.Forms.Label();
+            this._repositoryDataGridView = new System.Windows.Forms.DataGridView();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).BeginInit();
             this.SuspendLayout();
             // 
@@ -55,12 +55,12 @@ partial class ViewMain
             this._languageComboBox.Size = new System.Drawing.Size(182, 33);
             this._languageComboBox.TabIndex = 0;
             // 
-            // _topicTextBox
+            // _topicsTextBox
             // 
-            this._topicTextBox.Location = new System.Drawing.Point(178, 141);
-            this._topicTextBox.Name = "_topicTextBox";
-            this._topicTextBox.Size = new System.Drawing.Size(150, 31);
-            this._topicTextBox.TabIndex = 1;
+            this._topicsTextBox.Location = new System.Drawing.Point(178, 141);
+            this._topicsTextBox.Name = "_topicsTextBox";
+            this._topicsTextBox.Size = new System.Drawing.Size(150, 31);
+            this._topicsTextBox.TabIndex = 1;
             // 
             // _repositoryCountTextBox
             // 
@@ -76,16 +76,6 @@ partial class ViewMain
             this._sortDirectionComboBox.Name = "_sortDirectionComboBox";
             this._sortDirectionComboBox.Size = new System.Drawing.Size(182, 33);
             this._sortDirectionComboBox.TabIndex = 3;
-            // 
-            // _repositoryDataGridView
-            // 
-            this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this._repositoryDataGridView.Location = new System.Drawing.Point(119, 295);
-            this._repositoryDataGridView.Name = "_repositoryDataGridView";
-            this._repositoryDataGridView.RowHeadersWidth = 62;
-            this._repositoryDataGridView.RowTemplate.Height = 33;
-            this._repositoryDataGridView.Size = new System.Drawing.Size(797, 371);
-            this._repositoryDataGridView.TabIndex = 4;
             // 
             // _searchButton
             // 
@@ -179,6 +169,19 @@ partial class ViewMain
             this._jsonPathLabel.TabIndex = 14;
             this._jsonPathLabel.Text = "Json Path";
             // 
+            // _repositoryDataGridView
+            // 
+            this._repositoryDataGridView.AllowDrop = true;
+            this._repositoryDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.RaisedVertical;
+            this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this._repositoryDataGridView.Location = new System.Drawing.Point(119, 295);
+            this._repositoryDataGridView.Name = "_repositoryDataGridView";
+            this._repositoryDataGridView.RowHeadersWidth = 62;
+            this._repositoryDataGridView.RowTemplate.Height = 33;
+            this._repositoryDataGridView.Size = new System.Drawing.Size(797, 371);
+            this._repositoryDataGridView.TabIndex = 4;
+            // 
             // ViewMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -197,10 +200,11 @@ partial class ViewMain
             this.Controls.Add(this._repositoryDataGridView);
             this.Controls.Add(this._sortDirectionComboBox);
             this.Controls.Add(this._repositoryCountTextBox);
-            this.Controls.Add(this._topicTextBox);
+            this.Controls.Add(this._topicsTextBox);
             this.Controls.Add(this._languageComboBox);
             this.Name = "ViewMain";
             this.Text = "Form1";
+            this.Load += new System.EventHandler(this._viewMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -210,10 +214,9 @@ partial class ViewMain
     #endregion
 
     private ComboBox _languageComboBox;
-    private TextBox _topicTextBox;
+    private TextBox _topicsTextBox;
     private TextBox _repositoryCountTextBox;
     private ComboBox _sortDirectionComboBox;
-    private DataGridView _repositoryDataGridView;
     private Button _searchButton;
     private Button _downloadButton;
     private Button _calculateMetricButton;
@@ -224,4 +227,5 @@ partial class ViewMain
     private TextBox _jsonPathTextBox;
     private Button _jsonPathSelectButton;
     private Label _jsonPathLabel;
+    private DataGridView _repositoryDataGridView;
 }

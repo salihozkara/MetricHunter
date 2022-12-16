@@ -6,5 +6,6 @@ namespace GitHunter.Desktop.Presenters;
 
 public interface IViewMainPresenter : IPresenter<IViewMain>
 {
+     void LoadForm();
      Task SearchRepositories();
 }

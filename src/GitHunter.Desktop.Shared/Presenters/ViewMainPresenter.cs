@@ -1,7 +1,9 @@
 ﻿using GitHunter.Application.Git;
+using GitHunter.Application.LanguageStatistics;
 using GitHunter.Core.Desktop;
 using GitHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Octokit;
 
 namespace GitHunter.Desktop.Presenters;
 
@@ -9,6 +11,7 @@ public class ViewMainPresenter : IViewMainPresenter
 {
     private readonly IApplicationController _controller;
     private readonly IGitManager _gitManager;
+    private readonly IMetricCalculatorManager _metricCalculatorManager;
     private GitOutput? _gitOutput;
 
     public IViewMain View { get; }
@@ -20,11 +23,18 @@ public class ViewMainPresenter : IViewMainPresenter
         View.Presenter = this;
         
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
+        _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
     }
 
     public void Run()
     {
         View.Run();
+    }
+
+    public void LoadForm()
+    {
+        View.LanguageSelectList = _metricCalculatorManager.GetSupportedLanguages();
+        View.SortDirectionSelectList = Enum.GetValues<SortDirection>();
     }
 
     public async Task SearchRepositories()
@@ -33,9 +43,10 @@ public class ViewMainPresenter : IViewMainPresenter
         {
             Language = View.SelectedLanguage,
             Order = View.SortDirection,
-            Count = View.RepositoryCount
+            Count = View.RepositoryCount,
+            Topic = View.Topics
         };
-
+        
         _gitOutput = await _gitManager.GetRepositories(gitInput);
         View.ShowRepositories(_gitOutput.Repositories);
     }
