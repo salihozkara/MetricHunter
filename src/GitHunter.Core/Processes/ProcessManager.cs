@@ -15,12 +15,11 @@ public class ProcessManager : IProcessManager, ISingletonDependency
         return RunAsync(new ProcessStartInfo(command, arguments, workingDirectory));
     }
 
-    public Task<ProcessResult> RunAsync(Process process, string arguments, string? workingDirectory = null)
+    public async Task<ProcessResult> RunAsync(Process process, string arguments, string? workingDirectory = null)
     {
         if (_killAllProcessesRequested)
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
-        var tcs = new TaskCompletionSource<ProcessResult>();
 
         string? output = null;
         string? error = null;
@@ -45,18 +44,6 @@ public class ProcessManager : IProcessManager, ISingletonDependency
             output += args.Data + Environment.NewLine;
         };
 
-        process.Exited += (sender, args) =>
-        {
-            var result = new ProcessResult
-            {
-                ExitCode = process.ExitCode,
-                Output = output,
-                Error = error
-            };
-
-            tcs.SetResult(result);
-        };
-
 
         process.Start();
 
@@ -65,19 +52,26 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
         _processes.Add(process);
 
-        return tcs.Task;
+        await process.WaitForExitAsync();
+        
+        var result = new ProcessResult
+        {
+            ExitCode = process.ExitCode,
+            Output = output,
+            Error = error
+        };
+
+        return result;
     }
 
 
-    public Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo)
+    public async Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo)
     {
         if (_killAllProcessesRequested)
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
 
         var process = CreateProcess(processStartInfo);
-
-        var tcs = new TaskCompletionSource<ProcessResult>();
 
         string? output = null;
         string? error = null;
@@ -95,29 +89,23 @@ public class ProcessManager : IProcessManager, ISingletonDependency
             output += args.Data + Environment.NewLine;
             processStartInfo.OutputDataReceived?.Invoke(args.Data);
         };
-
-        process.Exited += (sender, args) =>
-        {
-            processStartInfo.Exited?.Invoke();
-            var result = new ProcessResult
-            {
-                ExitCode = process.ExitCode,
-                Output = output,
-                Error = error
-            };
-
-            tcs.SetResult(result);
-        };
-
-
+        
         process.Start();
 
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
         _processes.Add(process);
+        
+        await process.WaitForExitAsync();
+        processStartInfo.Exited?.Invoke();
 
-        return tcs.Task;
+        return new ProcessResult()
+        {
+            ExitCode = process.ExitCode,
+            Output = output,
+            Error = error
+        };
     }
 
     public Task<bool> KillAllProcessesAsync()

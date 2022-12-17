@@ -97,7 +97,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
 
         await Task.WhenAll(tasks);
 
-        _repositories = _repositories.DistinctBy(x => x.CloneUrl).ToList();
+        // _repositories = _repositories.DistinctBy(x => x.CloneUrl).ToList();
     }
 
     private async Task<SearchRepositoryResult?> RunRequest(SearchRepositoriesRequest x)
