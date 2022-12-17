@@ -29,7 +29,7 @@ public interface IGitManager
     /// </summary>
     /// <param name="failedRequests"></param>
     /// <returns></returns>
-    Task<GitOutput> RetryFailedRequest(HashSet<SearchRepositoriesRequest> failedRequests);
+    Task<GitOutput> RetryFailedRequest(List<SearchRepositoriesRequest> failedRequests);
 
     /// <summary>
     ///     This event is triggered when a request fails.

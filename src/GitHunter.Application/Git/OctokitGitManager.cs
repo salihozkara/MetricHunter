@@ -9,6 +9,8 @@ public class OctokitGitManager : IGitManager, ITransientDependency
 {
     private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
     private readonly ILogger<OctokitGitManager> _logger;
+    private const int MaxPage = 10;
+    private const int PerPage = 100;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="OctokitGitManager" /> class.
@@ -66,9 +68,37 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// <returns></returns>
     public async Task<GitOutput> GetRepositories(GitInput input)
     {
-        HashSet<SearchRepositoriesRequest> failedRequests = new();
-        var result = await GetRepositories(input, null, failedRequests);
-        return new GitOutput(result.Repositories.Take(input.Count).ToList(), result.FailedRequests);
+        List<SearchRepositoriesRequest> failedRequests = new();
+        List<Repository> repositories = new();
+        Range? stars = null;
+
+        while (repositories.Count < input.Count)
+        {
+            var requests = GetPageNumbers(input.Count - repositories.Count).Select(p => CreateRequest(input, p, stars))
+                .ToList();
+            var results = await RunRequests(requests, failedRequests);
+            var items = ConvertToRepositories(results);
+            repositories.AddRange(items);
+            var count = repositories.Count;
+            repositories = repositories.DistinctBy(r => r.CloneUrl).ToList();
+            var newCount = repositories.Count;
+            if (count != newCount)
+                _logger.LogWarning("{count} repositories were removed because of duplication", count - newCount);
+
+            if (results.Where(r => r != null).Any(i => i!.Items.Count != PerPage))
+            {
+                _logger.LogWarning("No more repositories found");
+                break;
+            }
+
+            // Updating range as only the first 1000 search results are available in Github requests
+            if (repositories.Any())
+                stars = input.Order == SortDirection.Descending
+                    ? Range.LessThanOrEquals(repositories.Min(x => x.StargazersCount))
+                    : Range.GreaterThanOrEquals(repositories.Max(x => x.StargazersCount));
+        }
+
+        return new GitOutput(repositories.Take(input.Count).ToList(), failedRequests);
     }
 
     /// <summary>
@@ -76,7 +106,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// </summary>
     /// <param name="failedRequests"></param>
     /// <returns></returns>
-    public async Task<GitOutput> RetryFailedRequest(HashSet<SearchRepositoriesRequest> failedRequests)
+    public async Task<GitOutput> RetryFailedRequest(List<SearchRepositoriesRequest> failedRequests)
     {
         _logger.LogWarning("Retrying failed requests");
         var requests = failedRequests.ToList();
@@ -103,40 +133,18 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// <returns></returns>
     private IEnumerable<int> GetPageNumbers(int count)
     {
-        var pages = count / 100;
-        pages += count % 100 == 0 ? 0 : 1;
-        for (var i = 1; i <= pages; i++) yield return i;
-    }
+        if (count <= 0)
+        {
+            return ArraySegment<int>.Empty;
+        }
 
-    /// <summary>
-    ///     Recursively pulls repository information based on input value
-    /// </summary>
-    /// <param name="input"></param>
-    /// <param name="range"></param>
-    /// <param name="failedRequests"></param>
-    /// <returns></returns>
-    private async Task<GitOutput> GetRepositories(GitInput input, Range? range,
-        HashSet<SearchRepositoriesRequest> failedRequests)
-    {
-        var stars = range;
-        var repositories = new List<Repository>();
-        var requests = GetPageNumbers(input.Count)
-            .Select(x => CreateRequest(input, x, stars));
+        var pages = Math.DivRem(count, PerPage, out var rem);
+        if (rem != 0)
+        {
+            pages++;
+        }
 
-        var results = await RunRequests(requests, failedRequests);
-        repositories.AddRange(ConvertToRepositories(results));
-        if (repositories.Count >= input.Count)
-            return new GitOutput(repositories, failedRequests);
-
-        // Updating range as only the first 1000 search results are available in Github requests
-        if (repositories.Any())
-            range = input.Order == SortDirection.Descending
-                ? Range.LessThanOrEquals(repositories.Min(x => x.StargazersCount))
-                : Range.GreaterThanOrEquals(repositories.Max(x => x.StargazersCount));
-
-        var result = await GetRepositories(input, range, failedRequests);
-        repositories.AddRange(result.Repositories);
-        return new GitOutput(repositories, failedRequests);
+        return Enumerable.Range(0, pages).Select(i => (i % MaxPage) + 1);
     }
 
     /// <summary>
@@ -146,12 +154,9 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// <param name="failedRequests"></param>
     /// <returns></returns>
     private async Task<SearchRepositoryResult?[]> RunRequests(IEnumerable<SearchRepositoriesRequest> requests,
-        HashSet<SearchRepositoriesRequest> failedRequests)
+        List<SearchRepositoriesRequest> failedRequests)
     {
         var tasks = requests.Select(r => RunRequest(r, failedRequests));
-
-        await RateLimitWait();
-
         return await Task.WhenAll(tasks);
     }
 
@@ -162,9 +167,10 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// <param name="failedRequests"></param>
     /// <returns></returns>
     private async Task<SearchRepositoryResult?> RunRequest(SearchRepositoriesRequest request,
-        HashSet<SearchRepositoriesRequest> failedRequests)
+        List<SearchRepositoriesRequest> failedRequests)
     {
-        failedRequests.Add(request);
+        if (!failedRequests.Contains(request))
+            failedRequests.Add(request);
         SearchRepositoryResult? result = null;
         try
         {
@@ -176,7 +182,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
             try
             {
                 _logger.LogWarning("Retrying request");
-                result = await Client.Search.SearchRepo(request);
+                result = await RunRequest(request, failedRequests);
             }
             catch (Exception exception)
             {
@@ -216,10 +222,12 @@ public class OctokitGitManager : IGitManager, ITransientDependency
                 {
                     var resetTime = rateLimits.Resources.Search.Reset;
                     var waitTime = resetTime - DateTimeOffset.Now;
-                    _logger.LogWarning("Rate limit exceeded, waiting {0} seconds", waitTime.TotalSeconds);
                     if (waitTime.TotalSeconds > 0)
+                    {
+                        _logger.LogWarning("Rate limit exceeded, waiting {0} seconds", waitTime.TotalSeconds);
                         await Task.Delay(waitTime);
-                    _logger.LogWarning("Rate limit reset");
+                        _logger.LogWarning("Rate limit reset");
+                    }
                 }
             }
         }
@@ -249,11 +257,11 @@ public class OctokitGitManager : IGitManager, ITransientDependency
         var request = new SearchRepositoriesRequest
         {
             Language = input.Language,
-            Topic = input.Topic,
+            Topic = input.Topic.IsNullOrWhiteSpace() ? null : input.Topic,
             SortField = RepoSearchSort.Stars,
             Stars = stars,
             Page = page,
-            PerPage = input.Count < 100 ? input.Count : 100,
+            PerPage = PerPage,
             Order = input.Order
         };
         return request;
