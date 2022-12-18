@@ -21,7 +21,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     
     public int RepositoryCount => int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
     public string Topics => _topicsTextBox.Text;
-    public string RepositoriesJsonPath => _jsonPathTextBox.Text;
+    public string RepositoriesJsonPath => "";
 
     public IEnumerable<Language>? LanguageSelectList
     {
@@ -55,18 +55,18 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         System.Windows.Forms.Application.Run(this);
     }
     
-    private void _jsonPathSelectButton_Click(object sender, EventArgs e)
-    {
-        var fileDialog = new OpenFileDialog
-        {
-            Filter = "Json files | *.json"
-        };
+    //private void _jsonPathSelectButton_Click(object sender, EventArgs e)
+    //{
+    //    var fileDialog = new OpenFileDialog
+    //    {
+    //        Filter = "Json files | *.json"
+    //    };
 
-        if (fileDialog.ShowDialog() == DialogResult.OK)
-        {
-            _jsonPathTextBox.Text = fileDialog.FileName;
-        }
-    }
+    //    if (fileDialog.ShowDialog() == DialogResult.OK)
+    //    {
+    //        _jsonPathTextBox.Text = fileDialog.FileName;
+    //    }
+    //}
     
     private void _searchButton_Click(object sender, EventArgs e)
     {
@@ -81,5 +81,25 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void _downloadMetricsButton_Click(object sender, EventArgs e)
     {
         Presenter.DownloadMetrics();
+    }
+
+    private void toolStripMenuItem1_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+    {
+
+    }
+
+    private void panel2_Paint(object sender, PaintEventArgs e)
+    {
+
+    }
+
+    private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
+    {
+
     }
 }
