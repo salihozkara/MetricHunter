@@ -1,7 +1,7 @@
 ﻿using GitHunter.Application.Resources;
 using GitHunter.Core.DependencyProcesses;
 
-namespace GitHunter.Application.LanguageStatistics.SourceMonitor;
+namespace GitHunter.Application.Metrics.SourceMonitor;
 
 public class SourceMonitorProcessDependency : IProcessDependency
 {
