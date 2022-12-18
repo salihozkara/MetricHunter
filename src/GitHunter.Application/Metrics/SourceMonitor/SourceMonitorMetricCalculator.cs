@@ -35,43 +35,54 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     public async Task<List<IMetric>> CalculateMetricsAsync(Repository repository, CancellationToken token = default)
     {
         await ProcessRepository(repository, token);
-        return await GetMetrics(repository, token);
-    }
-
-    private Task<List<IMetric>> GetMetrics(Repository repository, CancellationToken token)
-    {
         var reportsPath =
             PathHelper.BuildFullPath(repository.Language, ReportsPath, repository.FullName + ".xml");
-        var metrics = new List<IMetric>();
+
         var xmlDocument = new XmlDocument();
         xmlDocument.Load(reportsPath);
-        // add id to xml
-        var root = xmlDocument.DocumentElement;
-        var idAttribute = xmlDocument.CreateAttribute("id");
-        idAttribute.Value = repository.Id.ToString();
-        root?.Attributes.Append(idAttribute);
-        xmlDocument.Save(reportsPath);
-        
+
+        AddIdToXml(repository, xmlDocument, reportsPath);
+
+        FileNameChange(repository, reportsPath);
+
+        return GetMetrics(xmlDocument);
+    }
+
+    private List<IMetric> GetMetrics(XmlNode xmlNode)
+    {
+        List<IMetric> metrics = new();
+        var metricsDetails = xmlNode
+            .SelectNodes("//metric_name")?.Cast<XmlNode>()
+            .Zip(xmlNode.SelectNodes("//metric")?.Cast<XmlNode>() ?? Array.Empty<XmlNode>(),
+                (name, value) => new { name, value }).ToDictionary(k => k.name, v => v.value);
+        var matchesMetrics = metricsDetails?.Keys
+            .Select(k => new Metric(k.InnerText, metricsDetails[k].InnerText)).ToList();
+        if (matchesMetrics != null) metrics.AddRange(matchesMetrics);
+        return metrics;
+    }
+
+    private static void FileNameChange(Repository repository, string reportsPath)
+    {
         // file name change
         var fileInfo = new FileInfo(reportsPath);
         var newFileName = $"id_{repository.Id}_{fileInfo.Name}";
         if (fileInfo.DirectoryName != null)
         {
             var newFilePath = Path.Combine(fileInfo.DirectoryName, newFileName);
-            if(File.Exists(newFilePath))
+            if (File.Exists(newFilePath))
                 File.Delete(newFilePath);
             fileInfo.MoveTo(newFilePath);
         }
+    }
 
-        // get metrics
-        var metricsDetails = xmlDocument
-            .SelectNodes("//metric_name")?.Cast<XmlNode>()
-            .Zip(xmlDocument.SelectNodes("//metric")?.Cast<XmlNode>() ?? Array.Empty<XmlNode>(),
-                (name, value) => new{name, value}).ToDictionary(k=> k.name, v => v.value);
-        var matchesMetrics = metricsDetails?.Keys
-            .Select(k=> new Metric(k.InnerText, metricsDetails[k].InnerText)).ToList();
-        if (matchesMetrics != null) metrics.AddRange(matchesMetrics);
-        return Task.FromResult(metrics);
+    private static void AddIdToXml(Repository repository, XmlDocument xmlDocument, string reportsPath)
+    {
+        // add id to xml
+        var root = xmlDocument.DocumentElement;
+        var idAttribute = xmlDocument.CreateAttribute("id");
+        idAttribute.Value = repository.Id.ToString();
+        root?.Attributes.Append(idAttribute);
+        xmlDocument.Save(reportsPath);
     }
 
     private async Task ProcessRepository(Repository repository, CancellationToken token = default)
