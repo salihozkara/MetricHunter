@@ -1,7 +1,11 @@
 ﻿namespace GitHunter.Desktop.Core;
 
-public interface IPresenter<TView>
+public interface IPresenter<TView> : IPresenter where TView : IView
 {
     TView View { get; }
+}
+
+public interface IPresenter
+{
     void Run();
 }
