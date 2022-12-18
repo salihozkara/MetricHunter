@@ -22,8 +22,8 @@ public class CoreModule : GitHunterModule
                 var modules = ModuleHelper.FindGitHunterModuleTypes(processDependencyOptions.StartupModule);
 
                 foreach (var assembly in modules.Select(m => m.Assembly))
-                    if (!processDependencyChecker.CheckDependency(assembly))
-                        processDependencyOptions.ErrorAction?.Invoke();
+                    if (!processDependencyChecker.CheckDependency(assembly, out var dependency))
+                        processDependencyOptions.ErrorAction?.Invoke(dependency);
             }
         }
 

@@ -4,16 +4,12 @@ namespace GitHunter.Application.Git;
 
 public class GitOutput
 {
-    public GitOutput(IReadOnlyList<Repository> resultItems, int resultTotalCount, bool resultIncompleteResults)
+    public GitOutput(IReadOnlyList<Repository> resultItems, IReadOnlyList<SearchRepositoriesRequest> failedRequests)
     {
         Repositories = resultItems;
-        TotalCount = resultTotalCount;
-        IncompleteResults = resultIncompleteResults;
+        FailedRequests = failedRequests;
     }
 
-    public bool IncompleteResults { get; }
-
-    public int TotalCount { get; }
-
     public IReadOnlyList<Repository> Repositories { get; }
+    public IReadOnlyList<SearchRepositoriesRequest> FailedRequests { get; }
 }

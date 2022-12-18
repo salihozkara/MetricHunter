@@ -8,12 +8,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj"/>
-        <ProjectReference Include="..\GitHunter.Core\GitHunter.Core.csproj"/>
+        <ProjectReference Include="..\GitHunter.Application.Shared\GitHunter.Application.Shared.csproj" />
+        <ProjectReference Include="..\GitHunter.Core\GitHunter.Core.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Octokit" Version="4.0.3"/>
+        <PackageReference Include="Octokit" Version="4.0.3" />
     </ItemGroup>
 
 </Project>

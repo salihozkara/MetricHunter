@@ -1,4 +1,5 @@
-﻿using GitHunter.Application;
+﻿using System.Diagnostics;
+using GitHunter.Application;
 using GitHunter.Core.DependencyProcesses;
 using GitHunter.Core.Modules;
 using GitHunter.Desktop.Core;
@@ -17,7 +18,15 @@ public class DesktopWindowsFormModule : GitHunterModule
         Configure<ProcessDependencyOptions>(o =>
         {
             o.StartupModule = typeof(DesktopWindowsFormModule);
-            o.ErrorAction = () => { MessageBox.Show("Error"); };
+            o.ErrorAction = (pd) =>
+            {
+                var text = pd?.ErrorMessage + Environment.NewLine + "Do you want to download it now?";
+                if(MessageBox.Show(text, pd?.ErrorTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
+                {
+                    if (pd?.DownloadUrl != null) Process.Start("explorer", pd.DownloadUrl);
+                }
+                Environment.Exit(0);
+            };
         });
         
         base.ConfigureServices(context);

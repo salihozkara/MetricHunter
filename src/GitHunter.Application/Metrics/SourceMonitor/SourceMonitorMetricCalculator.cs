@@ -1,11 +1,12 @@
-﻿using GitHunter.Application.Resources;
+﻿using System.Xml;
+using GitHunter.Application.Resources;
 using GitHunter.Core.DependencyProcesses;
 using GitHunter.Core.Helpers;
 using GitHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
 using Octokit;
 
-namespace GitHunter.Application.LanguageStatistics.SourceMonitor;
+namespace GitHunter.Application.Metrics.SourceMonitor;
 
 [Language(Language.CSharp, Language.CPlusPlus, Language.Java)]
 [ProcessDependency<SourceMonitorProcessDependency>]
@@ -16,6 +17,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     private const string ProjectFileDirectoryReplacement = "{{project_file_directory}}";
     private const string ProjectLanguageReplacement = "{{project_language}}";
     private const string ReportsPathReplacement = "{{reports_path}}";
+
+    private const string ReportsPath = "Reports";
 
     private readonly ILogger<SourceMonitorMetricCalculator> _logger;
     private readonly IProcessManager _processManager;
@@ -29,16 +32,64 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     }
 
 
-    public Task CalculateMetricsAsync(Repository repository, CancellationToken token = default)
+    public async Task<List<IMetric>> CalculateMetricsAsync(Repository repository, CancellationToken token = default)
     {
-        return ProcessRepository(repository, token);
+        await ProcessRepository(repository, token);
+        var reportsPath =
+            PathHelper.BuildFullPath(repository.Language, ReportsPath, repository.FullName + ".xml");
+
+        var xmlDocument = new XmlDocument();
+        xmlDocument.Load(reportsPath);
+
+        AddIdToXml(repository, xmlDocument, reportsPath);
+
+        FileNameChange(repository, reportsPath);
+
+        return GetMetrics(xmlDocument);
+    }
+
+    private List<IMetric> GetMetrics(XmlNode xmlNode)
+    {
+        List<IMetric> metrics = new();
+        var metricsDetails = xmlNode
+            .SelectNodes("//metric_name")?.Cast<XmlNode>()
+            .Zip(xmlNode.SelectNodes("//metric")?.Cast<XmlNode>() ?? Array.Empty<XmlNode>(),
+                (name, value) => new { name, value }).ToDictionary(k => k.name, v => v.value);
+        var matchesMetrics = metricsDetails?.Keys
+            .Select(k => new Metric(k.InnerText, metricsDetails[k].InnerText)).ToList();
+        if (matchesMetrics != null) metrics.AddRange(matchesMetrics);
+        return metrics;
+    }
+
+    private static void FileNameChange(Repository repository, string reportsPath)
+    {
+        // file name change
+        var fileInfo = new FileInfo(reportsPath);
+        var newFileName = $"id_{repository.Id}_{fileInfo.Name}";
+        if (fileInfo.DirectoryName != null)
+        {
+            var newFilePath = Path.Combine(fileInfo.DirectoryName, newFileName);
+            if (File.Exists(newFilePath))
+                File.Delete(newFilePath);
+            fileInfo.MoveTo(newFilePath);
+        }
+    }
+
+    private static void AddIdToXml(Repository repository, XmlDocument xmlDocument, string reportsPath)
+    {
+        // add id to xml
+        var root = xmlDocument.DocumentElement;
+        var idAttribute = xmlDocument.CreateAttribute("id");
+        idAttribute.Value = repository.Id.ToString();
+        root?.Attributes.Append(idAttribute);
+        xmlDocument.Save(reportsPath);
     }
 
     private async Task ProcessRepository(Repository repository, CancellationToken token = default)
     {
         if (token.IsCancellationRequested)
             return;
-        var reportsPath = Path.Combine(repository.Language, "Reports", repository.FullName + ".xml");
+        var reportsPath = Path.Combine(repository.Language, ReportsPath, repository.FullName + ".xml");
         if (File.Exists(reportsPath))
         {
             _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.FullName);
