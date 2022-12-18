@@ -82,24 +82,4 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         Presenter.DownloadMetrics();
     }
-
-    private void toolStripMenuItem1_Click(object sender, EventArgs e)
-    {
-
-    }
-
-    private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
-    {
-
-    }
-
-    private void panel2_Paint(object sender, PaintEventArgs e)
-    {
-
-    }
-
-    private void tableLayoutPanel1_Paint(object sender, PaintEventArgs e)
-    {
-
-    }
 }
