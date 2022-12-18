@@ -19,16 +19,6 @@ public class GitProvider : IGitProvider, ISingletonDependency
         _logger = logger;
     }
 
-    public void Initialize(string username, string password)
-    {
-        throw new NotImplementedException();
-    }
-
-    public void Initialize(string token)
-    {
-        throw new NotImplementedException();
-    }
-
     // TODO: Add path to parameters
     public async Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
     {
