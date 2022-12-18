@@ -1,6 +1,6 @@
 ﻿using Octokit;
 
-namespace GitHunter.Application.LanguageStatistics;
+namespace GitHunter.Application.Metrics;
 
 public class LanguageAttribute : Attribute
 {

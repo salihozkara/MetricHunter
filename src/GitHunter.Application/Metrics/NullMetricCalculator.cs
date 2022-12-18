@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Octokit;
 
-namespace GitHunter.Application.LanguageStatistics;
+namespace GitHunter.Application.Metrics;
 
 public class NullMetricCalculator : IMetricCalculator
 {
@@ -12,9 +12,9 @@ public class NullMetricCalculator : IMetricCalculator
         _logger = logger;
     }
 
-    public Task CalculateMetricsAsync(Repository repository, CancellationToken token = default)
+    public Task<List<IMetric>> CalculateMetricsAsync(Repository repository, CancellationToken token = default)
     {
         _logger.LogInformation("No language statistics available for {Repository}", repository.Name);
-        return Task.CompletedTask;
+        return Task.FromResult(new List<IMetric>());
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 
-namespace GitHunter.Application.LanguageStatistics;
+namespace GitHunter.Application.Metrics;
 
 public class MetricCalculatorManager : IMetricCalculatorManager, ISingletonDependency
 {
