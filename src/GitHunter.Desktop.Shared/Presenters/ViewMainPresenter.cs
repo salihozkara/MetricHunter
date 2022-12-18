@@ -1,5 +1,5 @@
 ﻿using GitHunter.Application.Git;
-using GitHunter.Application.LanguageStatistics;
+using GitHunter.Application.Metrics;
 using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Views;

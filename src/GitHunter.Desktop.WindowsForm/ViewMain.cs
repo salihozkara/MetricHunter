@@ -1,13 +1,9 @@
 using System.ComponentModel;
-using System.Data;
-using GitHunter.Application.Git;
-using GitHunter.Application.LanguageStatistics;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Presenters;
 using GitHunter.Desktop.Views;
 using Octokit;
 using Volo.Abp.DependencyInjection;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace GitHunter.Desktop;
 
