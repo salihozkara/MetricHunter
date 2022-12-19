@@ -75,8 +75,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
         var result = await Presenter.CalculateMetrics();
-        MessageBox.Show(result);
-        Clipboard.SetText(result);
     }
 
     private void _downloadMetricsButton_Click(object sender, EventArgs e)
