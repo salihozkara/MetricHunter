@@ -16,6 +16,8 @@
 
         <modified_complexity>true</modified_complexity>
 
+        <parse_utf8_files>True</parse_utf8_files>
+
         <export>
             <export_file>{{reports_path}}\{{project_name}}.xml</export_file>
             <export_type>1 (project summary as xml)</export_type>

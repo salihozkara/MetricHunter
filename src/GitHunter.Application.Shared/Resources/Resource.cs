@@ -2,6 +2,7 @@
 using System.Dynamic;
 using System.Globalization;
 using System.Reflection;
+using GitHunter.Core.Helpers;
 using JsonNet.ContractResolvers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -49,6 +50,9 @@ public static class Resource
     {
         public static readonly ResValue<string> TemplateXml = new($"{DynamicResFolder}/SourceMonitor/template.xml",
             File.ReadAllText($"{DynamicResFolder}/SourceMonitor/template.xml"));
+
+        public static readonly string XmlReportsFolder =
+            PathHelper.BuildAndCreateFullPath($"{DynamicResFolder}/SourceMonitor/XmlReports");
 
         public static ResValue<Process> SourceMonitorExe => new($"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe",
             new Process

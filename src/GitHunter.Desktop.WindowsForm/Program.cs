@@ -22,19 +22,19 @@ public class Program
             .CreateLogger();
 
 
-        using var application =  AbpApplicationFactory.Create<DesktopWindowsFormModule>(
+        using var application = AbpApplicationFactory.Create<DesktopWindowsFormModule>(
             options =>
             {
                 options.UseAutofac();
                 options.Services.AddLogging(c => c.AddSerilog());
             });
-        
+
         application.Initialize();
 
         var processManager = application.ServiceProvider
             .GetRequiredService<IProcessManager>();
         // await processManager.KillAllProcessesAsync();
-        
+
         application.Shutdown();
     }
 }

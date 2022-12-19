@@ -7,6 +7,7 @@ public class Metric : IMetric
         Name = name;
         Value = value;
     }
+
     public string Name { get; }
     public string Value { get; }
 }
