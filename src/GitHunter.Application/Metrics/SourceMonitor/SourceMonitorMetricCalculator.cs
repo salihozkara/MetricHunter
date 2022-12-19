@@ -1,5 +1,6 @@
 ﻿using System.Xml;
 using GitHunter.Application.Resources;
+using GitHunter.Application.Results;
 using GitHunter.Core.DependencyProcesses;
 using GitHunter.Core.Helpers;
 using GitHunter.Core.Processes;
@@ -32,7 +33,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     }
 
 
-    public async Task<List<IMetric>> CalculateMetricsAsync(Repository repository, CancellationToken token = default)
+    public async Task<IResult> CalculateMetricsAsync(Repository repository, CancellationToken token = default)
     {
         await ProcessRepository(repository, token);
         var reportsPath =
@@ -43,14 +44,15 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         AddIdToXml(repository, xmlDocument, reportsPath);
 
-        FileNameChange(repository, reportsPath);
+        FileNameChangeAndMove(repository, reportsPath);
 
-        return GetMetrics(xmlDocument);
+        return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
     }
 
     private List<IMetric> GetMetrics(XmlNode xmlNode)
     {
         List<IMetric> metrics = new();
+
         var metricsDetails = xmlNode
             .SelectNodes("//metric_name")?.Cast<XmlNode>()
             .Zip(xmlNode.SelectNodes("//metric")?.Cast<XmlNode>() ?? Array.Empty<XmlNode>(),
@@ -58,21 +60,45 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         var matchesMetrics = metricsDetails?.Keys
             .Select(k => new Metric(k.InnerText, metricsDetails[k].InnerText)).ToList();
         if (matchesMetrics != null) metrics.AddRange(matchesMetrics);
-        return metrics;
+
+        return Metrics(metrics);
     }
 
-    private static void FileNameChange(Repository repository, string reportsPath)
+    private List<IMetric> Metrics(List<IMetric> metrics)
     {
-        // file name change
+        return new List<IMetric>
+        {
+            new LinesMetric(GetMetricListValue(metrics, LinesMetric.MatchedMetricNames)),
+            new StatementsMetric(GetMetricListValue(metrics, StatementsMetric.MatchedMetricNames)),
+            new PercentCommentLinesMetric(GetMetricListValue(metrics, PercentCommentLinesMetric.MatchedMetricNames)),
+            new PercentDocumentationLinesMetric(GetMetricListValue(metrics,
+                PercentDocumentationLinesMetric.MatchedMetricNames)),
+            new ClassesInterfacesStructsMetric(GetMetricListValue(metrics,
+                ClassesInterfacesStructsMetric.MatchedMetricNames)),
+            new MethodsPerClassMetric(GetMetricListValue(metrics, MethodsPerClassMetric.MatchedMetricNames)),
+            new StatementsPerMethodMetric(GetMetricListValue(metrics, StatementsPerMethodMetric.MatchedMetricNames)),
+            new MaximumComplexityMetric(GetMetricListValue(metrics, MaximumComplexityMetric.MatchedMetricNames)),
+            new AverageComplexityMetric(GetMetricListValue(metrics, AverageComplexityMetric.MatchedMetricNames)),
+            new MaximumBlockDepthMetric(GetMetricListValue(metrics, MaximumBlockDepthMetric.MatchedMetricNames)),
+            new AverageBlockDepthMetric(GetMetricListValue(metrics, AverageBlockDepthMetric.MatchedMetricNames))
+        };
+    }
+
+    private static string GetMetricListValue(IEnumerable<IMetric> metrics, string[] match)
+    {
+        var metric = metrics.FirstOrDefault(m => match.Contains(m.Name));
+        return metric?.Value ?? "0";
+    }
+
+    private static void FileNameChangeAndMove(Repository repository, string reportsPath)
+    {
+        // file name change and move
         var fileInfo = new FileInfo(reportsPath);
         var newFileName = $"id_{repository.Id}_{fileInfo.Name}";
-        if (fileInfo.DirectoryName != null)
-        {
-            var newFilePath = Path.Combine(fileInfo.DirectoryName, newFileName);
-            if (File.Exists(newFilePath))
-                File.Delete(newFilePath);
-            fileInfo.MoveTo(newFilePath);
-        }
+        var newFilePath = Path.Combine(Resource.SourceMonitor.XmlReportsFolder, newFileName);
+        if (File.Exists(newFilePath))
+            File.Delete(newFilePath);
+        fileInfo.MoveTo(newFilePath);
     }
 
     private static void AddIdToXml(Repository repository, XmlDocument xmlDocument, string reportsPath)
@@ -105,6 +131,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         var xmlPath = await CreateSourceMonitorXml(repository);
 
         var result = await _processManager.RunAsync(Resource.SourceMonitor.SourceMonitorExe.Value, $"/C \"{xmlPath}\"");
+        _logger.LogDebug("SourceMonitor log: {SourceMonitorLog}", result.Output);
+        _logger.LogError("SourceMonitor error log: {SourceMonitorErrorLog}", result.Error);
         if (result.ExitCode == 0)
             _logger.LogInformation("Statistics for {RepositoryName} calculated successfully", repository.FullName);
         else

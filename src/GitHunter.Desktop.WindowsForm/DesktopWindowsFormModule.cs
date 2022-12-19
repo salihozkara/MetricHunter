@@ -4,8 +4,8 @@ using GitHunter.Core.DependencyProcesses;
 using GitHunter.Core.Modules;
 using GitHunter.Desktop.Core;
 using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp;
 using Volo.Abp.Modularity;
-using ApplicationInitializationContext = Volo.Abp.ApplicationInitializationContext;
 
 namespace GitHunter.Desktop;
 
@@ -18,17 +18,17 @@ public class DesktopWindowsFormModule : GitHunterModule
         Configure<ProcessDependencyOptions>(o =>
         {
             o.StartupModule = typeof(DesktopWindowsFormModule);
-            o.ErrorAction = (pd) =>
+            o.ErrorAction = pd =>
             {
                 var text = pd?.ErrorMessage + Environment.NewLine + "Do you want to download it now?";
-                if(MessageBox.Show(text, pd?.ErrorTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) == DialogResult.Yes)
-                {
-                    if (pd?.DownloadUrl != null) Process.Start("explorer", pd.DownloadUrl);
-                }
+                if (MessageBox.Show(text, pd?.ErrorTitle, MessageBoxButtons.YesNo, MessageBoxIcon.Asterisk) ==
+                    DialogResult.Yes)
+                    if (pd?.DownloadUrl != null)
+                        Process.Start("explorer", pd.DownloadUrl);
                 Environment.Exit(0);
             };
         });
-        
+
         base.ConfigureServices(context);
     }
 
@@ -43,9 +43,9 @@ public class DesktopWindowsFormModule : GitHunterModule
     {
         var app = context.ServiceProvider
             .GetRequiredService<IApplicationController>();
-        
+
         app.StartApplication();
-        
+
         base.OnApplicationInitialization(context);
     }
 }

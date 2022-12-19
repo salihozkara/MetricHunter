@@ -2,6 +2,6 @@
 
 public interface IApplicationController
 {
-    void StartApplication();
     public IServiceProvider ServiceProvider { get; }
+    void StartApplication();
 }

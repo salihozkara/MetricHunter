@@ -53,7 +53,7 @@ public class ProcessManager : IProcessManager, ISingletonDependency
         _processes.Add(process);
 
         await process.WaitForExitAsync();
-        
+
         var result = new ProcessResult
         {
             ExitCode = process.ExitCode,
@@ -89,18 +89,18 @@ public class ProcessManager : IProcessManager, ISingletonDependency
             output += args.Data + Environment.NewLine;
             processStartInfo.OutputDataReceived?.Invoke(args.Data);
         };
-        
+
         process.Start();
 
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
 
         _processes.Add(process);
-        
+
         await process.WaitForExitAsync();
         processStartInfo.Exited?.Invoke();
 
-        return new ProcessResult()
+        return new ProcessResult
         {
             ExitCode = process.ExitCode,
             Output = output,

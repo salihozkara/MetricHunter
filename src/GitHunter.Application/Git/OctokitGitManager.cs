@@ -7,10 +7,10 @@ namespace GitHunter.Application.Git;
 
 public class OctokitGitManager : IGitManager, ITransientDependency
 {
-    private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
-    private readonly ILogger<OctokitGitManager> _logger;
     private const int MaxPage = 10;
     private const int PerPage = 100;
+    private static readonly GitHubClient Client = new(new ProductHeaderValue("GitHunter"));
+    private readonly ILogger<OctokitGitManager> _logger;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="OctokitGitManager" /> class.
@@ -133,18 +133,12 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// <returns></returns>
     private IEnumerable<int> GetPageNumbers(int count)
     {
-        if (count <= 0)
-        {
-            return ArraySegment<int>.Empty;
-        }
+        if (count <= 0) return ArraySegment<int>.Empty;
 
         var pages = Math.DivRem(count, PerPage, out var rem);
-        if (rem != 0)
-        {
-            pages++;
-        }
+        if (rem != 0) pages++;
 
-        return Enumerable.Range(0, pages).Select(i => (i % MaxPage) + 1);
+        return Enumerable.Range(0, pages).Select(i => i % MaxPage + 1);
     }
 
     /// <summary>
