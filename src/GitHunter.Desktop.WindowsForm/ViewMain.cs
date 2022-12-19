@@ -9,13 +9,21 @@ namespace GitHunter.Desktop;
 
 public partial class ViewMain : Form, ISingletonDependency, IViewMain
 {
+    public ViewMain()
+    {
+        InitializeComponent();
+    }
+
     public IViewMainPresenter Presenter { get; set; }
-    
+
     public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
-    
-    public SortDirection SortDirection => _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
-    
-    public int RepositoryCount => int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
+
+    public SortDirection SortDirection =>
+        _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
+
+    public int RepositoryCount =>
+        int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
+
     public string Topics => _topicsTextBox.Text;
     public string RepositoriesJsonPath => "";
 
@@ -35,22 +43,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _repositoryDataGridView.DataSource = new BindingSource(bindingList, null);
     }
 
-    public ViewMain()
-    {
-        InitializeComponent();
-    }
-    
-    
-    private void _viewMain_Load(object sender, EventArgs e)
-    {
-        Presenter.LoadForm();
-    }
-    
     public void Run()
     {
         System.Windows.Forms.Application.Run(this);
     }
-    
+
+
+    private void _viewMain_Load(object sender, EventArgs e)
+    {
+        Presenter.LoadForm();
+    }
+
     //private void _jsonPathSelectButton_Click(object sender, EventArgs e)
     //{
     //    var fileDialog = new OpenFileDialog
@@ -63,17 +66,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     //        _jsonPathTextBox.Text = fileDialog.FileName;
     //    }
     //}
-    
+
     private void _searchButton_Click(object sender, EventArgs e)
     {
         Presenter.SearchRepositories();
     }
 
-    private void _calculateMetricsButton_Click(object sender, EventArgs e)
+    private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
-        Presenter.CalculateMetrics();
+        var result = await Presenter.CalculateMetrics();
     }
-    
+
     private void _downloadMetricsButton_Click(object sender, EventArgs e)
     {
         Presenter.DownloadMetrics();
