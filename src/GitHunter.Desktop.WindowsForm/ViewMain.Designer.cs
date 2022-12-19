@@ -55,6 +55,7 @@ partial class ViewMain
             this.searchGroupBox = new System.Windows.Forms.GroupBox();
             this.operationGroupBox = new System.Windows.Forms.GroupBox();
             this.huntButton = new System.Windows.Forms.Button();
+            this.loadToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).BeginInit();
             this.menu.SuspendLayout();
             this.basePanel.SuspendLayout();
@@ -192,7 +193,8 @@ partial class ViewMain
             // 
             this.savedRepositoriesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showToolStripMenuItem,
-            this.saveToolStripMenuItem});
+            this.saveToolStripMenuItem,
+            this.loadToolStripMenuItem});
             this.savedRepositoriesToolStripMenuItem.Name = "savedRepositoriesToolStripMenuItem";
             this.savedRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(113, 29);
             this.savedRepositoriesToolStripMenuItem.Text = "Repository";
@@ -200,13 +202,13 @@ partial class ViewMain
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(158, 34);
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.showToolStripMenuItem.Text = "Show";
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(158, 34);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.saveToolStripMenuItem.Text = "Save";
             // 
             // loginGithubToolStripMenuItem
@@ -313,6 +315,13 @@ partial class ViewMain
             this.huntButton.Text = "Hunt";
             this.huntButton.UseVisualStyleBackColor = true;
             // 
+            // loadToolStripMenuItem
+            // 
+            this.loadToolStripMenuItem.Name = "loadToolStripMenuItem";
+            this.loadToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.loadToolStripMenuItem.Text = "Load";
+            this.loadToolStripMenuItem.Click += new System.EventHandler(this._loadToolStripMenuItem_Click);
+            // 
             // ViewMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -367,4 +376,5 @@ partial class ViewMain
     private ToolStripMenuItem loginGithubToolStripMenuItem;
     private ToolStripMenuItem showToolStripMenuItem;
     private ToolStripMenuItem saveToolStripMenuItem;
+    private ToolStripMenuItem loadToolStripMenuItem;
 }

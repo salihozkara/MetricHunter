@@ -123,6 +123,22 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
         return Task.FromResult(true);
     }
+    
+    public bool KillAllProcesses()
+    {
+        _killAllProcessesRequested = true;
+        var processes = _processes.Where(process => !process.HasExited).ToImmutableArray();
+        foreach (var process in processes)
+        {
+            process.Kill(true);
+            process.WaitForExit();
+            process.Close();
+            process.Dispose();
+            _processes.Remove(process);
+        }
+
+        return true;
+    }
 
     private Process CreateProcess(ProcessStartInfo processStartInfo)
     {

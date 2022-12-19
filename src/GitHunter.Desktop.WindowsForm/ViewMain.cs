@@ -81,4 +81,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         Presenter.DownloadMetrics();
     }
+
+    private void _loadToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        var fileDialog = new OpenFileDialog
+        {
+            Filter = "Json files | *.json"
+        };
+
+        if (fileDialog.ShowDialog() == DialogResult.OK)
+        {
+            Presenter.LoadRepositoriesFromFiles(fileDialog.FileName);
+        }
+    }
 }

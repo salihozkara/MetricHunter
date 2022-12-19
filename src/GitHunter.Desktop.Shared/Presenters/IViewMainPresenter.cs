@@ -5,8 +5,11 @@ namespace GitHunter.Desktop.Presenters;
 
 public interface IViewMainPresenter : IPresenter<IViewMain>
 {
-    void LoadForm();
-    Task SearchRepositories();
-    Task<string> CalculateMetrics();
-    Task DownloadMetrics();
+
+     void LoadForm();
+     Task SearchRepositories();
+     Task<string> CalculateMetrics();
+     Task DownloadMetrics();
+     
+     void LoadRepositoriesFromFiles(string path);
 }

@@ -1,10 +1,13 @@
-﻿using GitHunter.Application.Csv;
+using GitHunter.Application.Csv;
 using GitHunter.Application.Git;
 using GitHunter.Application.Metrics;
+using GitHunter.Application.Resources;
 using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Octokit;
 
 namespace GitHunter.Desktop.Presenters;
@@ -16,6 +19,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IGitManager _gitManager;
     private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
+    private readonly ILogger<ViewMainPresenter> _logger;
     private GitOutput? _gitOutput;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
@@ -27,7 +31,22 @@ public class ViewMainPresenter : IViewMainPresenter
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
         _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
+
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
+        _logger = _controller.ServiceProvider.GetRequiredService<ILogger<ViewMainPresenter>>();
+        
+        _gitProvider.CloneRepositorySuccess += OnCloneRepositorySuccess;
+        _gitProvider.CloneRepositoryError += OnCloneRepositoryError;
+    }
+
+    private void OnCloneRepositoryError(object? sender, CloneRepositoryErrorEventArgs e)
+    {
+        _logger.LogError("{FullName} repository clone error: {Message}", e.Repository.FullName, e.Exception?.Message);
+    }
+
+    private void OnCloneRepositorySuccess(object? sender, CloneRepositorySuccessEventArgs e)
+    {
+        _logger.LogInformation("{FullName} cloned successfully", e.Repository.FullName);
     }
 
     public IViewMain View { get; }
@@ -90,6 +109,20 @@ public class ViewMainPresenter : IViewMainPresenter
         if (_gitOutput is null)
             return;
 
-        foreach (var item in _gitOutput.Repositories) await _gitProvider.CloneRepository(item);
+        var size = _gitOutput.Repositories.Sum(r => r.Size);
+        var sizeInMb = size / 1024;
+        var sizeInGb = sizeInMb / 1024;
+        var sizeInTb = sizeInGb / 1024;
+        var repositories = _gitOutput.Repositories.DistinctBy(r => r.CloneUrl).ToList();
+        foreach (var item in repositories)
+        {
+            await _gitProvider.CloneRepository(item);
+        }
+    }
+
+    public void LoadRepositoriesFromFiles(string path)
+    {
+        _gitOutput = new GitOutput(JsonConvert.DeserializeObject<List<Repository>>(
+            File.ReadAllText(path), Resource.Jsons.JsonSerializerSettings)!, Array.Empty<SearchRepositoriesRequest>());
     }
 }

@@ -33,7 +33,7 @@ public class Program
 
         var processManager = application.ServiceProvider
             .GetRequiredService<IProcessManager>();
-        // await processManager.KillAllProcessesAsync();
+        processManager.KillAllProcesses();
 
         application.Shutdown();
     }

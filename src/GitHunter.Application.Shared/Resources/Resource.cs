@@ -15,7 +15,7 @@ public static class Resource
 {
     private const string ResFolder = "Res";
 
-    private static readonly string DynamicResFolder = GetOrCreateResFolder();
+    private static readonly string DynamicResFolder = "./"+ResFolder;
 
     public static ResValue<IEnumerable<Repository>> RepositoriesJson => new($"{DynamicResFolder}/repositories.json",
         JsonConvert
