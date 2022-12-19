@@ -12,4 +12,5 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
      Task DownloadMetrics();
      
      void LoadRepositoriesFromFiles(string path);
+     void SaveRepositoriesToFile(string fileName);
 }

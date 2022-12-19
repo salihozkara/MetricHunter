@@ -25,7 +25,8 @@ public class ProcessManager : IProcessManager, ISingletonDependency
         string? error = null;
 
         process.StartInfo.Arguments = arguments;
-        process.StartInfo.WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
+        if (string.IsNullOrWhiteSpace(process.StartInfo.WorkingDirectory))
+            process.StartInfo.WorkingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
         process.StartInfo.UseShellExecute = false;
         process.StartInfo.RedirectStandardOutput = true;
         process.StartInfo.RedirectStandardError = true;
@@ -123,7 +124,7 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
         return Task.FromResult(true);
     }
-    
+
     public bool KillAllProcesses()
     {
         _killAllProcessesRequested = true;

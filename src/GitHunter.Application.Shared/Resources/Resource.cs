@@ -15,7 +15,7 @@ public static class Resource
 {
     private const string ResFolder = "Res";
 
-    private static readonly string DynamicResFolder = "./"+ResFolder;
+    private static readonly string DynamicResFolder = GetOrCreateResFolder();
 
     public static ResValue<IEnumerable<Repository>> RepositoriesJson => new($"{DynamicResFolder}/repositories.json",
         JsonConvert
@@ -59,7 +59,7 @@ public static class Resource
             {
                 StartInfo = new ProcessStartInfo
                 {
-                    FileName = "SourceMonitor.exe",
+                    FileName = $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe",
                     UseShellExecute = false,
                     RedirectStandardOutput = true,
                     RedirectStandardError = true,

@@ -124,5 +124,25 @@ public class ViewMainPresenter : IViewMainPresenter
     {
         _gitOutput = new GitOutput(JsonConvert.DeserializeObject<List<Repository>>(
             File.ReadAllText(path), Resource.Jsons.JsonSerializerSettings)!, Array.Empty<SearchRepositoriesRequest>());
+        
+        var repositoryModelList = _gitOutput.Repositories.Select(x => new RepositoryModel
+        {
+            Name = x.Name,
+            Description = x.Description,
+            Stars = x.StargazersCount,
+            Url = x.HtmlUrl,
+            License = x.License?.Name ?? "Lisans Yok",
+            Owner = x.Owner.Login
+        }).ToList();
+
+        View.ShowRepositories(repositoryModelList);
+    }
+
+    public void SaveRepositoriesToFile(string fileName)
+    {
+        if (_gitOutput is null)
+            return;
+
+        File.WriteAllText(fileName, JsonConvert.SerializeObject(_gitOutput.Repositories, Resource.Jsons.JsonSerializerSettings));
     }
 }

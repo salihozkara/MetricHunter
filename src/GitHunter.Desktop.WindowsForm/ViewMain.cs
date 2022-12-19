@@ -75,6 +75,21 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
         var result = await Presenter.CalculateMetrics();
+
+        if (!string.IsNullOrEmpty(result))
+        {
+            var fileDialog = new SaveFileDialog
+            {
+                Filter = "Csv files | *.csv",
+                FileName = "metrics.csv",
+                Title = "Save metrics"
+            };
+            
+            if (fileDialog.ShowDialog() == DialogResult.OK)
+            {
+                await File.WriteAllTextAsync(fileDialog.FileName, result);
+            }
+        }
     }
 
     private void _downloadMetricsButton_Click(object sender, EventArgs e)
@@ -92,6 +107,19 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (fileDialog.ShowDialog() == DialogResult.OK)
         {
             Presenter.LoadRepositoriesFromFiles(fileDialog.FileName);
+        }
+    }
+
+    private void _saveToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        var fileDialog = new SaveFileDialog
+        {
+            Filter = "Json files | *.json"
+        };
+
+        if (fileDialog.ShowDialog() == DialogResult.OK)
+        {
+            Presenter.SaveRepositoriesToFile(fileDialog.FileName);
         }
     }
 }
