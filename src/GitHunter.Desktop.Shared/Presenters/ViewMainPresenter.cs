@@ -34,7 +34,7 @@ public class ViewMainPresenter : IViewMainPresenter
 
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
         _logger = _controller.ServiceProvider.GetRequiredService<ILogger<ViewMainPresenter>>();
-        
+
         _gitProvider.CloneRepositorySuccess += OnCloneRepositorySuccess;
         _gitProvider.CloneRepositoryError += OnCloneRepositoryError;
     }
@@ -96,9 +96,16 @@ public class ViewMainPresenter : IViewMainPresenter
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in _gitOutput.Repositories)
         {
-            var metric = await manager.CalculateMetricsAsync(item);
-            var dictList = metric.ToDictionaryListByTopics();
-            metrics.AddRange(dictList);
+            try
+            {
+                var metric = await manager.CalculateMetricsAsync(item);
+                var dictList = metric.ToDictionaryListByTopics();
+                metrics.AddRange(dictList);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Calculate metrics error");
+            }
         }
 
         return _csvHelper.MetricsToCsv(metrics);
@@ -124,18 +131,18 @@ public class ViewMainPresenter : IViewMainPresenter
     {
         _gitOutput = new GitOutput(JsonConvert.DeserializeObject<List<Repository>>(
             File.ReadAllText(path), Resource.Jsons.JsonSerializerSettings)!, Array.Empty<SearchRepositoriesRequest>());
-        
-        var repositoryModelList = _gitOutput.Repositories.Select(x => new RepositoryModel
-        {
-            Name = x.Name,
-            Description = x.Description,
-            Stars = x.StargazersCount,
-            Url = x.HtmlUrl,
-            License = x.License?.Name ?? "Lisans Yok",
-            Owner = x.Owner.Login
-        }).ToList();
-
-        View.ShowRepositories(repositoryModelList);
+        _logger.LogInformation("Loaded {Count} repositories from {Path}", _gitOutput.Repositories.Count, path);
+        // var repositoryModelList = _gitOutput.Repositories.Select(x => new RepositoryModel
+        // {
+        //     Name = x.Name,
+        //     Description = x.Description,
+        //     Stars = x.StargazersCount,
+        //     Url = x.HtmlUrl,
+        //     License = x.License?.Name ?? "Lisans Yok",
+        //     Owner = x.Owner.Login
+        // }).ToList();
+        //
+        // View.ShowRepositories(repositoryModelList);
     }
 
     public void SaveRepositoriesToFile(string fileName)
@@ -143,6 +150,7 @@ public class ViewMainPresenter : IViewMainPresenter
         if (_gitOutput is null)
             return;
 
-        File.WriteAllText(fileName, JsonConvert.SerializeObject(_gitOutput.Repositories, Resource.Jsons.JsonSerializerSettings));
+        File.WriteAllText(fileName,
+            JsonConvert.SerializeObject(_gitOutput.Repositories, Resource.Jsons.JsonSerializerSettings));
     }
 }
