@@ -44,7 +44,7 @@ public class ViewMainPresenter : IViewMainPresenter
     public void LoadForm()
     {
         View.LanguageSelectList = _metricCalculatorManager.GetSupportedLanguages();
-        View.SortDirectionSelectList = Enum.GetValues<SortDirection>();
+        View.SortDirectionSelectList = Enum.GetValues<SortDirection>().Reverse().ToList();
     }
 
     public async Task SearchRepositories()
