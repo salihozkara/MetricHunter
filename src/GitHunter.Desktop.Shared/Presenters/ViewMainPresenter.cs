@@ -1,11 +1,15 @@
-﻿using GitHunter.Application.Csv;
+using GitHunter.Application.Csv;
 using GitHunter.Application.Git;
 using GitHunter.Application.Metrics;
+using GitHunter.Application.Resources;
 using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Octokit;
+using System.Text;
+using FileMode = System.IO.FileMode;
 
 namespace GitHunter.Desktop.Presenters;
 
@@ -91,5 +95,41 @@ public class ViewMainPresenter : IViewMainPresenter
             return;
 
         foreach (var item in _gitOutput.Repositories) await _gitProvider.CloneRepository(item);
+    }
+
+    public void ShowRepositories()
+    {
+        var repositories = JsonConvert.DeserializeObject<Repository[]>(File.ReadAllText($"{View.RepositoriesJsonPath}"), Resource.Jsons.JsonSerializerSettings);
+
+        if (repositories == null) return;
+
+        var repositoryModelList = repositories.Select(x => new RepositoryModel
+        {
+            Name = x.Name,
+            Description = x.Description,
+            Stars = x.StargazersCount,
+            Url = x.HtmlUrl,
+            License = x.License?.Name ?? "No Licence",
+            Owner = x.Owner.Login
+        }).ToList();
+
+        View.ShowRepositories(repositoryModelList);
+    }
+
+    public Task SaveRepositories()
+    {
+        if (_gitOutput is null)
+            return Task.CompletedTask;
+
+        var json = JsonConvert.SerializeObject(_gitOutput.Repositories, Resource.Jsons.JsonSerializerSettings);
+
+        var currentDate = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
+        var fileName = $"{View.RepositoriesFolderPath}//repositories_{currentDate}.json";
+
+        // Save file with create moed
+        using var fileStream = new FileStream(fileName , FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
+        fileStream.WriteAsync(Encoding.UTF8.GetBytes(json));
+
+        return Task.CompletedTask;
     }
 }

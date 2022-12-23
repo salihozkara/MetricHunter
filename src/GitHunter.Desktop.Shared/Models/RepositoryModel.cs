@@ -1,4 +1,4 @@
-﻿namespace GitHunter.Desktop.Models;
+namespace GitHunter.Desktop.Models;
 
 public class RepositoryModel
 {

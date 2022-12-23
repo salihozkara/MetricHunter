@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using System.Diagnostics;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Presenters;
 using GitHunter.Desktop.Views;
@@ -9,76 +10,121 @@ namespace GitHunter.Desktop;
 
 public partial class ViewMain : Form, ISingletonDependency, IViewMain
 {
-    public ViewMain()
+  public ViewMain()
+  {
+    InitializeComponent();
+  }
+
+  public IViewMainPresenter Presenter { get; set; }
+
+  public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
+
+  public SortDirection SortDirection =>
+    _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
+
+  public int RepositoryCount =>
+    int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
+
+  public string Topics => _topicsTextBox.Text;
+  public string RepositoriesJsonPath { get; set; }
+  public string RepositoriesFolderPath { get; set; }
+
+  public IEnumerable<Language>? LanguageSelectList
+  {
+    set => _languageComboBox.DataSource = value;
+  }
+
+  public IEnumerable<SortDirection> SortDirectionSelectList
+  {
+    set => _sortDirectionComboBox.DataSource = value;
+  }
+
+  public void ShowRepositories(IEnumerable<RepositoryModel> repositories)
+  {
+    _repositoryDataGridView.DataSource = repositories.ToList();
+
+    SetHyperLink();
+  }
+
+  private void SetHyperLink()
+  {
+    if (_repositoryDataGridView.Columns.Contains("Url"))
     {
-        InitializeComponent();
+      _repositoryDataGridView.Columns["Url"]!.DefaultCellStyle = new DataGridViewCellStyle
+      {
+        ForeColor = Color.Blue,
+      };
+    }
+  }
+
+
+  public void Run()
+  {
+    System.Windows.Forms.Application.Run(this);
+  }
+
+
+  private void _viewMain_Load(object sender, EventArgs e)
+  {
+    Presenter.LoadForm();
+  }
+
+  private void _searchButton_Click(object sender, EventArgs e)
+  {
+    Presenter.SearchRepositories();
+  }
+
+  private async void _calculateMetricsButton_Click(object sender, EventArgs e)
+  {
+    var result = await Presenter.CalculateMetrics();
+  }
+
+  private void _downloadMetricsButton_Click(object sender, EventArgs e)
+  {
+    Presenter.DownloadMetrics();
+  }
+
+  private void showToolStripMenuItem_Click(object sender, EventArgs e)
+  {
+    using var fileDialog = new OpenFileDialog
+    {
+      Filter = "Json files | *.json"
+    };
+
+    if (fileDialog.ShowDialog() == DialogResult.OK)
+    {
+      RepositoriesJsonPath = fileDialog.FileName;
     }
 
-    public IViewMainPresenter Presenter { get; set; }
+    Presenter.ShowRepositories();
+  }
 
-    public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
+  private void saveToolStripMenuItem_Click(object sender, EventArgs e)
+  {
+    using var folderDialog = new FolderBrowserDialog();
 
-    public SortDirection SortDirection =>
-        _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
-
-    public int RepositoryCount =>
-        int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
-
-    public string Topics => _topicsTextBox.Text;
-    public string RepositoriesJsonPath => "";
-
-    public IEnumerable<Language>? LanguageSelectList
+    if (folderDialog.ShowDialog() == DialogResult.OK)
     {
-        set => _languageComboBox.DataSource = value;
+      RepositoriesFolderPath = folderDialog.SelectedPath;
     }
 
-    public IEnumerable<SortDirection> SortDirectionSelectList
+    Presenter.SaveRepositories();
+  }
+
+  private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
+  {
+    if (!_repositoryDataGridView.Columns[_repositoryDataGridView.CurrentCell.ColumnIndex].HeaderText
+          .Contains("Url")) return;
+
+    if (!String.IsNullOrWhiteSpace(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()))
     {
-        set => _sortDirectionComboBox.DataSource = value;
+      var ps = new ProcessStartInfo(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()!)
+      {
+        UseShellExecute = true,
+        Verb = "open"
+      };
+
+      Process.Start(ps);
     }
-
-    public void ShowRepositories(IEnumerable<RepositoryModel> repositories)
-    {
-        var bindingList = new BindingList<RepositoryModel>(repositories.ToList());
-        _repositoryDataGridView.DataSource = new BindingSource(bindingList, null);
-    }
-
-    public void Run()
-    {
-        System.Windows.Forms.Application.Run(this);
-    }
-
-
-    private void _viewMain_Load(object sender, EventArgs e)
-    {
-        Presenter.LoadForm();
-    }
-
-    //private void _jsonPathSelectButton_Click(object sender, EventArgs e)
-    //{
-    //    var fileDialog = new OpenFileDialog
-    //    {
-    //        Filter = "Json files | *.json"
-    //    };
-
-    //    if (fileDialog.ShowDialog() == DialogResult.OK)
-    //    {
-    //        _jsonPathTextBox.Text = fileDialog.FileName;
-    //    }
-    //}
-
-    private void _searchButton_Click(object sender, EventArgs e)
-    {
-        Presenter.SearchRepositories();
-    }
-
-    private async void _calculateMetricsButton_Click(object sender, EventArgs e)
-    {
-        var result = await Presenter.CalculateMetrics();
-    }
-
-    private void _downloadMetricsButton_Click(object sender, EventArgs e)
-    {
-        Presenter.DownloadMetrics();
-    }
+  }
 }

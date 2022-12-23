@@ -47,7 +47,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// </summary>
     /// <param name="username"></param>
     /// <param name="password"></param>
-    public void Initialize(string username, string password)
+    public void Authenticate(string username, string password)
     {
         Client.Credentials = new Credentials(username, password);
     }
@@ -56,7 +56,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     ///     User login
     /// </summary>
     /// <param name="token"></param>
-    public void Initialize(string token)
+    public void Authenticate(string token)
     {
         Client.Credentials = new Credentials(token);
     }

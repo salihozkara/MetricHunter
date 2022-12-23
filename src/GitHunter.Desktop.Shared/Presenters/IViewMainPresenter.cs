@@ -9,4 +9,6 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
     Task SearchRepositories();
     Task<string> CalculateMetrics();
     Task DownloadMetrics();
+    void ShowRepositories();
+    Task SaveRepositories();
 }

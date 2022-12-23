@@ -19,7 +19,8 @@ public interface IViewMain : IView<IViewMainPresenter>
 
     string Topics { get; }
 
-    string RepositoriesJsonPath { get; }
+    string RepositoriesJsonPath { get; set; }
+    string RepositoriesFolderPath { get; set; }
 
     void ShowRepositories(IEnumerable<RepositoryModel> repositories);
 }
