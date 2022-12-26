@@ -17,6 +17,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
   public IViewMainPresenter Presenter { get; set; }
 
+  public IEnumerable<long> SelectedRepositories
+  {
+    get
+    {
+      return _repositoryDataGridView.SelectedRows.Cast<DataGridViewRow>()
+        .Select(r => r.Cells[0].Value)
+        .Cast<long>()
+        .ToList();
+    }
+  }
+
   public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
 
   public SortDirection SortDirection =>
@@ -39,9 +50,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     set => _sortDirectionComboBox.DataSource = value;
   }
 
+  public string DownloadPath { get; set; }
+
   public void ShowRepositories(IEnumerable<RepositoryModel> repositories)
   {
     _repositoryDataGridView.DataSource = repositories.ToList();
+
+    if (_repositoryDataGridView.Columns["Id"] != null)
+    {
+      _repositoryDataGridView.Columns["Id"]!.Visible = false;
+    }
 
     SetHyperLink();
   }
@@ -57,12 +75,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     }
   }
 
-
   public void Run()
   {
     System.Windows.Forms.Application.Run(this);
   }
-
 
   private void _viewMain_Load(object sender, EventArgs e)
   {
@@ -79,9 +95,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     var result = await Presenter.CalculateMetrics();
   }
 
-  private void _downloadMetricsButton_Click(object sender, EventArgs e)
+  private void _downloadButton_Click(object sender, EventArgs e)
   {
-    Presenter.DownloadMetrics();
+    using var folderDialog = new FolderBrowserDialog();
+
+    if (folderDialog.ShowDialog() == DialogResult.OK)
+    {
+      DownloadPath = folderDialog.SelectedPath;
+    }
+
+    Presenter.DownloadRepositories();
   }
 
   private void showToolStripMenuItem_Click(object sender, EventArgs e)

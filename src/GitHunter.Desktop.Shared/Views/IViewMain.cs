@@ -11,6 +11,8 @@ public interface IViewMain : IView<IViewMainPresenter>
 
     IEnumerable<SortDirection> SortDirectionSelectList { set; }
 
+    IEnumerable<long> SelectedRepositories { get; }
+
     Language? SelectedLanguage { get; }
 
     SortDirection SortDirection { get; }
@@ -21,6 +23,7 @@ public interface IViewMain : IView<IViewMainPresenter>
 
     string RepositoriesJsonPath { get; set; }
     string RepositoriesFolderPath { get; set; }
+    string DownloadPath { get; set; }
 
     void ShowRepositories(IEnumerable<RepositoryModel> repositories);
 }

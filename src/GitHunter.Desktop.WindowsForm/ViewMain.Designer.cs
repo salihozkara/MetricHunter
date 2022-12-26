@@ -31,9 +31,9 @@ partial class ViewMain
     {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
             this._languageComboBox = new System.Windows.Forms.ComboBox();
             this._topicsTextBox = new System.Windows.Forms.TextBox();
             this._repositoryCountTextBox = new System.Windows.Forms.TextBox();
@@ -41,7 +41,7 @@ partial class ViewMain
             this._searchButton = new System.Windows.Forms.Button();
             this.SearchButton = new System.Windows.Forms.ImageList(this.components);
             this.IconList = new System.Windows.Forms.ImageList(this.components);
-            this._downloadMetricsButton = new System.Windows.Forms.Button();
+            this._downloadButton = new System.Windows.Forms.Button();
             this._calculateMetricsButton = new System.Windows.Forms.Button();
             this._topicsLabel = new System.Windows.Forms.Label();
             this._countRepositoryLabel = new System.Windows.Forms.Label();
@@ -133,19 +133,19 @@ partial class ViewMain
             this.IconList.Images.SetKeyName(2, "calculation.png");
             this.IconList.Images.SetKeyName(3, "download.png");
             // 
-            // _downloadMetricsButton
+            // _downloadButton
             // 
-            this._downloadMetricsButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._downloadMetricsButton.ImageKey = "download.png";
-            this._downloadMetricsButton.ImageList = this.IconList;
-            this._downloadMetricsButton.Location = new System.Drawing.Point(18, 47);
-            this._downloadMetricsButton.Name = "_downloadMetricsButton";
-            this._downloadMetricsButton.Size = new System.Drawing.Size(141, 41);
-            this._downloadMetricsButton.TabIndex = 6;
-            this._downloadMetricsButton.Text = "Download";
-            this._downloadMetricsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._downloadMetricsButton.UseVisualStyleBackColor = true;
-            this._downloadMetricsButton.Click += new System.EventHandler(this._downloadMetricsButton_Click);
+            this._downloadButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._downloadButton.ImageKey = "download.png";
+            this._downloadButton.ImageList = this.IconList;
+            this._downloadButton.Location = new System.Drawing.Point(18, 47);
+            this._downloadButton.Name = "_downloadButton";
+            this._downloadButton.Size = new System.Drawing.Size(141, 41);
+            this._downloadButton.TabIndex = 6;
+            this._downloadButton.Text = "Download";
+            this._downloadButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._downloadButton.UseVisualStyleBackColor = true;
+            this._downloadButton.Click += new System.EventHandler(this._downloadButton_Click);
             // 
             // _calculateMetricsButton
             // 
@@ -212,37 +212,37 @@ partial class ViewMain
             this._repositoryDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(211)))), ((int)(((byte)(193)))));
             this._repositoryDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this._repositoryDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle4.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
+            dataGridViewCellStyle4.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle4.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle4.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle4.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle4.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle4;
             this._repositoryDataGridView.ColumnHeadersHeight = 70;
             this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle5.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
+            dataGridViewCellStyle5.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle5.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle5.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle5.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle5.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
             this._repositoryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this._repositoryDataGridView.Location = new System.Drawing.Point(3, 153);
             this._repositoryDataGridView.Name = "_repositoryDataGridView";
             this._repositoryDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle6.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
+            dataGridViewCellStyle6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle6.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle6.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle6.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle6.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle6;
             this._repositoryDataGridView.RowHeadersWidth = 45;
             this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._repositoryDataGridView.RowTemplate.Height = 50;
@@ -381,7 +381,7 @@ partial class ViewMain
             // 
             this.operationGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.operationGroupBox.Controls.Add(this.huntButton);
-            this.operationGroupBox.Controls.Add(this._downloadMetricsButton);
+            this.operationGroupBox.Controls.Add(this._downloadButton);
             this.operationGroupBox.Controls.Add(this._calculateMetricsButton);
             this.operationGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.operationGroupBox.Location = new System.Drawing.Point(201, 745);
@@ -439,7 +439,7 @@ partial class ViewMain
     private TextBox _repositoryCountTextBox;
     private ComboBox _sortDirectionComboBox;
     private Button _searchButton;
-    private Button _downloadMetricsButton;
+    private Button _downloadButton;
     private Button _calculateMetricsButton;
     private Label _topicsLabel;
     private Label _countRepositoryLabel;

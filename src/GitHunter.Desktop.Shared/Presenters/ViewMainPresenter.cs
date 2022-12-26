@@ -5,10 +5,12 @@ using GitHunter.Application.Resources;
 using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Octokit;
 using System.Text;
+using Volo.Abp;
 using FileMode = System.IO.FileMode;
 
 namespace GitHunter.Desktop.Presenters;
@@ -20,7 +22,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IGitManager _gitManager;
     private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
-    private GitOutput? _gitOutput;
+    private IEnumerable<Repository> Repositories;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -57,10 +59,13 @@ public class ViewMainPresenter : IViewMainPresenter
             Topic = View.Topics
         };
 
-        _gitOutput = await _gitManager.GetRepositories(gitInput);
+        var gitResult = await _gitManager.GetRepositories(gitInput);
 
-        var repositoryModelList = _gitOutput.Repositories.Select(x => new RepositoryModel
+        Repositories = gitResult.Repositories;
+
+        var repositoryModelList = Repositories.Select(x => new RepositoryModel
         {
+            Id = x.Id,
             Name = x.Name,
             Description = x.Description,
             Stars = x.StargazersCount,
@@ -74,12 +79,15 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> CalculateMetrics()
     {
-        if (View.SelectedLanguage is null || _gitOutput is null) return null;
+        if (!Repositories.Any())
+            throw new UserFriendlyException("Önce repoları arayın.");
+
+        if (View.SelectedLanguage is null) return null;
 
         var manager = _metricCalculatorManager.FindMetricCalculator(View.SelectedLanguage.Value);
 
         var metrics = new List<Dictionary<string, string>>();
-        foreach (var item in _gitOutput.Repositories)
+        foreach (var item in Repositories)
         {
             var metric = await manager.CalculateMetricsAsync(item);
             var dictList = metric.ToDictionaryListByTopics();
@@ -89,22 +97,36 @@ public class ViewMainPresenter : IViewMainPresenter
         return _csvHelper.MetricsToCsv(metrics);
     }
 
-    public async Task DownloadMetrics()
+    public async Task DownloadRepositories()
     {
-        if (_gitOutput is null)
-            return;
+        if (!Repositories.Any())
+            throw new UserFriendlyException("Önce repoları arayın.");
 
-        foreach (var item in _gitOutput.Repositories) await _gitProvider.CloneRepository(item);
+        if (View.SelectedRepositories.Any())
+        {
+            var selectedRepos = Repositories.Where(x => View.SelectedRepositories.Contains(x.Id)).ToList();
+
+            foreach (var item in selectedRepos) await _gitProvider.CloneRepository(item);
+            return;
+        }
+
+        foreach (var item in Repositories) await _gitProvider.CloneRepository(item);
     }
 
     public void ShowRepositories()
     {
-        var repositories = JsonConvert.DeserializeObject<Repository[]>(File.ReadAllText($"{View.RepositoriesJsonPath}"), Resource.Jsons.JsonSerializerSettings);
-
-        if (repositories == null) return;
-
-        var repositoryModelList = repositories.Select(x => new RepositoryModel
+        if (View.RepositoriesJsonPath.IsNullOrEmpty())
         {
+          throw new UserFriendlyException("Repository bulunamadı");
+        }
+
+        Repositories = JsonConvert.DeserializeObject<Repository[]>(File.ReadAllText($"{View.RepositoriesJsonPath}"), Resource.Jsons.JsonSerializerSettings);
+
+        if (Repositories != null && !Repositories.Any()) return;
+
+        var repositoryModelList = Repositories!.Select(x => new RepositoryModel
+        {
+            Id = x.Id,
             Name = x.Name,
             Description = x.Description,
             Stars = x.StargazersCount,
@@ -118,10 +140,10 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public Task SaveRepositories()
     {
-        if (_gitOutput is null)
-            return Task.CompletedTask;
+        if (!Repositories.Any())
+            throw new UserFriendlyException("Önce repoları arayın.");
 
-        var json = JsonConvert.SerializeObject(_gitOutput.Repositories, Resource.Jsons.JsonSerializerSettings);
+        var json = JsonConvert.SerializeObject(Repositories, Resource.Jsons.JsonSerializerSettings);
 
         var currentDate = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
         var fileName = $"{View.RepositoriesFolderPath}//repositories_{currentDate}.json";
