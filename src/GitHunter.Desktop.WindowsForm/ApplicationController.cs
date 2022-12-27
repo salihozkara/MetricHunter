@@ -19,4 +19,11 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
         var presenter = new ViewMainPresenter(viewMain, this);
         presenter.Run();
     }
+
+    public void ShowGithubLogin()
+    {
+        using var viewGithubLogin = new ViewGithubLogin();
+        var presenter = new ViewGithubLoginPresenter(this, viewGithubLogin);
+        presenter.Run();
+    }
 }

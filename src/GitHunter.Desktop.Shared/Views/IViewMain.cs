@@ -7,6 +7,7 @@ namespace GitHunter.Desktop.Views;
 
 public interface IViewMain : IView<IViewMainPresenter>
 {
+    string GithubToken { get; }
     IEnumerable<Language>? LanguageSelectList { set; }
 
     IEnumerable<SortDirection> SortDirectionSelectList { set; }

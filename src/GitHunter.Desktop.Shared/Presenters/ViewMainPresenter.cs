@@ -49,6 +49,11 @@ public class ViewMainPresenter : IViewMainPresenter
         View.SortDirectionSelectList = Enum.GetValues<SortDirection>().Reverse().ToList();
     }
 
+    public void ShowGithubLogin()
+    {
+        _controller.ShowGithubLogin();
+    }
+
     public async Task SearchRepositories()
     {
         var gitInput = new GitInput
