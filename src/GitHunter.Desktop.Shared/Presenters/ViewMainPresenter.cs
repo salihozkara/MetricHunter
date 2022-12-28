@@ -1,11 +1,18 @@
-﻿using GitHunter.Application.Csv;
+using GitHunter.Application.Csv;
 using GitHunter.Application.Git;
 using GitHunter.Application.Metrics;
+using GitHunter.Application.Resources;
 using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Models;
 using GitHunter.Desktop.Views;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Octokit;
+using System.Text;
+using GitHunter.Application.Repositories;
+using Volo.Abp;
+using FileMode = System.IO.FileMode;
 
 namespace GitHunter.Desktop.Presenters;
 
@@ -16,7 +23,20 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IGitManager _gitManager;
     private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
-    private GitOutput? _gitOutput;
+    private IEnumerable<Repository> _repositories;
+    private IRepositoryAppService _repositoryAppService;
+
+    public IEnumerable<Repository> Repositories
+    {
+        get
+        {
+            return View.SelectedRepositories.Any()
+                ? _repositories.Where(x => View.SelectedRepositories.Contains(x.Id)).ToList()
+                : _repositories;
+        }
+        
+        set => _repositories = value;
+    }
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -24,10 +44,13 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller = controller;
         View.Presenter = this;
 
+        _repositories = new List<Repository>();
+
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
         _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
+        _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
     }
 
     public IViewMain View { get; }
@@ -40,7 +63,12 @@ public class ViewMainPresenter : IViewMainPresenter
     public void LoadForm()
     {
         View.LanguageSelectList = _metricCalculatorManager.GetSupportedLanguages();
-        View.SortDirectionSelectList = Enum.GetValues<SortDirection>();
+        View.SortDirectionSelectList = Enum.GetValues<SortDirection>().Reverse().ToList();
+    }
+
+    public void ShowGithubLogin()
+    {
+        _controller.ShowGithubLogin();
     }
 
     public async Task SearchRepositories()
@@ -53,10 +81,13 @@ public class ViewMainPresenter : IViewMainPresenter
             Topic = View.Topics
         };
 
-        _gitOutput = await _gitManager.GetRepositories(gitInput);
+        var gitResult = await _gitManager.GetRepositories(gitInput);
 
-        var repositoryModelList = _gitOutput.Repositories.Select(x => new RepositoryModel
+        _repositories = gitResult.Repositories;
+
+        var repositoryModelList = Repositories.Select(x => new RepositoryModel
         {
+            Id = x.Id,
             Name = x.Name,
             Description = x.Description,
             Stars = x.StargazersCount,
@@ -70,12 +101,17 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> CalculateMetrics()
     {
-        if (View.SelectedLanguage is null || _gitOutput is null) return null;
+        if (!Repositories.Any())
+        {
+            _controller.ErrorMessage("Repository bulunamadı");
+        }
+
+        if (View.SelectedLanguage is null) return null;
 
         var manager = _metricCalculatorManager.FindMetricCalculator(View.SelectedLanguage.Value);
 
         var metrics = new List<Dictionary<string, string>>();
-        foreach (var item in _gitOutput.Repositories)
+        foreach (var item in Repositories)
         {
             var metric = await manager.CalculateMetricsAsync(item);
             var dictList = metric.ToDictionaryListByTopics();
@@ -85,11 +121,53 @@ public class ViewMainPresenter : IViewMainPresenter
         return _csvHelper.MetricsToCsv(metrics);
     }
 
-    public async Task DownloadMetrics()
+    public async Task DownloadRepositories()
     {
-        if (_gitOutput is null)
+        if (!Repositories.Any())
+        {
+            _controller.ErrorMessage("Repository bulunamadı.");
             return;
+        }
+        
+        foreach (var item in Repositories) await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
+    }
 
-        foreach (var item in _gitOutput.Repositories) await _gitProvider.CloneRepository(item);
+    public async Task ShowRepositories()
+    {
+        if (View.JsonLoadPath.IsNullOrEmpty())
+        {
+            _controller.ErrorMessage("Dosya bulunamadı");
+            return;
+        }
+
+        var repositories = await _repositoryAppService.ReadRepositories(View.JsonLoadPath);
+
+        if (!repositories.Any()) return;
+
+        Repositories = repositories;
+
+        var repositoryModelList = Repositories.Select(x => new RepositoryModel
+        {
+            Id = x.Id,
+            Name = x.Name,
+            Description = x.Description,
+            Stars = x.StargazersCount,
+            Url = x.HtmlUrl,
+            License = x.License?.Name ?? "No Licence",
+            Owner = x.Owner.Login
+        }).ToList();
+
+        View.ShowRepositories(repositoryModelList);
+    }
+
+    public async Task SaveRepositories()
+    {
+        if (!Repositories.Any())
+        {
+            _controller.ErrorMessage("No repositories found for save.");
+            return;
+        }
+
+        await _repositoryAppService.WriteRepositories(Repositories, View.JsonSavePath);
     }
 }

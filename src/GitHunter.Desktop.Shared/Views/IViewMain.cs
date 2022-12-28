@@ -7,9 +7,13 @@ namespace GitHunter.Desktop.Views;
 
 public interface IViewMain : IView<IViewMainPresenter>
 {
+    void ShowMessage(string message);
+    string GithubToken { get; }
     IEnumerable<Language>? LanguageSelectList { set; }
 
     IEnumerable<SortDirection> SortDirectionSelectList { set; }
+
+    IEnumerable<long> SelectedRepositories { get; }
 
     Language? SelectedLanguage { get; }
 
@@ -19,7 +23,11 @@ public interface IViewMain : IView<IViewMainPresenter>
 
     string Topics { get; }
 
-    string RepositoriesJsonPath { get; }
+    string JsonLoadPath { get; set; }
+    
+    string JsonSavePath { get; set; }
+    
+    string DownloadRepositoryPath { get; set; }
 
     void ShowRepositories(IEnumerable<RepositoryModel> repositories);
 }

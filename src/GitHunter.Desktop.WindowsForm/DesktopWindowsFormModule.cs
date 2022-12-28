@@ -45,7 +45,7 @@ public class DesktopWindowsFormModule : GitHunterModule
             .GetRequiredService<IApplicationController>();
 
         app.StartApplication();
-
+            
         base.OnApplicationInitialization(context);
     }
 }

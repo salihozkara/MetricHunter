@@ -29,12 +29,19 @@ partial class ViewMain
     /// </summary>
     private void InitializeComponent()
     {
+            this.components = new System.ComponentModel.Container();
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this._languageComboBox = new System.Windows.Forms.ComboBox();
             this._topicsTextBox = new System.Windows.Forms.TextBox();
             this._repositoryCountTextBox = new System.Windows.Forms.TextBox();
             this._sortDirectionComboBox = new System.Windows.Forms.ComboBox();
             this._searchButton = new System.Windows.Forms.Button();
-            this._downloadMetricsButton = new System.Windows.Forms.Button();
+            this.SearchButton = new System.Windows.Forms.ImageList(this.components);
+            this.IconList = new System.Windows.Forms.ImageList(this.components);
+            this._downloadButton = new System.Windows.Forms.Button();
             this._calculateMetricsButton = new System.Windows.Forms.Button();
             this._topicsLabel = new System.Windows.Forms.Label();
             this._countRepositoryLabel = new System.Windows.Forms.Label();
@@ -48,6 +55,7 @@ partial class ViewMain
             this.loginGithubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.helpMenu = new System.Windows.Forms.ToolStripMenuItem();
             this.contributorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.reportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.basePanel = new System.Windows.Forms.Panel();
             this.layoutPanel = new System.Windows.Forms.TableLayoutPanel();
@@ -66,117 +74,187 @@ partial class ViewMain
             // 
             // _languageComboBox
             // 
+            this._languageComboBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._languageComboBox.FormattingEnabled = true;
             this._languageComboBox.Location = new System.Drawing.Point(339, 81);
             this._languageComboBox.Name = "_languageComboBox";
-            this._languageComboBox.Size = new System.Drawing.Size(142, 33);
+            this._languageComboBox.Size = new System.Drawing.Size(142, 42);
             this._languageComboBox.TabIndex = 0;
             // 
             // _topicsTextBox
             // 
+            this._topicsTextBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._topicsTextBox.Location = new System.Drawing.Point(14, 81);
             this._topicsTextBox.Name = "_topicsTextBox";
-            this._topicsTextBox.Size = new System.Drawing.Size(142, 31);
+            this._topicsTextBox.Size = new System.Drawing.Size(142, 41);
             this._topicsTextBox.TabIndex = 1;
             // 
             // _repositoryCountTextBox
             // 
+            this._repositoryCountTextBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._repositoryCountTextBox.Location = new System.Drawing.Point(174, 81);
             this._repositoryCountTextBox.Name = "_repositoryCountTextBox";
-            this._repositoryCountTextBox.Size = new System.Drawing.Size(142, 31);
+            this._repositoryCountTextBox.Size = new System.Drawing.Size(142, 41);
             this._repositoryCountTextBox.TabIndex = 2;
             // 
             // _sortDirectionComboBox
             // 
+            this._sortDirectionComboBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._sortDirectionComboBox.FormattingEnabled = true;
             this._sortDirectionComboBox.Location = new System.Drawing.Point(503, 81);
             this._sortDirectionComboBox.Name = "_sortDirectionComboBox";
-            this._sortDirectionComboBox.Size = new System.Drawing.Size(142, 33);
+            this._sortDirectionComboBox.Size = new System.Drawing.Size(142, 42);
             this._sortDirectionComboBox.TabIndex = 3;
             // 
             // _searchButton
             // 
-            this._searchButton.Location = new System.Drawing.Point(669, 80);
+            this._searchButton.ImageKey = "search.png";
+            this._searchButton.ImageList = this.SearchButton;
+            this._searchButton.Location = new System.Drawing.Point(662, 81);
             this._searchButton.Name = "_searchButton";
-            this._searchButton.Size = new System.Drawing.Size(100, 34);
+            this._searchButton.Size = new System.Drawing.Size(48, 42);
             this._searchButton.TabIndex = 5;
-            this._searchButton.Text = "Search";
             this._searchButton.UseVisualStyleBackColor = true;
             this._searchButton.Click += new System.EventHandler(this._searchButton_Click);
             // 
-            // _downloadMetricsButton
+            // SearchButton
             // 
-            this._downloadMetricsButton.Location = new System.Drawing.Point(98, 44);
-            this._downloadMetricsButton.Name = "_downloadMetricsButton";
-            this._downloadMetricsButton.Size = new System.Drawing.Size(112, 34);
-            this._downloadMetricsButton.TabIndex = 6;
-            this._downloadMetricsButton.Text = "Download";
-            this._downloadMetricsButton.UseVisualStyleBackColor = true;
-            this._downloadMetricsButton.Click += new System.EventHandler(this._downloadMetricsButton_Click);
+            this.SearchButton.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.SearchButton.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("SearchButton.ImageStream")));
+            this.SearchButton.TransparentColor = System.Drawing.Color.Transparent;
+            this.SearchButton.Images.SetKeyName(0, "search.png");
+            // 
+            // IconList
+            // 
+            this.IconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
+            this.IconList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("IconList.ImageStream")));
+            this.IconList.TransparentColor = System.Drawing.Color.Transparent;
+            this.IconList.Images.SetKeyName(0, "search.png");
+            this.IconList.Images.SetKeyName(1, "knife.png");
+            this.IconList.Images.SetKeyName(2, "calculation.png");
+            this.IconList.Images.SetKeyName(3, "download.png");
+            // 
+            // _downloadButton
+            // 
+            this._downloadButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._downloadButton.ImageKey = "download.png";
+            this._downloadButton.ImageList = this.IconList;
+            this._downloadButton.Location = new System.Drawing.Point(18, 47);
+            this._downloadButton.Name = "_downloadButton";
+            this._downloadButton.Size = new System.Drawing.Size(141, 41);
+            this._downloadButton.TabIndex = 6;
+            this._downloadButton.Text = "Download";
+            this._downloadButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._downloadButton.UseVisualStyleBackColor = true;
+            this._downloadButton.Click += new System.EventHandler(this._downloadButton_Click);
             // 
             // _calculateMetricsButton
             // 
-            this._calculateMetricsButton.Location = new System.Drawing.Point(259, 44);
+            this._calculateMetricsButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._calculateMetricsButton.ImageKey = "calculation.png";
+            this._calculateMetricsButton.ImageList = this.IconList;
+            this._calculateMetricsButton.Location = new System.Drawing.Point(246, 47);
             this._calculateMetricsButton.Name = "_calculateMetricsButton";
-            this._calculateMetricsButton.Size = new System.Drawing.Size(169, 34);
+            this._calculateMetricsButton.Size = new System.Drawing.Size(213, 41);
             this._calculateMetricsButton.TabIndex = 7;
             this._calculateMetricsButton.Text = "Calculate Metrics";
+            this._calculateMetricsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this._calculateMetricsButton.UseVisualStyleBackColor = true;
             this._calculateMetricsButton.Click += new System.EventHandler(this._calculateMetricsButton_Click);
             // 
             // _topicsLabel
             // 
             this._topicsLabel.AutoSize = true;
-            this._topicsLabel.Location = new System.Drawing.Point(14, 53);
+            this._topicsLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._topicsLabel.Location = new System.Drawing.Point(14, 44);
             this._topicsLabel.Name = "_topicsLabel";
-            this._topicsLabel.Size = new System.Drawing.Size(61, 25);
+            this._topicsLabel.Size = new System.Drawing.Size(68, 34);
             this._topicsLabel.TabIndex = 8;
             this._topicsLabel.Text = "Topics";
             // 
             // _countRepositoryLabel
             // 
             this._countRepositoryLabel.AutoSize = true;
-            this._countRepositoryLabel.Location = new System.Drawing.Point(174, 50);
+            this._countRepositoryLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._countRepositoryLabel.Location = new System.Drawing.Point(174, 44);
             this._countRepositoryLabel.Name = "_countRepositoryLabel";
-            this._countRepositoryLabel.Size = new System.Drawing.Size(126, 25);
+            this._countRepositoryLabel.Size = new System.Drawing.Size(131, 34);
             this._countRepositoryLabel.TabIndex = 9;
             this._countRepositoryLabel.Text = "Wanted Count";
             // 
             // _languageLabel
             // 
             this._languageLabel.AutoSize = true;
-            this._languageLabel.Location = new System.Drawing.Point(339, 50);
+            this._languageLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._languageLabel.Location = new System.Drawing.Point(339, 44);
             this._languageLabel.Name = "_languageLabel";
-            this._languageLabel.Size = new System.Drawing.Size(89, 25);
+            this._languageLabel.Size = new System.Drawing.Size(92, 34);
             this._languageLabel.TabIndex = 10;
             this._languageLabel.Text = "Language";
             // 
             // _sortDirectionLabel
             // 
             this._sortDirectionLabel.AutoSize = true;
-            this._sortDirectionLabel.Location = new System.Drawing.Point(503, 53);
+            this._sortDirectionLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._sortDirectionLabel.Location = new System.Drawing.Point(503, 44);
             this._sortDirectionLabel.Name = "_sortDirectionLabel";
-            this._sortDirectionLabel.Size = new System.Drawing.Size(69, 25);
+            this._sortDirectionLabel.Size = new System.Drawing.Size(76, 34);
             this._sortDirectionLabel.TabIndex = 11;
             this._sortDirectionLabel.Text = "Sort By";
             // 
             // _repositoryDataGridView
             // 
-            this._repositoryDataGridView.AllowDrop = true;
+            this._repositoryDataGridView.AllowUserToAddRows = false;
+            this._repositoryDataGridView.AllowUserToDeleteRows = false;
+            this._repositoryDataGridView.AllowUserToResizeColumns = false;
+            this._repositoryDataGridView.AllowUserToResizeRows = false;
             this._repositoryDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._repositoryDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.RaisedVertical;
-            this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this._repositoryDataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
+            this._repositoryDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(211)))), ((int)(((byte)(193)))));
+            this._repositoryDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
+            this._repositoryDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+            this._repositoryDataGridView.ColumnHeadersHeight = 70;
+            this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this._repositoryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditOnEnter;
+            this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
             this._repositoryDataGridView.Location = new System.Drawing.Point(3, 153);
             this._repositoryDataGridView.Name = "_repositoryDataGridView";
-            this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.AutoSizeToAllHeaders;
-            this._repositoryDataGridView.RowTemplate.Height = 33;
-            this._repositoryDataGridView.Size = new System.Drawing.Size(809, 381);
+            this._repositoryDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+            this._repositoryDataGridView.RowHeadersWidth = 45;
+            this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+            this._repositoryDataGridView.RowTemplate.Height = 50;
+            this._repositoryDataGridView.Size = new System.Drawing.Size(1098, 561);
             this._repositoryDataGridView.TabIndex = 4;
+            this._repositoryDataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
             // 
             // menu
             // 
+            this.menu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(211)))), ((int)(((byte)(193)))));
+            this.menu.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.menu.ImageScalingSize = new System.Drawing.Size(24, 24);
             this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.savedRepositoriesToolStripMenuItem,
@@ -184,7 +262,7 @@ partial class ViewMain
             this.helpMenu});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(875, 33);
+            this.menu.Size = new System.Drawing.Size(1164, 42);
             this.menu.TabIndex = 15;
             this.menu.Text = "menuStrip1";
             // 
@@ -193,57 +271,74 @@ partial class ViewMain
             this.savedRepositoriesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.showToolStripMenuItem,
             this.saveToolStripMenuItem});
+            this.savedRepositoriesToolStripMenuItem.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.savedRepositoriesToolStripMenuItem.Name = "savedRepositoriesToolStripMenuItem";
-            this.savedRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(113, 29);
+            this.savedRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(118, 38);
             this.savedRepositoriesToolStripMenuItem.Text = "Repository";
             // 
             // showToolStripMenuItem
             // 
             this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(158, 34);
-            this.showToolStripMenuItem.Text = "Show";
+            this.showToolStripMenuItem.Size = new System.Drawing.Size(159, 42);
+            this.showToolStripMenuItem.Text = "Load";
+            this.showToolStripMenuItem.Click += new System.EventHandler(this.showToolStripMenuItem_Click);
             // 
             // saveToolStripMenuItem
             // 
             this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(158, 34);
+            this.saveToolStripMenuItem.Size = new System.Drawing.Size(159, 42);
             this.saveToolStripMenuItem.Text = "Save";
+            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
             // 
             // loginGithubToolStripMenuItem
             // 
+            this.loginGithubToolStripMenuItem.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.loginGithubToolStripMenuItem.Name = "loginGithubToolStripMenuItem";
-            this.loginGithubToolStripMenuItem.Size = new System.Drawing.Size(133, 29);
+            this.loginGithubToolStripMenuItem.Size = new System.Drawing.Size(140, 38);
             this.loginGithubToolStripMenuItem.Text = "Login GitHub";
+            this.loginGithubToolStripMenuItem.Click += new System.EventHandler(this.loginGithubToolStripMenuItem_Click);
             // 
             // helpMenu
             // 
             this.helpMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.contributorsToolStripMenuItem,
+            this.helpToolStripMenuItem,
             this.reportToolStripMenuItem});
+            this.helpMenu.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.helpMenu.Name = "helpMenu";
-            this.helpMenu.Size = new System.Drawing.Size(65, 29);
+            this.helpMenu.Size = new System.Drawing.Size(69, 38);
             this.helpMenu.Text = "Help";
             // 
             // contributorsToolStripMenuItem
             // 
             this.contributorsToolStripMenuItem.Name = "contributorsToolStripMenuItem";
-            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(214, 34);
+            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
             this.contributorsToolStripMenuItem.Text = "Contributors";
+            this.contributorsToolStripMenuItem.Click += new System.EventHandler(this.contributorsToolStripMenuItem_Click);
+            // 
+            // helpToolStripMenuItem
+            // 
+            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
+            this.helpToolStripMenuItem.Text = "Help";
+            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // reportToolStripMenuItem
             // 
             this.reportToolStripMenuItem.Name = "reportToolStripMenuItem";
-            this.reportToolStripMenuItem.Size = new System.Drawing.Size(214, 34);
+            this.reportToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
             this.reportToolStripMenuItem.Text = "Report";
+            this.reportToolStripMenuItem.Click += new System.EventHandler(this.reportToolStripMenuItem_Click);
             // 
             // basePanel
             // 
+            this.basePanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
             this.basePanel.Controls.Add(this.layoutPanel);
             this.basePanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.basePanel.Location = new System.Drawing.Point(0, 33);
+            this.basePanel.Location = new System.Drawing.Point(0, 42);
             this.basePanel.Name = "basePanel";
-            this.basePanel.Padding = new System.Windows.Forms.Padding(30, 50, 30, 30);
-            this.basePanel.Size = new System.Drawing.Size(875, 717);
+            this.basePanel.Padding = new System.Windows.Forms.Padding(30);
+            this.basePanel.Size = new System.Drawing.Size(1164, 927);
             this.basePanel.TabIndex = 16;
             // 
             // layoutPanel
@@ -254,13 +349,13 @@ partial class ViewMain
             this.layoutPanel.Controls.Add(this.searchRepositoryPanel, 0, 0);
             this.layoutPanel.Controls.Add(this.operationGroupBox, 0, 2);
             this.layoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.layoutPanel.Location = new System.Drawing.Point(30, 50);
+            this.layoutPanel.Location = new System.Drawing.Point(30, 30);
             this.layoutPanel.Name = "layoutPanel";
             this.layoutPanel.RowCount = 3;
             this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 100F));
-            this.layoutPanel.Size = new System.Drawing.Size(815, 637);
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
+            this.layoutPanel.Size = new System.Drawing.Size(1104, 867);
             this.layoutPanel.TabIndex = 5;
             // 
             // searchRepositoryPanel
@@ -269,12 +364,13 @@ partial class ViewMain
             this.searchRepositoryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.searchRepositoryPanel.Location = new System.Drawing.Point(3, 3);
             this.searchRepositoryPanel.Name = "searchRepositoryPanel";
-            this.searchRepositoryPanel.Size = new System.Drawing.Size(809, 144);
+            this.searchRepositoryPanel.Size = new System.Drawing.Size(1098, 144);
             this.searchRepositoryPanel.TabIndex = 5;
             // 
             // searchGroupBox
             // 
             this.searchGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.searchGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
             this.searchGroupBox.Controls.Add(this._repositoryCountTextBox);
             this.searchGroupBox.Controls.Add(this._sortDirectionLabel);
             this.searchGroupBox.Controls.Add(this._searchButton);
@@ -284,9 +380,11 @@ partial class ViewMain
             this.searchGroupBox.Controls.Add(this._languageComboBox);
             this.searchGroupBox.Controls.Add(this._topicsTextBox);
             this.searchGroupBox.Controls.Add(this._topicsLabel);
-            this.searchGroupBox.Location = new System.Drawing.Point(14, 15);
+            this.searchGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.searchGroupBox.Location = new System.Drawing.Point(144, 3);
             this.searchGroupBox.Name = "searchGroupBox";
-            this.searchGroupBox.Size = new System.Drawing.Size(781, 126);
+            this.searchGroupBox.Padding = new System.Windows.Forms.Padding(10);
+            this.searchGroupBox.Size = new System.Drawing.Size(804, 138);
             this.searchGroupBox.TabIndex = 12;
             this.searchGroupBox.TabStop = false;
             this.searchGroupBox.Text = "Search Repositories";
@@ -295,9 +393,10 @@ partial class ViewMain
             // 
             this.operationGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.operationGroupBox.Controls.Add(this.huntButton);
-            this.operationGroupBox.Controls.Add(this._downloadMetricsButton);
+            this.operationGroupBox.Controls.Add(this._downloadButton);
             this.operationGroupBox.Controls.Add(this._calculateMetricsButton);
-            this.operationGroupBox.Location = new System.Drawing.Point(57, 540);
+            this.operationGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.operationGroupBox.Location = new System.Drawing.Point(201, 745);
             this.operationGroupBox.Name = "operationGroupBox";
             this.operationGroupBox.Size = new System.Drawing.Size(701, 94);
             this.operationGroupBox.TabIndex = 6;
@@ -306,24 +405,30 @@ partial class ViewMain
             // 
             // huntButton
             // 
-            this.huntButton.Location = new System.Drawing.Point(484, 44);
+            this.huntButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.huntButton.ImageKey = "knife.png";
+            this.huntButton.ImageList = this.IconList;
+            this.huntButton.Location = new System.Drawing.Point(557, 47);
             this.huntButton.Name = "huntButton";
-            this.huntButton.Size = new System.Drawing.Size(121, 34);
+            this.huntButton.Size = new System.Drawing.Size(121, 41);
             this.huntButton.TabIndex = 8;
             this.huntButton.Text = "Hunt";
+            this.huntButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.huntButton.UseVisualStyleBackColor = true;
             // 
             // ViewMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(875, 750);
+            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(115)))), ((int)(((byte)(186)))), ((int)(((byte)(155)))));
+            this.ClientSize = new System.Drawing.Size(1164, 969);
             this.Controls.Add(this.basePanel);
             this.Controls.Add(this.menu);
+            this.ForeColor = System.Drawing.Color.Black;
             this.MainMenuStrip = this.menu;
             this.MinimumSize = new System.Drawing.Size(897, 806);
             this.Name = "ViewMain";
-            this.Text = "Form1";
+            this.Text = "GitHunter";
             this.Load += new System.EventHandler(this._viewMain_Load);
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).EndInit();
             this.menu.ResumeLayout(false);
@@ -346,7 +451,7 @@ partial class ViewMain
     private TextBox _repositoryCountTextBox;
     private ComboBox _sortDirectionComboBox;
     private Button _searchButton;
-    private Button _downloadMetricsButton;
+    private Button _downloadButton;
     private Button _calculateMetricsButton;
     private Label _topicsLabel;
     private Label _countRepositoryLabel;
@@ -367,4 +472,7 @@ partial class ViewMain
     private ToolStripMenuItem loginGithubToolStripMenuItem;
     private ToolStripMenuItem showToolStripMenuItem;
     private ToolStripMenuItem saveToolStripMenuItem;
+    private ImageList IconList;
+    private ImageList SearchButton;
+    private ToolStripMenuItem helpToolStripMenuItem;
 }

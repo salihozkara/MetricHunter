@@ -9,13 +9,13 @@ public interface IGitManager
     /// </summary>
     /// <param name="username"></param>
     /// <param name="password"></param>
-    void Initialize(string username, string password);
+    void Authenticate(string username, string password);
 
     /// <summary>
     ///     User login
     /// </summary>
     /// <param name="token"></param>
-    void Initialize(string token);
+    void Authenticate(string token);
 
     /// <summary>
     ///     Lists repository information from github by input
