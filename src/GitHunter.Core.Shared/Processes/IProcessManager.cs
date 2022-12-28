@@ -10,4 +10,5 @@ public interface IProcessManager
     Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo);
 
     Task<bool> KillAllProcessesAsync();
+    void KillAllProcesses();
 }

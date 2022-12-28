@@ -2,6 +2,7 @@
 using GitHunter.Core.Helpers;
 using GitHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 
@@ -56,7 +57,11 @@ public class GitProvider : IGitProvider, ISingletonDependency
                 _logger.LogError($"Failed to clone {repository.FullName}.");
 
             if (result.ExitCode == 0)
+            {
                 OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository));
+                var infoContent = JsonConvert.SerializeObject(repository);
+                await File.WriteAllTextAsync(Path.Combine(repositoryPath, GitConsts.RepositoryInfoFileExtension), infoContent, token);
+            }
             else
                 OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, null));
 

@@ -106,11 +106,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void _downloadButton_Click(object sender, EventArgs e)
     {
-        using var folderDialog = new FolderBrowserDialog();
-
-        if (folderDialog.ShowDialog() != DialogResult.OK) return;
-        
-        DownloadRepositoryPath = folderDialog.SelectedPath;
+        // using var folderDialog = new FolderBrowserDialog();
+        //
+        // if (folderDialog.ShowDialog() != DialogResult.OK) return;
+        //
+        // DownloadRepositoryPath = folderDialog.SelectedPath;
+        DownloadRepositoryPath = "";
         Presenter.DownloadRepositories();
     }
 
