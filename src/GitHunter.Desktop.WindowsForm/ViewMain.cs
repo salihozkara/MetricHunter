@@ -102,6 +102,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
         var result = await Presenter.CalculateMetrics();
+        using var fileDialog = new SaveFileDialog
+        {
+            Filter = "Csv files | *.csv"
+        };
+
+        if (fileDialog.ShowDialog() == DialogResult.OK)
+        {
+            await File.WriteAllTextAsync(fileDialog.FileName, result);
+        }
     }
 
     private void _downloadButton_Click(object sender, EventArgs e)

@@ -106,13 +106,11 @@ public class ViewMainPresenter : IViewMainPresenter
             _controller.ErrorMessage("Repository bulunamadı");
         }
 
-        if (View.SelectedLanguage is null) return null;
-
-        var manager = _metricCalculatorManager.FindMetricCalculator(View.SelectedLanguage.Value);
-
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
         {
+            var language = GitConsts.LanguagesMap[item.Language];
+            var manager = _metricCalculatorManager.FindMetricCalculator(language);
             var metric = await manager.CalculateMetricsAsync(item);
             var dictList = metric.ToDictionaryListByTopics();
             metrics.AddRange(dictList);
@@ -169,5 +167,27 @@ public class ViewMainPresenter : IViewMainPresenter
         }
 
         await _repositoryAppService.WriteRepositories(Repositories, View.JsonSavePath);
+    }
+
+    public async Task<string> HuntRepositories()
+    {
+        if (!Repositories.Any())
+        {
+            _controller.ErrorMessage("Repository bulunamadı.");
+            return null;
+        }
+
+        var metrics = new List<Dictionary<string, string>>();
+        foreach (var item in Repositories)
+        {
+            await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
+            var language = GitConsts.LanguagesMap[item.Language];
+            var manager = _metricCalculatorManager.FindMetricCalculator(language);
+            var metric = await manager.CalculateMetricsAsync(item);
+            var dictList = metric.ToDictionaryListByTopics();
+            metrics.AddRange(dictList);
+            await _gitProvider.DeleteLocalRepository(item);
+        }
+        return _csvHelper.MetricsToCsv(metrics);
     }
 }

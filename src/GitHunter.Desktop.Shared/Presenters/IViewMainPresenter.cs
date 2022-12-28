@@ -14,4 +14,5 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
     Task DownloadRepositories();
     Task ShowRepositories();
     Task SaveRepositories();
+    Task<string> HuntRepositories();
 }
