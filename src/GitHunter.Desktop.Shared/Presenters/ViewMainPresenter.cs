@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Octokit;
 using System.Text;
+using GitHunter.Application.Repositories;
 using Volo.Abp;
 using FileMode = System.IO.FileMode;
 
@@ -22,7 +23,20 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IGitManager _gitManager;
     private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
-    private IEnumerable<Repository> Repositories;
+    private IEnumerable<Repository> _repositories;
+    private IRepositoryAppService _repositoryAppService;
+
+    public IEnumerable<Repository> Repositories
+    {
+        get
+        {
+            return View.SelectedRepositories.Any()
+                ? _repositories.Where(x => View.SelectedRepositories.Contains(x.Id)).ToList()
+                : _repositories;
+        }
+        
+        set => _repositories = value;
+    }
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -30,10 +44,13 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller = controller;
         View.Presenter = this;
 
+        _repositories = new List<Repository>();
+
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
         _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
+        _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
     }
 
     public IViewMain View { get; }
@@ -66,7 +83,7 @@ public class ViewMainPresenter : IViewMainPresenter
 
         var gitResult = await _gitManager.GetRepositories(gitInput);
 
-        Repositories = gitResult.Repositories;
+        _repositories = gitResult.Repositories;
 
         var repositoryModelList = Repositories.Select(x => new RepositoryModel
         {
@@ -85,7 +102,9 @@ public class ViewMainPresenter : IViewMainPresenter
     public async Task<string> CalculateMetrics()
     {
         if (!Repositories.Any())
-            throw new UserFriendlyException("Önce repoları arayın.");
+        {
+            _controller.ErrorMessage("Repository bulunamadı");
+        }
 
         if (View.SelectedLanguage is null) return null;
 
@@ -105,31 +124,29 @@ public class ViewMainPresenter : IViewMainPresenter
     public async Task DownloadRepositories()
     {
         if (!Repositories.Any())
-            throw new UserFriendlyException("Önce repoları arayın.");
-
-        if (View.SelectedRepositories.Any())
         {
-            var selectedRepos = Repositories.Where(x => View.SelectedRepositories.Contains(x.Id)).ToList();
+            _controller.ErrorMessage("Repository bulunamadı.");
+            return;
+        }
+        
+        foreach (var item in Repositories) await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
+    }
 
-            foreach (var item in selectedRepos) await _gitProvider.CloneRepository(item);
+    public async Task ShowRepositories()
+    {
+        if (View.JsonLoadPath.IsNullOrEmpty())
+        {
+            _controller.ErrorMessage("Dosya bulunamadı");
             return;
         }
 
-        foreach (var item in Repositories) await _gitProvider.CloneRepository(item);
-    }
+        var repositories = await _repositoryAppService.ReadRepositories(View.JsonLoadPath);
 
-    public void ShowRepositories()
-    {
-        if (View.RepositoriesJsonPath.IsNullOrEmpty())
-        {
-          throw new UserFriendlyException("Repository bulunamadı");
-        }
+        if (!repositories.Any()) return;
 
-        Repositories = JsonConvert.DeserializeObject<Repository[]>(File.ReadAllText($"{View.RepositoriesJsonPath}"), Resource.Jsons.JsonSerializerSettings);
+        Repositories = repositories;
 
-        if (Repositories != null && !Repositories.Any()) return;
-
-        var repositoryModelList = Repositories!.Select(x => new RepositoryModel
+        var repositoryModelList = Repositories.Select(x => new RepositoryModel
         {
             Id = x.Id,
             Name = x.Name,
@@ -143,20 +160,14 @@ public class ViewMainPresenter : IViewMainPresenter
         View.ShowRepositories(repositoryModelList);
     }
 
-    public Task SaveRepositories()
+    public async Task SaveRepositories()
     {
         if (!Repositories.Any())
-            throw new UserFriendlyException("Önce repoları arayın.");
+        {
+            _controller.ErrorMessage("No repositories found for save.");
+            return;
+        }
 
-        var json = JsonConvert.SerializeObject(Repositories, Resource.Jsons.JsonSerializerSettings);
-
-        var currentDate = DateTime.Now.ToString("dd-MM-yyyy_HH-mm-ss");
-        var fileName = $"{View.RepositoriesFolderPath}//repositories_{currentDate}.json";
-
-        // Save file with create moed
-        using var fileStream = new FileStream(fileName , FileMode.Create, FileAccess.Write, FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
-        fileStream.WriteAsync(Encoding.UTF8.GetBytes(json));
-
-        return Task.CompletedTask;
+        await _repositoryAppService.WriteRepositories(Repositories, View.JsonSavePath);
     }
 }

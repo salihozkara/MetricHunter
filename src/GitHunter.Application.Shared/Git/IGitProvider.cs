@@ -4,7 +4,7 @@ namespace GitHunter.Application.Git;
 
 public interface IGitProvider
 {
-    Task<bool> CloneRepository(Repository repository, CancellationToken token = default);
+    Task<bool> CloneRepository(Repository repository, string clonePath = "", CancellationToken token = default);
     event EventHandler<CloneRepositoryErrorEventArgs>? CloneRepositoryError;
     event EventHandler<CloneRepositorySuccessEventArgs>? CloneRepositorySuccess;
 

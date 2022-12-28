@@ -17,6 +17,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public IViewMainPresenter Presenter { get; set; }
 
+    public void ShowMessage(string message)
+    {
+        MessageBox.Show(message);   
+    }
+
     public string GithubToken => Properties.Settings.Default.GithubToken;
 
     public IEnumerable<long> SelectedRepositories
@@ -39,8 +44,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
       int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
 
     public string Topics => _topicsTextBox.Text;
-    public string RepositoriesJsonPath { get; set; }
-    public string RepositoriesFolderPath { get; set; }
+    
+    public string JsonLoadPath { get; set; }
+    
+    public string JsonSavePath { get; set; }
+    
+    public string DownloadRepositoryPath { get; set; }
 
     public IEnumerable<Language>? LanguageSelectList
     {
@@ -51,9 +60,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         set => _sortDirectionComboBox.DataSource = value;
     }
-
-    public string DownloadPath { get; set; }
-
+    
     public void ShowRepositories(IEnumerable<RepositoryModel> repositories)
     {
         _repositoryDataGridView.DataSource = repositories.ToList();
@@ -101,11 +108,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         using var folderDialog = new FolderBrowserDialog();
 
-        if (folderDialog.ShowDialog() == DialogResult.OK)
-        {
-            DownloadPath = folderDialog.SelectedPath;
-        }
-
+        if (folderDialog.ShowDialog() != DialogResult.OK) return;
+        
+        DownloadRepositoryPath = folderDialog.SelectedPath;
         Presenter.DownloadRepositories();
     }
 
@@ -118,7 +123,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         if (fileDialog.ShowDialog() == DialogResult.OK)
         {
-            RepositoriesJsonPath = fileDialog.FileName;
+            JsonLoadPath = fileDialog.FileName;
         }
 
         Presenter.ShowRepositories();
@@ -126,14 +131,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void saveToolStripMenuItem_Click(object sender, EventArgs e)
     {
-        using var folderDialog = new FolderBrowserDialog();
-
-        if (folderDialog.ShowDialog() == DialogResult.OK)
+        using var saveFileDialog = new SaveFileDialog
         {
-            RepositoriesFolderPath = folderDialog.SelectedPath;
-        }
+            Filter = "Json files | *.json",
+            OverwritePrompt = false
+        };
 
+        if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
+        
+        JsonSavePath = saveFileDialog.FileName;
         Presenter.SaveRepositories();
+
     }
 
     private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)

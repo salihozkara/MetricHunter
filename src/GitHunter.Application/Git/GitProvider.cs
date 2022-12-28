@@ -20,15 +20,16 @@ public class GitProvider : IGitProvider, ISingletonDependency
     }
 
     // TODO: Add path to parameters
-    public async Task<bool> CloneRepository(Repository repository, CancellationToken token = default)
+    public async Task<bool> CloneRepository(Repository repository, string clonePath, CancellationToken token = default)
     {
         try
         {
             if (token.IsCancellationRequested) return false;
 
             _logger.LogInformation($"Cloning {repository.FullName}...");
-            var path = PathHelper.BuildAndCreateFullPath(repository.Language, "Repositories", repository.Owner.Login);
-
+            
+            var path = PathHelper.BuildAndCreateFullPath(clonePath, repository.Language + " Repositories", repository.Owner.Login);
+            
             var repositoryPath = Path.Combine(path, repository.Name);
             if (Directory.Exists(repositoryPath))
             {
@@ -67,7 +68,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
             return false;
         }
     }
-
+    
     public event EventHandler<CloneRepositoryErrorEventArgs>? CloneRepositoryError;
     public event EventHandler<CloneRepositorySuccessEventArgs>? CloneRepositorySuccess;
 

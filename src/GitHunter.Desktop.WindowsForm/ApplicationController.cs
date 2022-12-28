@@ -1,22 +1,39 @@
 ﻿using GitHunter.Desktop.Core;
 using GitHunter.Desktop.Presenters;
+using GitHunter.Desktop.Views;
 using Volo.Abp.DependencyInjection;
 
 namespace GitHunter.Desktop;
 
 public class ApplicationController : IApplicationController, ISingletonDependency
 {
-    public ApplicationController(IServiceProvider serviceProvider)
+    public IViewMain ViewMain { get; }
+    public void ErrorMessage(string message)
+    {
+        MessageBox.Show(message);
+    }
+
+    public void SuccessMessage(string message)
+    {
+        throw new NotImplementedException();
+    }
+
+    public ApplicationController(IServiceProvider serviceProvider, IViewMain viewMain)
     {
         ServiceProvider = serviceProvider;
+        ViewMain = viewMain;
+    }
+
+    public void ShowMessage(string message)
+    {
+        ViewMain.ShowMessage(message);
     }
 
     public IServiceProvider ServiceProvider { get; }
 
     public void StartApplication()
     {
-        using var viewMain = new ViewMain();
-        var presenter = new ViewMainPresenter(viewMain, this);
+        var presenter = new ViewMainPresenter(ViewMain, this);
         presenter.Run();
     }
 
