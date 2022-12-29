@@ -8,16 +8,18 @@ In addition to these features, GitHunter also allows developers to make predicti
 
 Overall, GitHunter is a useful tool for developers who want to stay up-to-date on the most popular and successful repositories on GitHub, and learn from the experiences of other developers.
 
-## Installing and running GitHunter
+## Getting Started
+
+### Useful Links
+
+* [How to use GitHunter](doc/UsergGuide.md)
+* [Roadmap](doc/Roadmap.md)
 
 ### Requirements
 
 * Windows 11 or Windows 10 version 2004 (code name 20H1 / build number 19041) or newer.
 * .NET 7 Desktop Runtime
 * Git
-
-### Via GitHub with EXE [Recommended]
-Go to GitHunter [releases page](https://github.com/salihozkara/GitHunter/releases), click on Assets at the bottom to show the files available in the release. Please use the appropriate the GitHunter installer that matches your machine's architecture. For most, it is x64.
 
 ## Features
 
@@ -31,7 +33,3 @@ Go to GitHunter [releases page](https://github.com/salihozkara/GitHunter/release
 
 * **Learning resources:** Offers a range of resources and learning materials to help developers improve their skills and stay up-to-date on the latest developments in their field.
 
-## Useful links
-
-* [How to use GitHunter](doc/UsergGuide.md)
-* [Roadmap](doc/Roadmap.md)
