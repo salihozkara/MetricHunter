@@ -12,7 +12,7 @@ Overall, GitHunter is a useful tool for developers who want to stay up-to-date o
 
 ### Useful Links
 
-* [How to use GitHunter](doc/UsergGuide.md)
+* [How to use GitHunter](doc/UserGuide.md)
 * [Roadmap](doc/Roadmap.md)
 
 ### Requirements
