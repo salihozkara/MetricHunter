@@ -206,4 +206,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
 
     }
+
+    private void huntButton_Click(object sender, EventArgs e)
+    {
+        Presenter.HuntRepositories();
+    }
 }
