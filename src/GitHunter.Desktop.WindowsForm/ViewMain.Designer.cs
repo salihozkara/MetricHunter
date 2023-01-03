@@ -312,21 +312,21 @@ partial class ViewMain
             // contributorsToolStripMenuItem
             // 
             this.contributorsToolStripMenuItem.Name = "contributorsToolStripMenuItem";
-            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
+            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(222, 42);
             this.contributorsToolStripMenuItem.Text = "Contributors";
             this.contributorsToolStripMenuItem.Click += new System.EventHandler(this.contributorsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(222, 42);
             this.helpToolStripMenuItem.Text = "Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // reportToolStripMenuItem
             // 
             this.reportToolStripMenuItem.Name = "reportToolStripMenuItem";
-            this.reportToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
+            this.reportToolStripMenuItem.Size = new System.Drawing.Size(222, 42);
             this.reportToolStripMenuItem.Text = "Report";
             this.reportToolStripMenuItem.Click += new System.EventHandler(this.reportToolStripMenuItem_Click);
             // 
@@ -415,6 +415,7 @@ partial class ViewMain
             this.huntButton.Text = "Hunt";
             this.huntButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
             this.huntButton.UseVisualStyleBackColor = true;
+            this.huntButton.Click += new System.EventHandler(this.huntButton_Click);
             // 
             // ViewMain
             // 
