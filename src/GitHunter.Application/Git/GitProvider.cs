@@ -80,7 +80,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
     public Task<bool> DeleteLocalRepository(Repository repository, CancellationToken token = default)
     {
-        var path = PathHelper.BuildAndCreateFullPath(repository.Language, "Repositories", repository.Owner.Login);
+        var path = PathHelper.BuildAndCreateFullPath(repository.Language + " Repositories", repository.Owner.Login);
 
         var repositoryPath = Path.Combine(path, repository.Name);
 

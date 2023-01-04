@@ -146,7 +146,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         var reportsPath = PathHelper.BuildAndCreateFullPath(repository.Language, "Reports", repository.Owner.Login);
 
-        var projectDirectory = PathHelper.BuildFullPath(repository.Language, "Repositories", repository.FullName);
+        var projectDirectory = PathHelper.BuildFullPath(repository.Language + " Repositories", repository.FullName);
 
         var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
 

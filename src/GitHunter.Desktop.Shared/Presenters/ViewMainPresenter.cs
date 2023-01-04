@@ -180,13 +180,15 @@ public class ViewMainPresenter : IViewMainPresenter
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
         {
-            await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
-            var language = GitConsts.LanguagesMap[item.Language];
-            var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var metric = await manager.CalculateMetricsAsync(item);
-            var dictList = metric.ToDictionaryListByTopics();
-            metrics.AddRange(dictList);
-            await _gitProvider.DeleteLocalRepository(item);
+            if (await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath))
+            {
+                var language = GitConsts.LanguagesMap[item.Language];
+                var manager = _metricCalculatorManager.FindMetricCalculator(language);
+                var metric = await manager.CalculateMetricsAsync(item);
+                var dictList = metric.ToDictionaryListByTopics();
+                metrics.AddRange(dictList);
+                await _gitProvider.DeleteLocalRepository(item);
+            }
         }
         return _csvHelper.MetricsToCsv(metrics);
     }
