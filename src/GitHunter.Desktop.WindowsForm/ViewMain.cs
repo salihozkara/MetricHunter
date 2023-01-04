@@ -102,6 +102,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
         var result = await Presenter.CalculateMetrics();
+        await SaveCsv(result);
+    }
+
+    private static async Task SaveCsv(string result)
+    {
         using var fileDialog = new SaveFileDialog
         {
             Filter = "Csv files | *.csv"
@@ -207,8 +212,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     }
 
-    private void huntButton_Click(object sender, EventArgs e)
+    private async void huntButton_Click(object sender, EventArgs e)
     {
-        Presenter.HuntRepositories();
+        var result = await Presenter.HuntRepositories();
+        await SaveCsv(result);
     }
 }
