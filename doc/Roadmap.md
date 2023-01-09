@@ -1,5 +1,5 @@
 # Roadmap
-The following is a roadmap for the development of GitHunter:
+The following is a roadmap for the development of MetricHunter:
 
 ## Priority 1: Improve search functionality
 * Add advanced search options, such as the ability to search by date range or by specific users
@@ -18,4 +18,4 @@ The following is a roadmap for the development of GitHunter:
 * Redesign the user interface to make it more intuitive and user-friendly
 * Add new features to make it easier for developers to find and explore repositories on GitHub
 
-This roadmap is subject to change based on the goals and priorities of the GitHunter project. However, these are the key areas that GitHunter will focus on in order to continue improving and evolving as a tool for developers.
+This roadmap is subject to change based on the goals and priorities of the MetricHunter project. However, these are the key areas that MetricHunter will focus on in order to continue improving and evolving as a tool for developers.
