@@ -29,5 +29,7 @@ public interface IViewMain : IView<IViewMainPresenter>
     string DownloadRepositoryPath { get; set; }
     void ShowMessage(string message);
 
-    void ShowRepositories(IEnumerable<RepositoryModel> repositories);
+    void ShowRepositories(IEnumerable<Repository> repositories);
+    
+    void SetSearchProgressBar(int value);
 }

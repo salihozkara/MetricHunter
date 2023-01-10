@@ -3,6 +3,7 @@ namespace MetricHunter.Desktop.Models;
 public class RepositoryModel
 {
     public long Id { get; set; }
+    public int Index { get; set; }
     public string Name { get; set; }
     public string Owner { get; set; }
     public string Description { get; set; }

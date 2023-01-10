@@ -61,13 +61,43 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         set => _sortDirectionComboBox.DataSource = value;
     }
 
-    public void ShowRepositories(IEnumerable<RepositoryModel> repositories)
+    public void ShowRepositories(IEnumerable<Repository> repositories)
     {
-        _repositoryDataGridView.DataSource = repositories.ToList();
+        var index = 0;
+        var repositoryModelList = repositories.Select(x => new RepositoryModel
+        {
+            Id = x.Id,
+            Index = ++index,
+            Name = x.Name,
+            Description = x.Description,
+            Stars = x.StargazersCount,
+            Url = x.HtmlUrl,
+            License = x.License?.Name ?? "No License",
+            Owner = x.Owner.Login,
+            SizeString = ToSizeString(x.Size)
+        }).ToList();
+        _repositoryDataGridView.DataSource = repositoryModelList.ToList();
 
         if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
 
         SetHyperLink();
+    }
+
+    public void SetSearchProgressBar(int value)
+    {
+        if(value > 100) value = 100;
+        if(value < 0) value = 0;
+        _searchProgressBar.Value = value;
+    }
+
+    private static string ToSizeString(long size) // size in kilobytes
+    {
+        return size switch
+        {
+            < 1024 => $"{size} KB",
+            < 1024 * 1024 => $"{Math.Round(size / 1024.0, 2)} MB",
+            _ => $"{Math.Round(size / 1024.0 / 1024.0, 2)} GB"
+        };
     }
 
     public void Run()
@@ -89,9 +119,13 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         Presenter.LoadForm();
     }
 
-    private void _searchButton_Click(object sender, EventArgs e)
+    private async void _searchButton_Click(object sender, EventArgs e)
     {
-        Presenter.SearchRepositories();
+        SetSearchProgressBar(0);
+        var button = sender as Button;
+        button!.Enabled = false;
+        await Presenter.SearchRepositories();
+        button.Enabled = true;
     }
 
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)

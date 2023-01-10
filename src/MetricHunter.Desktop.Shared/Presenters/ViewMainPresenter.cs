@@ -1,9 +1,9 @@
+using System.Diagnostics;
 using MetricHunter.Application.Csv;
 using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
 using MetricHunter.Desktop.Core;
-using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Octokit;
@@ -18,7 +18,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IGitProvider _gitProvider;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
-    private IEnumerable<Repository> _repositories;
+    private List<Repository> _repositories;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -33,6 +33,17 @@ public class ViewMainPresenter : IViewMainPresenter
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
         _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
+        
+        _gitManager.SearchRepositoriesRequestSuccess += GitManager_SearchRepositoriesRequestSuccess;
+    }
+
+    private void GitManager_SearchRepositoriesRequestSuccess(object? sender, RequestSuccessEventArgs e)
+    {
+        _repositories.AddRange(e.Result.Items);
+        _repositories = _repositories.DistinctBy(x=>x.Id).Take(View.RepositoryCount).ToList();
+        var progressBarValue = (int) Math.Round((double) _repositories.Count / View.RepositoryCount * 100);
+        View.SetSearchProgressBar(progressBarValue);
+        View.ShowRepositories(Repositories);
     }
 
     public IEnumerable<Repository> Repositories
@@ -44,7 +55,7 @@ public class ViewMainPresenter : IViewMainPresenter
                 : _repositories;
         }
 
-        set => _repositories = value;
+        set => _repositories = value.ToList();
     }
 
     public IViewMain View { get; }
@@ -75,24 +86,16 @@ public class ViewMainPresenter : IViewMainPresenter
             Topic = View.Topics
         };
 
-        var gitResult = await _gitManager.GetRepositoriesAsync(gitInput);
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        await _gitManager.GetRepositoriesAsync(gitInput);
+        stopwatch.Stop();
 
-        _repositories = gitResult.Repositories;
-
-        var repositoryModelList = Repositories.Select(x => new RepositoryModel
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            Stars = x.StargazersCount,
-            Url = x.HtmlUrl,
-            License = x.License?.Name ?? "No License",
-            Owner = x.Owner.Login,
-            SizeString = ToSizeString(x.Size)
-        }).ToList();
-
-        View.ShowRepositories(repositoryModelList);
+        View.ShowRepositories(Repositories);
+        
+        View.ShowMessage($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
     }
+    
 
     public async Task<string> CalculateMetrics()
     {
@@ -135,19 +138,7 @@ public class ViewMainPresenter : IViewMainPresenter
 
         Repositories = repositories;
 
-        var repositoryModelList = Repositories.Select(x => new RepositoryModel
-        {
-            Id = x.Id,
-            Name = x.Name,
-            Description = x.Description,
-            Stars = x.StargazersCount,
-            Url = x.HtmlUrl,
-            License = x.License?.Name ?? "No Licence",
-            Owner = x.Owner.Login,
-            SizeString = ToSizeString(x.Size)
-        }).ToList();
-
-        View.ShowRepositories(repositoryModelList);
+        View.ShowRepositories(Repositories);
     }
 
     public async Task SaveRepositories()
@@ -190,15 +181,5 @@ public class ViewMainPresenter : IViewMainPresenter
         }
 
         return true;
-    }
-
-    private static string ToSizeString(long size) // size in kilobytes
-    {
-        return size switch
-        {
-            < 1024 => $"{size} KB",
-            < 1024 * 1024 => $"{Math.Round(size / 1024.0, 2)} MB",
-            _ => $"{Math.Round(size / 1024.0 / 1024.0, 2)} GB"
-        };
     }
 }
