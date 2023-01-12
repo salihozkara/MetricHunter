@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -32,6 +33,19 @@ namespace MetricHunter.Desktop
         public void Run()
         {
             ShowDialog();
+        }
+
+        private void githubTokenHelp_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
+        {
+            var githubTokenHelpLink = "https://github.com/salihozkara/MetricHunter/blob/master/doc/UserGuide.md#how-to-authenticate";
+
+            var ps = new ProcessStartInfo(githubTokenHelpLink)
+            {
+                UseShellExecute = true,
+                Verb = "open"
+            };
+
+            Process.Start(ps);
         }
     }
 }

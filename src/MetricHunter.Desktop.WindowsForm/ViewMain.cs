@@ -209,7 +209,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void helpToolStripMenuItem_Click(object sender, EventArgs e)
     {
+        var helpLink = "https://github.com/salihozkara/MetricHunter/blob/master/doc/UserGuide.md";
 
+        var ps = new ProcessStartInfo(helpLink)
+        {
+            UseShellExecute = true,
+            Verb = "open"
+        };
+
+        Process.Start(ps);
     }
 
     private async void huntButton_Click(object sender, EventArgs e)
