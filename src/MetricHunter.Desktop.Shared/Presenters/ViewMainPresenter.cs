@@ -34,6 +34,8 @@ public class ViewMainPresenter : IViewMainPresenter
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
         _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
         
+        _gitManager.Authenticate(View.GithubToken);
+
         _gitManager.SearchRepositoriesRequestSuccess += GitManager_SearchRepositoriesRequestSuccess;
     }
 
