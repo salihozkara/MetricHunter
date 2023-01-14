@@ -33,6 +33,7 @@
             this.AuthenticateButton = new System.Windows.Forms.Button();
             this.label1 = new System.Windows.Forms.Label();
             this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
+            this.githubTokenHelp = new System.Windows.Forms.LinkLabel();
             ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
             this.SuspendLayout();
             // 
@@ -80,11 +81,23 @@
             this.fileSystemWatcher1.EnableRaisingEvents = true;
             this.fileSystemWatcher1.SynchronizingObject = this;
             // 
+            // githubTokenHelp
+            // 
+            this.githubTokenHelp.AutoSize = true;
+            this.githubTokenHelp.Location = new System.Drawing.Point(34, 359);
+            this.githubTokenHelp.Name = "githubTokenHelp";
+            this.githubTokenHelp.Size = new System.Drawing.Size(257, 25);
+            this.githubTokenHelp.TabIndex = 4;
+            this.githubTokenHelp.TabStop = true;
+            this.githubTokenHelp.Text = "How to retrieve a Github Token";
+            this.githubTokenHelp.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.githubTokenHelp_LinkClicked);
+            // 
             // ViewGithubLogin
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(627, 413);
+            this.Controls.Add(this.githubTokenHelp);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.AuthenticateButton);
             this.Controls.Add(this.GithubLoginLabel);
@@ -105,5 +118,6 @@
         private Button AuthenticateButton;
         private Label label1;
         private FileSystemWatcher fileSystemWatcher1;
+        private LinkLabel githubTokenHelp;
     }
 }

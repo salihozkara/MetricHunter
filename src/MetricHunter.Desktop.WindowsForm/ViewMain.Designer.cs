@@ -179,9 +179,9 @@ partial class ViewMain
             this._countRepositoryLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._countRepositoryLabel.Location = new System.Drawing.Point(205, 37);
             this._countRepositoryLabel.Name = "_countRepositoryLabel";
-            this._countRepositoryLabel.Size = new System.Drawing.Size(131, 34);
+            this._countRepositoryLabel.Size = new System.Drawing.Size(63, 34);
             this._countRepositoryLabel.TabIndex = 9;
-            this._countRepositoryLabel.Text = "Wanted Count";
+            this._countRepositoryLabel.Text = "Count";
             // 
             // _languageLabel
             // 
@@ -199,9 +199,9 @@ partial class ViewMain
             this._sortDirectionLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._sortDirectionLabel.Location = new System.Drawing.Point(534, 37);
             this._sortDirectionLabel.Name = "_sortDirectionLabel";
-            this._sortDirectionLabel.Size = new System.Drawing.Size(76, 34);
+            this._sortDirectionLabel.Size = new System.Drawing.Size(123, 34);
             this._sortDirectionLabel.TabIndex = 11;
-            this._sortDirectionLabel.Text = "Sort By";
+            this._sortDirectionLabel.Text = "Sort By Stars";
             // 
             // _repositoryDataGridView
             // 
@@ -313,22 +313,22 @@ partial class ViewMain
             // contributorsToolStripMenuItem
             // 
             this.contributorsToolStripMenuItem.Name = "contributorsToolStripMenuItem";
-            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(222, 42);
+            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
             this.contributorsToolStripMenuItem.Text = "Contributors";
             this.contributorsToolStripMenuItem.Click += new System.EventHandler(this.contributorsToolStripMenuItem_Click);
             // 
             // helpToolStripMenuItem
             // 
             this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(222, 42);
+            this.helpToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
             this.helpToolStripMenuItem.Text = "Help";
             this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
             // 
             // reportToolStripMenuItem
             // 
             this.reportToolStripMenuItem.Name = "reportToolStripMenuItem";
-            this.reportToolStripMenuItem.Size = new System.Drawing.Size(222, 42);
-            this.reportToolStripMenuItem.Text = "Report";
+            this.reportToolStripMenuItem.Size = new System.Drawing.Size(270, 42);
+            this.reportToolStripMenuItem.Text = "Report an Issue";
             this.reportToolStripMenuItem.Click += new System.EventHandler(this.reportToolStripMenuItem_Click);
             // 
             // basePanel
