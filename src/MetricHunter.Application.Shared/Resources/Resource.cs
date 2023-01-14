@@ -3,6 +3,7 @@ using System.Dynamic;
 using System.Globalization;
 using System.Reflection;
 using JsonNet.ContractResolvers;
+using MetricHunter.Core;
 using MetricHunter.Core.Helpers;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
@@ -27,8 +28,7 @@ public static class Resource
     private static string GetOrCreateResFolder()
     {
         var userFolder = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-        const string slnName = "ProjectStatistics";
-        var privateSlnFolderName = "." + slnName.ToLower();
+        var privateSlnFolderName = "." + MetricHunterConsts.AppName.ToLower();
         var resFolder = Path.Combine(userFolder, privateSlnFolderName, ResFolder);
         if (!Directory.Exists(resFolder)) Directory.CreateDirectory(resFolder);
         var baseResFolder = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)!, ResFolder);
