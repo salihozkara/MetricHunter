@@ -1,5 +1,5 @@
 ﻿using MetricHunter.Core.DependencyProcesses;
-using MetricHunter.Core.Helpers;
+using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
 using Octokit;
@@ -18,40 +18,45 @@ public class GitProvider : IGitProvider, ISingletonDependency
         _processManager = processManager;
         _logger = logger;
     }
-
-    // TODO: Add path to parameters
-    public async Task<bool> CloneRepository(Repository repository, string clonePath, CancellationToken token = default)
+    
+    public async Task<bool> CloneRepository(Repository repository, string cloneBaseDirectoryPath = "", CancellationToken token = default)
     {
+        if(string.IsNullOrWhiteSpace(cloneBaseDirectoryPath))
+        {
+            cloneBaseDirectoryPath = PathHelper.TempPath;
+        }
         try
         {
             if (token.IsCancellationRequested) return false;
 
             _logger.LogInformation($"Cloning {repository.FullName}...");
 
-            var path = PathHelper.BuildAndCreateFullPath(clonePath, repository.Language + " Repositories",
-                repository.Owner.Login);
+            var repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
 
-            var repositoryPath = Path.Combine(path, repository.Name);
+            var path = repositoryPath.ParentDirectory;
             if (Directory.Exists(repositoryPath))
             {
                 if (!Directory.Exists(Path.Combine(repositoryPath, ".git")))
                     await DeleteLocalRepository(repositoryPath, token);
-                _logger.LogInformation($"Repository {repository.FullName} already exists.");
-                _logger.LogInformation($"Updating {repository.FullName}...");
-
-                var r = await _processManager.RunAsync(new ProcessStartInfo("git",
-                    $"pull {repository.CloneUrl} --allow-unrelated-histories",
-                    repositoryPath));
-                if (r.ExitCode != 0)
-                {
-                    _logger.LogWarning(
-                        $"Repository {repository.FullName} is not a git repository. Deleting and cloning again...");
-                    await DeleteLocalRepository(repositoryPath, token);
-                }
                 else
                 {
-                    _logger.LogInformation($"Repository {repository.FullName} updated.");
-                    return true;
+                    _logger.LogInformation($"Repository {repository.FullName} already exists.");
+                    _logger.LogInformation($"Updating {repository.FullName}...");
+
+                    var r = await _processManager.RunAsync(new ProcessStartInfo("git",
+                        $"pull {repository.CloneUrl} --allow-unrelated-histories",
+                        repositoryPath));
+                    if (r.ExitCode != 0)
+                    {
+                        _logger.LogWarning(
+                            $"Repository {repository.FullName} is not a git repository. Deleting and cloning again...");
+                        await DeleteLocalRepository(repositoryPath, token);
+                    }
+                    else
+                    {
+                        _logger.LogInformation($"Repository {repository.FullName} updated.");
+                        return true;
+                    }
                 }
             }
 
@@ -102,18 +107,20 @@ public class GitProvider : IGitProvider, ISingletonDependency
     public event EventHandler<CloneRepositorySuccessEventArgs>? CloneRepositorySuccess;
 
 
-    public Task<bool> DeleteLocalRepository(Repository repository, CancellationToken token = default)
+    public Task<bool> DeleteLocalRepository(Repository repository, string cloneBaseDirectoryPath = "", CancellationToken token = default)
     {
-        var path = PathHelper.BuildAndCreateFullPath(repository.Language + " Repositories", repository.Owner.Login);
-
-        var repositoryPath = Path.Combine(path, repository.Name);
+        if(string.IsNullOrWhiteSpace(cloneBaseDirectoryPath))
+        {
+            cloneBaseDirectoryPath = PathHelper.TempPath;
+        }
+        var repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
 
         return DeleteLocalRepository(repositoryPath, token);
     }
 
     public Task<bool> DeleteLocalRepository(string path, CancellationToken token = default)
     {
-        if (token.IsCancellationRequested) return Task.FromResult(false);
+        token.ThrowIfCancellationRequested();
 
         if (Directory.Exists(path))
         {

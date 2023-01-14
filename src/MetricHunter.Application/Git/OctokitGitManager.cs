@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Octokit;
+using Octokit.Internal;
 using Volo.Abp.DependencyInjection;
 using Range = Octokit.Range;
 
@@ -47,18 +48,40 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// </summary>
     /// <param name="username"></param>
     /// <param name="password"></param>
-    public void Authenticate(string username, string password)
+    public bool Authenticate(string username, string password)
     {
-        Client.Credentials = new Credentials(username, password);
+        try
+        {
+            Client.Credentials = new Credentials(username, password);
+            Client.User.Current().GetAwaiter().GetResult();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Client.Credentials = Credentials.Anonymous;
+            _logger.LogError(e, "Error while authenticating");
+            return false;
+        }
     }
 
     /// <summary>
     ///     User login
     /// </summary>
     /// <param name="token"></param>
-    public void Authenticate(string token)
+    public bool Authenticate(string token)
     {
-        Client.Credentials = new Credentials(token);
+        try
+        {
+            Client.Credentials = new Credentials(token);
+            Client.User.Current().GetAwaiter().GetResult();
+            return true;
+        }
+        catch (Exception e)
+        {
+            Client.Credentials = Credentials.Anonymous;
+            _logger.LogError(e, "Error while authenticating");
+            return false;
+        }
     }
 
     /// <summary>

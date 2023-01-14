@@ -34,9 +34,15 @@ public class ViewMainPresenter : IViewMainPresenter
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
         _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
         
-        _gitManager.Authenticate(View.GithubToken);
+        Authenticate();
 
         _gitManager.SearchRepositoriesRequestSuccess += GitManager_SearchRepositoriesRequestSuccess;
+    }
+
+    private void Authenticate()
+    {
+        if (!string.IsNullOrWhiteSpace(View.GithubToken))
+            _gitManager.Authenticate(View.GithubToken);
     }
 
     private void GitManager_SearchRepositoriesRequestSuccess(object? sender, RequestSuccessEventArgs e)
@@ -76,10 +82,12 @@ public class ViewMainPresenter : IViewMainPresenter
     public void ShowGithubLogin()
     {
         _controller.ShowGithubLogin();
+        Authenticate();
     }
 
     public async Task SearchRepositories()
     {
+        _repositories.Clear();
         var gitInput = new GitInput
         {
             Language = View.SelectedLanguage,
@@ -92,7 +100,6 @@ public class ViewMainPresenter : IViewMainPresenter
         stopwatch.Start();
         await _gitManager.GetRepositoriesAsync(gitInput);
         stopwatch.Stop();
-
         View.ShowRepositories(Repositories);
         
         View.ShowMessage($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
@@ -108,19 +115,22 @@ public class ViewMainPresenter : IViewMainPresenter
         {
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var metric = await manager.CalculateMetricsAsync(item);
+            // var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath, View.CalculateMetricsByLocalResultsPath);
+            var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath, View.CalculateMetricsByLocalResultsPath);
             if (metric.IsEmpty())
                 continue;
             var dictList = metric.ToDictionaryListByTopics();
             metrics.AddRange(dictList);
         }
+        
+        var local = await _metricCalculatorManager.FindMetricCalculator(Language.CSharp).CalculateMetricsByLocalResultsAsync(_repositories, View.CalculateMetricsByLocalResultsPath);
 
         return _csvHelper.MetricsToCsv(metrics);
     }
 
     public async Task DownloadRepositories()
     {
-        if (CheckSelectRepositories())
+        if (!CheckSelectRepositories())
             return;
 
         foreach (var item in Repositories) await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
@@ -156,12 +166,12 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> HuntRepositories()
     {
-        if (CheckSelectRepositories())
+        if (!CheckSelectRepositories())
             return string.Empty;
 
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
-            if (await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath))
+            if (await _gitProvider.CloneRepository(item))
             {
                 var language = GitConsts.LanguagesMap[item.Language];
                 var manager = _metricCalculatorManager.FindMetricCalculator(language);

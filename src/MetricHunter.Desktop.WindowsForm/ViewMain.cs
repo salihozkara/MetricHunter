@@ -1,4 +1,3 @@
-using System.ComponentModel;
 using System.Diagnostics;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
@@ -29,7 +28,20 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _searchProgressBar.Value = value;
     }
 
-    public string GithubToken => Properties.Settings.Default.GithubToken;
+    public string GithubToken
+    {
+        get
+        {
+            try
+            {
+                return Properties.Settings.Default.GithubToken;
+            }
+            catch (Exception e)
+            {
+                return "";
+            }
+        }
+    } 
 
     public IEnumerable<long> SelectedRepositories
     {
@@ -57,6 +69,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public string JsonSavePath { get; set; }
     
     public string DownloadRepositoryPath { get; set; }
+    
+    public string CalculateMetricsRepositoryPath { get; set; }
+    
+    public string CalculateMetricsByLocalResultsPath { get; set; }
 
     public IEnumerable<Language>? LanguageSelectList
     {
@@ -132,10 +148,28 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
+        using var folderDialog = new FolderBrowserDialog();
+        
+        folderDialog.UseDescriptionForTitle = true;
+        folderDialog.Description = "Select the repositories folder";
+
+        if (folderDialog.ShowDialog() == DialogResult.OK)
+        {
+            CalculateMetricsRepositoryPath = folderDialog.SelectedPath;
+        };
+        
+        
+        folderDialog.Description = "Select the local results folder";
+        
+        if (folderDialog.ShowDialog() == DialogResult.OK)
+        {
+            CalculateMetricsByLocalResultsPath = folderDialog.SelectedPath;
+        };
+        
         var result = await Presenter.CalculateMetrics();
         await SaveCsv(result);
     }
-
+    
     private static async Task SaveCsv(string result)
     {
         using var fileDialog = new SaveFileDialog
@@ -151,12 +185,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void _downloadButton_Click(object sender, EventArgs e)
     {
-        // using var folderDialog = new FolderBrowserDialog();
-        //
-        // if (folderDialog.ShowDialog() != DialogResult.OK) return;
-        //
-        // DownloadRepositoryPath = folderDialog.SelectedPath;
-        DownloadRepositoryPath = "";
+        using var folderDialog = new FolderBrowserDialog();
+        
+        if (folderDialog.ShowDialog() == DialogResult.OK)
+        {
+            DownloadRepositoryPath = folderDialog.SelectedPath;
+        };
         Presenter.DownloadRepositories();
     }
 
@@ -195,7 +229,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (!_repositoryDataGridView.Columns[_repositoryDataGridView.CurrentCell.ColumnIndex].HeaderText
               .Contains("Url")) return;
 
-        if (!String.IsNullOrWhiteSpace(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()))
+        if (!string.IsNullOrWhiteSpace(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()))
         {
             var ps = new ProcessStartInfo(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()!)
             {

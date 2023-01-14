@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Reflection;
 using JsonNet.ContractResolvers;
 using MetricHunter.Core;
-using MetricHunter.Core.Helpers;
+using MetricHunter.Core.Paths;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Octokit;
@@ -52,7 +52,7 @@ public static class Resource
             File.ReadAllText($"{DynamicResFolder}/SourceMonitor/template.xml"));
 
         public static readonly string XmlReportsFolder =
-            PathHelper.BuildAndCreateFullPath($"{DynamicResFolder}/SourceMonitor/XmlReports");
+            PathHelper.BuildAndCreateFullPath($"{DynamicResFolder}/SourceMonitor/XmlReports")!;
 
         public static ResValue<Process> SourceMonitorExe => new($"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe",
             new Process
