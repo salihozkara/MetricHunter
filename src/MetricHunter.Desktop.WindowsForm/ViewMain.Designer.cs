@@ -61,6 +61,7 @@ partial class ViewMain
             this.layoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.searchRepositoryPanel = new System.Windows.Forms.Panel();
             this.searchGroupBox = new System.Windows.Forms.GroupBox();
+            this._searchProgressBar = new System.Windows.Forms.ProgressBar();
             this.operationGroupBox = new System.Windows.Forms.GroupBox();
             this.huntButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).BeginInit();
@@ -76,7 +77,7 @@ partial class ViewMain
             // 
             this._languageComboBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._languageComboBox.FormattingEnabled = true;
-            this._languageComboBox.Location = new System.Drawing.Point(339, 81);
+            this._languageComboBox.Location = new System.Drawing.Point(370, 74);
             this._languageComboBox.Name = "_languageComboBox";
             this._languageComboBox.Size = new System.Drawing.Size(142, 42);
             this._languageComboBox.TabIndex = 0;
@@ -84,7 +85,7 @@ partial class ViewMain
             // _topicsTextBox
             // 
             this._topicsTextBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._topicsTextBox.Location = new System.Drawing.Point(14, 81);
+            this._topicsTextBox.Location = new System.Drawing.Point(45, 74);
             this._topicsTextBox.Name = "_topicsTextBox";
             this._topicsTextBox.Size = new System.Drawing.Size(142, 41);
             this._topicsTextBox.TabIndex = 1;
@@ -92,7 +93,7 @@ partial class ViewMain
             // _repositoryCountTextBox
             // 
             this._repositoryCountTextBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryCountTextBox.Location = new System.Drawing.Point(174, 81);
+            this._repositoryCountTextBox.Location = new System.Drawing.Point(205, 74);
             this._repositoryCountTextBox.Name = "_repositoryCountTextBox";
             this._repositoryCountTextBox.Size = new System.Drawing.Size(142, 41);
             this._repositoryCountTextBox.TabIndex = 2;
@@ -101,7 +102,7 @@ partial class ViewMain
             // 
             this._sortDirectionComboBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._sortDirectionComboBox.FormattingEnabled = true;
-            this._sortDirectionComboBox.Location = new System.Drawing.Point(503, 81);
+            this._sortDirectionComboBox.Location = new System.Drawing.Point(534, 74);
             this._sortDirectionComboBox.Name = "_sortDirectionComboBox";
             this._sortDirectionComboBox.Size = new System.Drawing.Size(142, 42);
             this._sortDirectionComboBox.TabIndex = 3;
@@ -110,7 +111,7 @@ partial class ViewMain
             // 
             this._searchButton.ImageKey = "search.png";
             this._searchButton.ImageList = this.SearchButton;
-            this._searchButton.Location = new System.Drawing.Point(662, 81);
+            this._searchButton.Location = new System.Drawing.Point(693, 74);
             this._searchButton.Name = "_searchButton";
             this._searchButton.Size = new System.Drawing.Size(48, 42);
             this._searchButton.TabIndex = 5;
@@ -166,7 +167,7 @@ partial class ViewMain
             // 
             this._topicsLabel.AutoSize = true;
             this._topicsLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._topicsLabel.Location = new System.Drawing.Point(14, 44);
+            this._topicsLabel.Location = new System.Drawing.Point(45, 37);
             this._topicsLabel.Name = "_topicsLabel";
             this._topicsLabel.Size = new System.Drawing.Size(68, 34);
             this._topicsLabel.TabIndex = 8;
@@ -176,7 +177,7 @@ partial class ViewMain
             // 
             this._countRepositoryLabel.AutoSize = true;
             this._countRepositoryLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._countRepositoryLabel.Location = new System.Drawing.Point(174, 44);
+            this._countRepositoryLabel.Location = new System.Drawing.Point(205, 37);
             this._countRepositoryLabel.Name = "_countRepositoryLabel";
             this._countRepositoryLabel.Size = new System.Drawing.Size(63, 34);
             this._countRepositoryLabel.TabIndex = 9;
@@ -186,7 +187,7 @@ partial class ViewMain
             // 
             this._languageLabel.AutoSize = true;
             this._languageLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._languageLabel.Location = new System.Drawing.Point(339, 44);
+            this._languageLabel.Location = new System.Drawing.Point(370, 37);
             this._languageLabel.Name = "_languageLabel";
             this._languageLabel.Size = new System.Drawing.Size(92, 34);
             this._languageLabel.TabIndex = 10;
@@ -196,7 +197,7 @@ partial class ViewMain
             // 
             this._sortDirectionLabel.AutoSize = true;
             this._sortDirectionLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._sortDirectionLabel.Location = new System.Drawing.Point(503, 44);
+            this._sortDirectionLabel.Location = new System.Drawing.Point(534, 37);
             this._sortDirectionLabel.Name = "_sortDirectionLabel";
             this._sortDirectionLabel.Size = new System.Drawing.Size(123, 34);
             this._sortDirectionLabel.TabIndex = 11;
@@ -233,7 +234,7 @@ partial class ViewMain
             this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle5;
             this._repositoryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this._repositoryDataGridView.Location = new System.Drawing.Point(3, 153);
+            this._repositoryDataGridView.Location = new System.Drawing.Point(3, 185);
             this._repositoryDataGridView.Name = "_repositoryDataGridView";
             this._repositoryDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
             dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
@@ -247,7 +248,7 @@ partial class ViewMain
             this._repositoryDataGridView.RowHeadersWidth = 45;
             this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._repositoryDataGridView.RowTemplate.Height = 50;
-            this._repositoryDataGridView.Size = new System.Drawing.Size(1098, 561);
+            this._repositoryDataGridView.Size = new System.Drawing.Size(1098, 529);
             this._repositoryDataGridView.TabIndex = 4;
             this._repositoryDataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
             // 
@@ -352,7 +353,7 @@ partial class ViewMain
             this.layoutPanel.Location = new System.Drawing.Point(30, 30);
             this.layoutPanel.Name = "layoutPanel";
             this.layoutPanel.RowCount = 3;
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 182F));
             this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
             this.layoutPanel.Size = new System.Drawing.Size(1104, 867);
@@ -364,13 +365,14 @@ partial class ViewMain
             this.searchRepositoryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.searchRepositoryPanel.Location = new System.Drawing.Point(3, 3);
             this.searchRepositoryPanel.Name = "searchRepositoryPanel";
-            this.searchRepositoryPanel.Size = new System.Drawing.Size(1098, 144);
+            this.searchRepositoryPanel.Size = new System.Drawing.Size(1098, 176);
             this.searchRepositoryPanel.TabIndex = 5;
             // 
             // searchGroupBox
             // 
             this.searchGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
             this.searchGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
+            this.searchGroupBox.Controls.Add(this._searchProgressBar);
             this.searchGroupBox.Controls.Add(this._repositoryCountTextBox);
             this.searchGroupBox.Controls.Add(this._sortDirectionLabel);
             this.searchGroupBox.Controls.Add(this._searchButton);
@@ -381,13 +383,20 @@ partial class ViewMain
             this.searchGroupBox.Controls.Add(this._topicsTextBox);
             this.searchGroupBox.Controls.Add(this._topicsLabel);
             this.searchGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.searchGroupBox.Location = new System.Drawing.Point(144, 3);
+            this.searchGroupBox.Location = new System.Drawing.Point(144, 19);
             this.searchGroupBox.Name = "searchGroupBox";
             this.searchGroupBox.Padding = new System.Windows.Forms.Padding(10);
-            this.searchGroupBox.Size = new System.Drawing.Size(804, 138);
+            this.searchGroupBox.Size = new System.Drawing.Size(804, 154);
             this.searchGroupBox.TabIndex = 12;
             this.searchGroupBox.TabStop = false;
             this.searchGroupBox.Text = "Search Repositories";
+            // 
+            // _searchProgressBar
+            // 
+            this._searchProgressBar.Location = new System.Drawing.Point(18, 129);
+            this._searchProgressBar.Name = "_searchProgressBar";
+            this._searchProgressBar.Size = new System.Drawing.Size(752, 16);
+            this._searchProgressBar.TabIndex = 12;
             // 
             // operationGroupBox
             // 
@@ -476,4 +485,5 @@ partial class ViewMain
     private ImageList IconList;
     private ImageList SearchButton;
     private ToolStripMenuItem helpToolStripMenuItem;
+    private ProgressBar _searchProgressBar;
 }
