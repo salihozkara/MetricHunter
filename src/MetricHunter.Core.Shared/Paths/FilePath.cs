@@ -26,12 +26,12 @@ public class FilePath : BasePath
 
     public static IEnumerable<FilePath> FromFileInfoEnumerable(IEnumerable<FileInfo> fileSystemInfos)
     {
-        return fileSystemInfos.Select(x => (FilePath)x).ToArray();
+        return fileSystemInfos.Select(x => (FilePath)x);
     }
     
     public static IEnumerable<FilePath> FromStringEnumerable(IEnumerable<string> paths)
     {
-        return paths.Select(x => new FilePath(x)).ToArray();
+        return paths.Select(x => new FilePath(x));
     }
 
     public override DirectoryPath ParentDirectory => Directory;

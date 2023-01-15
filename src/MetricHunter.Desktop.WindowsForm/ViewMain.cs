@@ -100,7 +100,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             Url = x.HtmlUrl,
             License = x.License?.Name ?? "No License",
             Owner = x.Owner.Login,
-            SizeString = ToSizeString(x.Size)
+            Size = ToSizeString(x.Size)
         }).ToList();
         _repositoryDataGridView.DataSource = repositoryModelList.ToList();
 
@@ -148,20 +148,41 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         await Presenter.SearchRepositories();
         button.Enabled = true;
     }
+    
+    private string BuildFileDialogFilter(Dictionary<string,string> fileDialogFilter)
+    {
+        var filter = "";
+        foreach (var (key, value) in fileDialogFilter)
+        {
+            if(filter != "")
+                filter += "|";
+            filter += $"{key}|*{value}";
+        }
+
+        return filter;
+    }
 
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
-        using var folderDialog = new FolderBrowserDialog();
-        
-        folderDialog.UseDescriptionForTitle = true;
-        folderDialog.Description = "Select the repositories folder";
-
-        if (folderDialog.ShowDialog() == DialogResult.OK)
+        using var fileDialog = new OpenFileDialog();
+        fileDialog.Multiselect = false;
+        fileDialog.Filter = BuildFileDialogFilter(new Dictionary<string, string>
         {
-            CalculateMetricsRepositoryPath = folderDialog.SelectedPath;
-        };
+            {"Metric Hunter Files", GitConsts.RepositoryInfoFileExtension},
+            {"Json Files", ".json"}
+        });
+
+        if (fileDialog.ShowDialog() == DialogResult.OK)
+        {
+            CalculateMetricsRepositoryPath = fileDialog.FileName;
+        }
+        else
+        {
+            return;
+        }
         
-        
+        using var folderDialog = new FolderBrowserDialog();
+
         folderDialog.Description = "Select the local results folder";
         
         if (folderDialog.ShowDialog() == DialogResult.OK)

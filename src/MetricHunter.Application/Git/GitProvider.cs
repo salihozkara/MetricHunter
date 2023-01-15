@@ -1,4 +1,5 @@
 ﻿using MetricHunter.Core.DependencyProcesses;
+using MetricHunter.Core.Jsons;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
@@ -84,7 +85,11 @@ public class GitProvider : IGitProvider, ISingletonDependency
                 }
 
                 if (result.ExitCode == 0)
+                {
+                    AddRepositoryInfoFile(cloneBaseDirectoryPath, repository);
                     OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
+                }
+                    
                 else
                     OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, null));
 
@@ -160,14 +165,12 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
     protected virtual void OnCloneRepositorySuccess(CloneRepositorySuccessEventArgs e)
     {
-        AddRepositoryInfoFile(e.LocalPath, e.Repository);
         CloneRepositorySuccess?.Invoke(this, e);
     }
     
-    private void AddRepositoryInfoFile(DirectoryPath repositoryPath, Repository repository)
+    private async void AddRepositoryInfoFile(DirectoryPath repositoryPath, Repository repository)
     {
         FilePath repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension)!;
-        repositoryInfoFilePath.CreateIfNotExists();
-        File.WriteAllText(repositoryInfoFilePath, JsonConvert.SerializeObject(repository));
+        await JsonHelper.AppendJson(repository, repositoryInfoFilePath, (r)=>r.Id);
     }
 }

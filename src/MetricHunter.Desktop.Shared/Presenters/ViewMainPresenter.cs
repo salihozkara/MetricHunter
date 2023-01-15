@@ -6,6 +6,7 @@ using MetricHunter.Application.Repositories;
 using MetricHunter.Application.Resources;
 using MetricHunter.Core.Jsons;
 using MetricHunter.Core.Paths;
+using MetricHunter.Core.Strings;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -45,13 +46,22 @@ public class ViewMainPresenter : IViewMainPresenter
         LoadFromArgsAsync();
     }
     
-    private async Task LoadFromArgsAsync()
+    private async void LoadFromArgsAsync()
     {
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1)
         {
             var files = args.Skip(1).Where(x=>x.EndsWith(GitConsts.RepositoryInfoFileExtension)).ToArray();
-            Repositories = await _repositoryAppService.GetRepositoriesFromPaths(FilePath.FromStringEnumerable(files).ToArray());
+            Console.WriteLine($"Loading {files.Length} files");
+            var repositories = new List<Repository>();
+            foreach (var file in files)
+            {
+                var repository = await _repositoryAppService.ReadRepositoriesAsync(file);
+                repositories.AddRange(repository);
+            }
+
+            Console.WriteLine($"Loaded {repositories.Count} repositories");
+            Repositories = repositories;
         }
     }
 
@@ -128,20 +138,16 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> CalculateMetrics()
     {
-        var repositoryList = Repositories.ToList();
-        DirectoryPath path = View.CalculateMetricsRepositoryPath!;
-        if (!repositoryList.Any())
-        {
-            var infoFiles = path.DirectoryInfo.GetFiles("*"+GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories);
-            repositoryList = await _repositoryAppService.GetRepositoriesFromPaths(FilePath.FromFileInfoEnumerable(infoFiles).ToArray());
-        }
-
+        var repositoryList = await _repositoryAppService.ReadRepositoriesAsync(View.CalculateMetricsRepositoryPath);
+        if(_repositories.Any())
+            repositoryList = repositoryList.Where(x => Repositories.Any(x2=>x2.Id == x.Id)).ToArray();
+        
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in repositoryList)
         {
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath, View.CalculateMetricsByLocalResultsPath);
+            var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath.ToFilePath().Directory, View.CalculateMetricsByLocalResultsPath);
             if (metric.IsEmpty())
                 continue;
             var dictList = metric.ToDictionaryListByTopics();
@@ -166,7 +172,7 @@ public class ViewMainPresenter : IViewMainPresenter
             return;
         }
 
-        var repositories = await _repositoryAppService.ReadRepositories(View.JsonLoadPath);
+        var repositories = await _repositoryAppService.ReadRepositoriesAsync(View.JsonLoadPath);
 
         if (!repositories.Any()) return;
 
@@ -183,7 +189,7 @@ public class ViewMainPresenter : IViewMainPresenter
             return;
         }
 
-        await _repositoryAppService.WriteRepositories(Repositories, View.JsonSavePath);
+        await _repositoryAppService.WriteRepositoriesAsync(Repositories, View.JsonSavePath);
     }
 
     public async Task<string> HuntRepositories()
