@@ -56,13 +56,12 @@ public abstract class MetricHunterPath<T> : MetricHunterPath where T : MetricHun
     {
     }
 
-    private static T FromMetricHunterPath(MetricHunterPath<T>? path) => (path as T) ?? default!;
+    private static AnonymousPath FromMetricHunterPath(MetricHunterPath<T>? path) => new (path);
 
-    public static T operator +(MetricHunterPath<T> path, object other) =>
+    public static AnonymousPath operator +(MetricHunterPath<T> path, object other) =>
         FromMetricHunterPath(System.IO.Path.Combine(path.Path, other.ToString() ?? string.Empty));
     
-    public static T? operator /(MetricHunterPath<T> path, object other) =>
-        FromMetricHunterPath(System.IO.Path.Combine(path.Path, other.ToString() ?? string.Empty));
+    public static AnonymousPath operator /(MetricHunterPath<T> path, object other) => path + other ;
     
     public static implicit operator string(MetricHunterPath<T> path) => path.Path;
     public static implicit operator MetricHunterPath<T>?(string? path) => path == null ? null : Create(path);

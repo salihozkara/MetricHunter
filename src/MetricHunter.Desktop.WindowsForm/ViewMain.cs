@@ -1,7 +1,10 @@
 using System.Diagnostics;
+using MetricHunter.Application.Git;
+using MetricHunter.Application.Resources;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Views;
+using Newtonsoft.Json;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 
@@ -12,6 +15,13 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public ViewMain()
     {
         InitializeComponent();
+        var args = Environment.GetCommandLineArgs();
+        if (args.Length > 1)
+        {
+            var files = args.Skip(1).Where(x=>x.EndsWith(GitConsts.RepositoryInfoFileExtension)).ToArray();
+            var repositories = files.Select(x => JsonConvert.DeserializeObject<Repository>(File.ReadAllText(x),Resource.Jsons.JsonSerializerSettings)).ToArray();
+            ShowRepositories(repositories);
+        }
     }
 
     public IViewMainPresenter Presenter { get; set; }

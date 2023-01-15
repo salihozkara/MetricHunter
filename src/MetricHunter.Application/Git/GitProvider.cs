@@ -2,6 +2,7 @@
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 
@@ -36,7 +37,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
             var path = repositoryPath.ParentDirectory;
             if (Directory.Exists(repositoryPath))
             {
-                if (!Directory.Exists(Path.Combine(repositoryPath, ".git")))
+                if (!File.Exists(Path.Combine(repositoryPath, GitConsts.RepositoryInfoFileExtension)))
                     await DeleteLocalRepository(repositoryPath, token);
                 else
                 {
@@ -83,7 +84,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
                 }
 
                 if (result.ExitCode == 0)
-                    OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository));
+                    OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
                 else
                     OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, null));
 
@@ -159,6 +160,14 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
     protected virtual void OnCloneRepositorySuccess(CloneRepositorySuccessEventArgs e)
     {
+        AddRepositoryInfoFile(e.LocalPath, e.Repository);
         CloneRepositorySuccess?.Invoke(this, e);
+    }
+    
+    private void AddRepositoryInfoFile(DirectoryPath repositoryPath, Repository repository)
+    {
+        FilePath repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension)!;
+        repositoryInfoFilePath.CreateIfNotExists();
+        File.WriteAllText(repositoryInfoFilePath, JsonConvert.SerializeObject(repository));
     }
 }

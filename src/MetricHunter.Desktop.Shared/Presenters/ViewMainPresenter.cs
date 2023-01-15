@@ -3,9 +3,12 @@ using MetricHunter.Application.Csv;
 using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
+using MetricHunter.Application.Resources;
+using MetricHunter.Core.Paths;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Octokit;
 
 namespace MetricHunter.Desktop.Presenters;
@@ -63,7 +66,11 @@ public class ViewMainPresenter : IViewMainPresenter
                 : _repositories;
         }
 
-        set => _repositories = value.ToList();
+        set
+        {
+            _repositories = value.ToList();
+            View.ShowRepositories(_repositories);
+        }
     }
 
     public IViewMain View { get; }
@@ -108,23 +115,25 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> CalculateMetrics()
     {
-        CheckSelectRepositories();
+        var repositoryList = Repositories.ToList();
+        DirectoryPath path = View.CalculateMetricsRepositoryPath!;
+        if (!repositoryList.Any())
+        {
+            var infoFiles = path.DirectoryInfo.GetFiles("*"+GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories);
+            repositoryList = infoFiles.Select(x => JsonConvert.DeserializeObject<Repository>(File.ReadAllText(x.FullName),Resource.Jsons.JsonSerializerSettings)).ToList();
+        }
 
         var metrics = new List<Dictionary<string, string>>();
-        foreach (var item in Repositories)
+        foreach (var item in repositoryList)
         {
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            // var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath, View.CalculateMetricsByLocalResultsPath);
             var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath, View.CalculateMetricsByLocalResultsPath);
             if (metric.IsEmpty())
                 continue;
             var dictList = metric.ToDictionaryListByTopics();
             metrics.AddRange(dictList);
         }
-        
-        var local = await _metricCalculatorManager.FindMetricCalculator(Language.CSharp).CalculateMetricsByLocalResultsAsync(_repositories, View.CalculateMetricsByLocalResultsPath);
-
         return _csvHelper.MetricsToCsv(metrics);
     }
 
