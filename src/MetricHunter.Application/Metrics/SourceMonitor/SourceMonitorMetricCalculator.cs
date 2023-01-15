@@ -22,14 +22,14 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     private const string ProjectLanguageReplacement = "{{project_language}}";
     private const string ReportsPathReplacement = "{{reports_path}}";
 
-    private string _reportsPath;
-    private string _projectsPath;
-    private string _xmlTemplate;
-
     private const string FileExtension = "xml";
 
     private readonly ILogger<SourceMonitorMetricCalculator> _logger;
     private readonly IProcessManager _processManager;
+    private string _projectsPath;
+
+    private string _reportsPath;
+    private readonly string _xmlTemplate;
 
 
     public SourceMonitorMetricCalculator(IProcessManager processManager,
@@ -41,10 +41,13 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     }
 
 
-    public async Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "", string baseReportsDirectoryPath = "", CancellationToken token = default)
+    public async Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "",
+        string baseReportsDirectoryPath = "", CancellationToken token = default)
     {
         _reportsPath = string.IsNullOrEmpty(baseReportsDirectoryPath) ? PathHelper.TempPath : baseReportsDirectoryPath;
-        _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath) ? PathHelper.TempPath : baseRepositoriesDirectoryPath;
+        _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath)
+            ? PathHelper.TempPath
+            : baseRepositoriesDirectoryPath;
         await ProcessRepository(repository, token);
         var reportsPath =
             PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
@@ -69,10 +72,10 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         string baseDirectoryPath = "",
         CancellationToken token = default)
     {
-        if(string.IsNullOrEmpty(baseDirectoryPath))
+        if (string.IsNullOrEmpty(baseDirectoryPath))
             baseDirectoryPath = PathHelper.TempPath;
         DirectoryPath path = baseDirectoryPath;
-        var files = path.DirectoryInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories); 
+        var files = path.DirectoryInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories);
         var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
         {
             var fileName = $"id_{repository.Id}_{repository.Name}.xml";
@@ -158,7 +161,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     {
         if (token.IsCancellationRequested)
             return;
-        var reportPath = PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
+        var reportPath =
+            PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
         if (File.Exists(reportPath))
         {
             _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.FullName);
@@ -189,9 +193,11 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             PathHelper.BuildDirectoryPath(_reportsPath, repository.Language, "SourceMonitor", repository.Owner.Login);
         xmlDirectory.CreateIfNotExists();
 
-        var reportsPath = PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension).ParentDirectory;
+        var reportsPath = PathHelper
+            .BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension).ParentDirectory;
 
-        var projectDirectory = PathHelper.BuildRepositoryDirectoryPath(_projectsPath, repository.Language, repository.FullName);
+        var projectDirectory =
+            PathHelper.BuildRepositoryDirectoryPath(_projectsPath, repository.Language, repository.FullName);
 
         var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
 

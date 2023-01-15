@@ -9,12 +9,11 @@ namespace MetricHunter.Desktop;
 
 public class Program
 {
-
     [STAThread]
     public static void Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
-        
+
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Volo.Abp", LogEventLevel.Warning)

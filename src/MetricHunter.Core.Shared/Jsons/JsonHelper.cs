@@ -34,14 +34,14 @@ public static class JsonHelper
         Converters = new JsonConverter[] { new StringEnumConverter() },
         ContractResolver = new PrivateSetterContractResolver()
     };
-    
+
     public static Task WriteJsonAsync<T>(T obj, FilePath path)
     {
         var json = JsonConvert.SerializeObject(obj);
         path.CreateDirectoryIfNotExists();
         return File.WriteAllTextAsync(path, json);
     }
-    
+
     public static async Task<T?> ReadJsonAsync<T>(FilePath path) where T : class
     {
         var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T));
@@ -50,32 +50,28 @@ public static class JsonHelper
         var jToken = JToken.Parse(json);
         if (isEnumerable)
         {
-            if(jToken is JArray jArray)
-            {
+            if (jToken is JArray jArray)
                 return jArray.ToObject<T>(JsonSerializer.Create(ReadingJsonSerializerSettings));
-            }
 
             var type = typeof(T);
-            var itemType = (type.HasElementType ? type.GetElementType() : type.IsGenericType ? type.GetGenericArguments()[0] : typeof(object)) ?? typeof(object);
+            var itemType =
+                (type.HasElementType ? type.GetElementType() :
+                    type.IsGenericType ? type.GetGenericArguments()[0] : typeof(object)) ?? typeof(object);
             var value = jToken.ToObject(itemType, JsonSerializer.Create(ReadingJsonSerializerSettings));
             var array = Array.CreateInstance(itemType, 1);
             array.SetValue(value, 0);
             if (array is T result) return result;
             if (type.IsClass)
-            {
                 result = (T)Activator.CreateInstance(type, array)!;
-            }else if(type.IsInterface)
-            {
+            else if (type.IsInterface)
                 result = (T)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType), array)!;
-            }else
-            {
+            else
                 throw new NotSupportedException($"Type {type} is not supported");
-            }
             return result;
         }
         else
         {
-            if(jToken is JArray jArray)
+            if (jToken is JArray jArray)
             {
                 var array = jArray.ToObject<List<T>>(JsonSerializer.Create(ReadingJsonSerializerSettings));
                 return array is not null && array.Count > 0 ? array[0] : default;
@@ -85,7 +81,7 @@ public static class JsonHelper
         }
     }
 
-    public static async Task AppendJson<T, TKey>(T obj, FilePath path, Func<T,TKey>? distinctBy)
+    public static async Task AppendJson<T, TKey>(T obj, FilePath path, Func<T, TKey>? distinctBy)
     {
         if (!path.Exists)
         {
@@ -104,10 +100,10 @@ public static class JsonHelper
 
         await WriteJsonAsync(obj, path);
     }
-    
+
     public static Task AppendJson<T>(T obj, FilePath path)
     {
-        return AppendJson<T,object>(obj, path, null);
+        return AppendJson<T, object>(obj, path, null);
     }
 
     public static async Task AppendRangeJsonAsync<T>(IEnumerable<T> obj, FilePath path)
@@ -115,12 +111,9 @@ public static class JsonHelper
         if (path.Exists)
         {
             var result = await ReadJsonAsync<List<T>>(path);
-            if (result != null)
-            {
-                obj = obj.Concat(result);
-            }
+            if (result != null) obj = obj.Concat(result);
         }
-        
+
         await WriteJsonAsync(obj, path);
     }
 }

@@ -1,10 +1,9 @@
 using System.Diagnostics;
 using MetricHunter.Application.Git;
-using MetricHunter.Application.Resources;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
+using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
-using Newtonsoft.Json;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 
@@ -21,7 +20,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void ShowMessage(string message)
     {
-        MessageBox.Show(message);   
+        MessageBox.Show(message);
     }
 
     public void SetSearchProgressBar(int value)
@@ -37,44 +36,44 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         {
             try
             {
-                return Properties.Settings.Default.GithubToken;
+                return Settings.Default.GithubToken;
             }
             catch (Exception e)
             {
                 return "";
             }
         }
-    } 
+    }
 
     public IEnumerable<long> SelectedRepositories
     {
         get
         {
             return _repositoryDataGridView.SelectedRows.Cast<DataGridViewRow>()
-              .Select(r => r.Cells[0].Value)
-              .Cast<long>()
-              .ToList();
+                .Select(r => r.Cells[0].Value)
+                .Cast<long>()
+                .ToList();
         }
     }
 
     public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
 
     public SortDirection SortDirection =>
-      _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
+        _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
 
     public int RepositoryCount =>
-      int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
+        int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
 
     public string Topics => _topicsTextBox.Text;
-    
+
     public string JsonLoadPath { get; set; }
-    
+
     public string JsonSavePath { get; set; }
-    
+
     public string DownloadRepositoryPath { get; set; }
-    
+
     public string CalculateMetricsRepositoryPath { get; set; }
-    
+
     public string CalculateMetricsByLocalResultsPath { get; set; }
 
     public IEnumerable<Language>? LanguageSelectList
@@ -86,7 +85,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         set => _sortDirectionComboBox.DataSource = value;
     }
-    
+
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
         var index = 0;
@@ -108,7 +107,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         SetHyperLink();
     }
-    
+
+    public void Run()
+    {
+        System.Windows.Forms.Application.Run(this);
+    }
+
     private static string ToSizeString(long size) // size in kilobytes
     {
         return size switch
@@ -122,17 +126,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void SetHyperLink()
     {
         if (_repositoryDataGridView.Columns.Contains("Url"))
-        {
             _repositoryDataGridView.Columns["Url"]!.DefaultCellStyle = new DataGridViewCellStyle
             {
-                ForeColor = Color.Blue,
+                ForeColor = Color.Blue
             };
-        }
-    }
-
-    public void Run()
-    {
-        System.Windows.Forms.Application.Run(this);
     }
 
     private void _viewMain_Load(object sender, EventArgs e)
@@ -148,13 +145,13 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         await Presenter.SearchRepositories();
         button.Enabled = true;
     }
-    
-    private string BuildFileDialogFilter(Dictionary<string,string> fileDialogFilter)
+
+    private string BuildFileDialogFilter(Dictionary<string, string> fileDialogFilter)
     {
         var filter = "";
         foreach (var (key, value) in fileDialogFilter)
         {
-            if(filter != "")
+            if (filter != "")
                 filter += "|";
             filter += $"{key}|*{value}";
         }
@@ -168,32 +165,27 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         fileDialog.Multiselect = false;
         fileDialog.Filter = BuildFileDialogFilter(new Dictionary<string, string>
         {
-            {"Metric Hunter Files", GitConsts.RepositoryInfoFileExtension},
-            {"Json Files", ".json"}
+            { "Metric Hunter Files", GitConsts.RepositoryInfoFileExtension },
+            { "Json Files", ".json" }
         });
 
         if (fileDialog.ShowDialog() == DialogResult.OK)
-        {
             CalculateMetricsRepositoryPath = fileDialog.FileName;
-        }
         else
-        {
             return;
-        }
-        
+
         using var folderDialog = new FolderBrowserDialog();
 
         folderDialog.Description = "Select the local results folder";
-        
+
         if (folderDialog.ShowDialog() == DialogResult.OK)
-        {
             CalculateMetricsByLocalResultsPath = folderDialog.SelectedPath;
-        };
-        
+        ;
+
         var result = await Presenter.CalculateMetrics();
         await SaveCsv(result);
     }
-    
+
     private static async Task SaveCsv(string result)
     {
         using var fileDialog = new SaveFileDialog
@@ -201,20 +193,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             Filter = "Csv files | *.csv"
         };
 
-        if (fileDialog.ShowDialog() == DialogResult.OK)
-        {
-            await File.WriteAllTextAsync(fileDialog.FileName, result);
-        }
+        if (fileDialog.ShowDialog() == DialogResult.OK) await File.WriteAllTextAsync(fileDialog.FileName, result);
     }
 
     private void _downloadButton_Click(object sender, EventArgs e)
     {
         using var folderDialog = new FolderBrowserDialog();
-        
-        if (folderDialog.ShowDialog() == DialogResult.OK)
-        {
-            DownloadRepositoryPath = folderDialog.SelectedPath;
-        };
+
+        if (folderDialog.ShowDialog() == DialogResult.OK) DownloadRepositoryPath = folderDialog.SelectedPath;
+        ;
         Presenter.DownloadRepositories();
     }
 
@@ -225,10 +212,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             Filter = "Json files | *.json"
         };
 
-        if (fileDialog.ShowDialog() == DialogResult.OK)
-        {
-            JsonLoadPath = fileDialog.FileName;
-        }
+        if (fileDialog.ShowDialog() == DialogResult.OK) JsonLoadPath = fileDialog.FileName;
 
         Presenter.ShowRepositories();
     }
@@ -242,16 +226,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         };
 
         if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
-        
+
         JsonSavePath = saveFileDialog.FileName;
         Presenter.SaveRepositories();
-
     }
 
     private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
     {
         if (!_repositoryDataGridView.Columns[_repositoryDataGridView.CurrentCell.ColumnIndex].HeaderText
-              .Contains("Url")) return;
+                .Contains("Url")) return;
 
         if (!string.IsNullOrWhiteSpace(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()))
         {

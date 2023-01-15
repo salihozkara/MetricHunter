@@ -1,11 +1,6 @@
-﻿using System.Diagnostics;
-using System.Globalization;
-using System.Reflection;
-using JsonNet.ContractResolvers;
+﻿using System.Reflection;
 using MetricHunter.Core;
 using MetricHunter.Core.Paths;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 namespace MetricHunter.Application.Resources;
 

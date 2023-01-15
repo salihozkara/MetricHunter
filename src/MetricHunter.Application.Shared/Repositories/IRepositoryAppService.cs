@@ -1,5 +1,4 @@
-﻿using MetricHunter.Core.Paths;
-using Octokit;
+﻿using Octokit;
 
 namespace MetricHunter.Application.Repositories;
 

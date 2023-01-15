@@ -3,34 +3,41 @@
 public abstract class BasePath
 {
     protected readonly string _path;
-    
+
+    private PathType? _pathType;
+
     protected FileSystemInfo? FileSystemInfo;
+
+    protected BasePath(string path)
+    {
+        _path = path;
+    }
 
     public bool IsFullPath => Path.IsPathRooted(_path);
     public string FullPath => Path.GetFullPath(_path);
-    
+
     public virtual DirectoryPath Directory => Path.GetDirectoryName(FullPath)!;
-    
+
     public bool Exists => IsValid && (File.Exists(_path) || System.IO.Directory.Exists(_path));
-    
+
     public virtual DirectoryPath ParentDirectory => System.IO.Directory.GetParent(_path)?.FullName!;
     public bool IsValid => ValidatePath();
-    
-    private PathType? _pathType;
     public PathType Type => _pathType ??= GetPathType();
 
-    public virtual void CreateIfNotExists(){}
+    public virtual void CreateIfNotExists()
+    {
+    }
 
     public void CreateDirectoryIfNotExists()
     {
         Directory.CreateIfNotExists();
     }
-    
+
     public void DeleteIfExists()
     {
         if (!Exists)
             return;
-        
+
         if (Type == PathType.File)
             File.Delete(_path);
         else
@@ -44,25 +51,17 @@ public abstract class BasePath
 
     private PathType GetPathType()
     {
-        if(!IsValid) return PathType.Invalid;
-        if(Exists)
-        {
-            return File.Exists(_path) ? PathType.File : PathType.Directory;
-        }
+        if (!IsValid) return PathType.Invalid;
+        if (Exists) return File.Exists(_path) ? PathType.File : PathType.Directory;
 
         return PathType.Unknown;
-    }
-    
-    protected BasePath(string path)
-    {
-        _path = path;
     }
 
     public static implicit operator string(BasePath pathBase)
     {
         return pathBase._path;
     }
-    
+
     public static implicit operator BasePath(string path)
     {
         var unknownPath = new UnknownPath(path);
@@ -79,19 +78,30 @@ public abstract class BasePath
     {
         return Path.Combine(pathBase._path, path.ToString()!);
     }
-    
-    public static UnknownPath operator /(BasePath pathBase, object path) => pathBase + path;
-    
-    public override bool Equals(object? obj) =>
-        FullPath.Equals(Path.GetFullPath(obj?.ToString() ?? string.Empty),
+
+    public static UnknownPath operator /(BasePath pathBase, object path)
+    {
+        return pathBase + path;
+    }
+
+    public override bool Equals(object? obj)
+    {
+        return FullPath.Equals(Path.GetFullPath(obj?.ToString() ?? string.Empty),
             StringComparison.OrdinalIgnoreCase);
+    }
 
     public override int GetHashCode()
     {
         return FullPath.GetHashCode();
     }
 
-    protected bool Equals(BasePath other) =>
-        FullPath.Equals(other.FullPath, StringComparison.OrdinalIgnoreCase);
-    public override string ToString() => this;
+    protected bool Equals(BasePath other)
+    {
+        return FullPath.Equals(other.FullPath, StringComparison.OrdinalIgnoreCase);
+    }
+
+    public override string ToString()
+    {
+        return this;
+    }
 }

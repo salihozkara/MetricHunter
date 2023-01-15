@@ -1,8 +1,4 @@
-﻿using System.Text;
-using MetricHunter.Application.Resources;
-using MetricHunter.Core.Jsons;
-using MetricHunter.Core.Paths;
-using Newtonsoft.Json;
+﻿using MetricHunter.Core.Jsons;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 

@@ -3,7 +3,6 @@ using MetricHunter.Core.Jsons;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Octokit;
 using Volo.Abp.DependencyInjection;
 
@@ -20,26 +19,28 @@ public class GitProvider : IGitProvider, ISingletonDependency
         _processManager = processManager;
         _logger = logger;
     }
-    
-    public async Task<bool> CloneRepository(Repository repository, string cloneBaseDirectoryPath = "", CancellationToken token = default)
+
+    public async Task<bool> CloneRepository(Repository repository, string cloneBaseDirectoryPath = "",
+        CancellationToken token = default)
     {
-        if(string.IsNullOrWhiteSpace(cloneBaseDirectoryPath))
-        {
-            cloneBaseDirectoryPath = PathHelper.TempPath;
-        }
+        if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
         try
         {
             if (token.IsCancellationRequested) return false;
 
             _logger.LogInformation($"Cloning {repository.FullName}...");
 
-            var repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
+            var repositoryPath =
+                PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language,
+                    repository.FullName);
 
             var path = repositoryPath.ParentDirectory;
             if (repositoryPath.Exists)
             {
                 if (!(repositoryPath + GitConsts.RepositoryInfoFileExtension).Exists)
+                {
                     await DeleteLocalRepository(repositoryPath, token);
+                }
                 else
                 {
                     _logger.LogInformation($"Repository {repository.FullName} already exists.");
@@ -89,9 +90,11 @@ public class GitProvider : IGitProvider, ISingletonDependency
                     AddRepositoryInfoFile(cloneBaseDirectoryPath, repository);
                     OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
                 }
-                    
+
                 else
+                {
                     OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, null));
+                }
 
                 return result.ExitCode == 0;
             }
@@ -113,13 +116,12 @@ public class GitProvider : IGitProvider, ISingletonDependency
     public event EventHandler<CloneRepositorySuccessEventArgs>? CloneRepositorySuccess;
 
 
-    public Task<bool> DeleteLocalRepository(Repository repository, string cloneBaseDirectoryPath = "", CancellationToken token = default)
+    public Task<bool> DeleteLocalRepository(Repository repository, string cloneBaseDirectoryPath = "",
+        CancellationToken token = default)
     {
-        if(string.IsNullOrWhiteSpace(cloneBaseDirectoryPath))
-        {
-            cloneBaseDirectoryPath = PathHelper.TempPath;
-        }
-        var repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
+        if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
+        var repositoryPath =
+            PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
 
         return DeleteLocalRepository(repositoryPath, token);
     }
@@ -167,10 +169,10 @@ public class GitProvider : IGitProvider, ISingletonDependency
     {
         CloneRepositorySuccess?.Invoke(this, e);
     }
-    
+
     private async void AddRepositoryInfoFile(DirectoryPath repositoryPath, Repository repository)
     {
         FilePath repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension)!;
-        await JsonHelper.AppendJson(repository, repositoryInfoFilePath, (r)=>r.Id);
+        await JsonHelper.AppendJson(repository, repositoryInfoFilePath, r => r.Id);
     }
 }

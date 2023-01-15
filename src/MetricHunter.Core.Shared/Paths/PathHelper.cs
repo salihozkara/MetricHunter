@@ -2,9 +2,9 @@
 
 public static class PathHelper
 {
-    public static readonly DirectoryPath TempPath = (Path.GetTempPath() + "MetricHunter\\")!;
     private const string ReportsPrefix = "Reports";
     private const string RepositoriesPrefix = "Repositories";
+    public static readonly DirectoryPath TempPath = (Path.GetTempPath() + "MetricHunter\\")!;
 
     private static UnknownPath BuildPath(params string?[] paths)
     {
@@ -13,7 +13,10 @@ public static class PathHelper
         return path;
     }
 
-    public static DirectoryPath BuildDirectoryPath(params string?[] paths) => BuildPath(paths);
+    public static DirectoryPath BuildDirectoryPath(params string?[] paths)
+    {
+        return BuildPath(paths);
+    }
 
     public static FilePath BuildReportPath(string reportPath, string language, string fullName,
         string extension)
