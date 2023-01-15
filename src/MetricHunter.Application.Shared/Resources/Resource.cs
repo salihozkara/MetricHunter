@@ -12,9 +12,9 @@ namespace MetricHunter.Application.Resources;
 // TODO: Refactor
 public static class Resource
 {
-    private const string ResFolder = "Res";
+    private static readonly DirectoryPath ResFolder = "Res";
 
-    private static readonly DirectoryPath DynamicResFolder = "./" + ResFolder;
+    private static readonly DirectoryPath DynamicResFolder = AppDomain.CurrentDomain.BaseDirectory + ResFolder;
 
     private static string GetOrCreateResFolder()
     {
@@ -42,33 +42,5 @@ public static class Resource
         public static readonly FilePath TemplateXml = $"{DynamicResFolder}/SourceMonitor/template.xml";
 
         public static FilePath SourceMonitorExe => $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe";
-    }
-
-    public static class Jsons
-    {
-        public static readonly JsonSerializerSettings JsonSerializerSettings = new()
-        {
-            Formatting = Formatting.Indented,
-            NullValueHandling = NullValueHandling.Ignore,
-            ReferenceLoopHandling = ReferenceLoopHandling.Serialize,
-            PreserveReferencesHandling = PreserveReferencesHandling.Objects,
-            TypeNameHandling = TypeNameHandling.Auto,
-            TypeNameAssemblyFormatHandling = TypeNameAssemblyFormatHandling.Simple,
-            DefaultValueHandling = DefaultValueHandling.Ignore,
-            MissingMemberHandling = MissingMemberHandling.Ignore,
-            ObjectCreationHandling = ObjectCreationHandling.Replace,
-            ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor,
-            MaxDepth = 100,
-            DateFormatHandling = DateFormatHandling.IsoDateFormat,
-            DateTimeZoneHandling = DateTimeZoneHandling.Utc,
-            DateParseHandling = DateParseHandling.DateTimeOffset,
-            FloatFormatHandling = FloatFormatHandling.String,
-            FloatParseHandling = FloatParseHandling.Double,
-            StringEscapeHandling = StringEscapeHandling.Default,
-            Culture = CultureInfo.InvariantCulture,
-            CheckAdditionalContent = true,
-            Converters = new JsonConverter[] { new StringEnumConverter() },
-            ContractResolver = new PrivateSetterContractResolver()
-        };
     }
 }

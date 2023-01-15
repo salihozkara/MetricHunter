@@ -24,6 +24,16 @@ public class FilePath : BasePath
         return path;
     }
 
+    public static IEnumerable<FilePath> FromFileInfoEnumerable(IEnumerable<FileInfo> fileSystemInfos)
+    {
+        return fileSystemInfos.Select(x => (FilePath)x).ToArray();
+    }
+    
+    public static IEnumerable<FilePath> FromStringEnumerable(IEnumerable<string> paths)
+    {
+        return paths.Select(x => new FilePath(x)).ToArray();
+    }
+
     public override DirectoryPath ParentDirectory => Directory;
 
     public static implicit operator FilePath(UnknownPath unknownPath) => new(unknownPath);

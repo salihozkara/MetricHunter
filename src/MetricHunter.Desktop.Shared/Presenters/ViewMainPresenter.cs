@@ -4,6 +4,7 @@ using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
 using MetricHunter.Application.Resources;
+using MetricHunter.Core.Jsons;
 using MetricHunter.Core.Paths;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
@@ -40,6 +41,18 @@ public class ViewMainPresenter : IViewMainPresenter
         Authenticate();
 
         _gitManager.SearchRepositoriesRequestSuccess += GitManager_SearchRepositoriesRequestSuccess;
+
+        LoadFromArgsAsync();
+    }
+    
+    private async Task LoadFromArgsAsync()
+    {
+        var args = Environment.GetCommandLineArgs();
+        if (args.Length > 1)
+        {
+            var files = args.Skip(1).Where(x=>x.EndsWith(GitConsts.RepositoryInfoFileExtension)).ToArray();
+            Repositories = await _repositoryAppService.GetRepositoriesFromPaths(FilePath.FromStringEnumerable(files).ToArray());
+        }
     }
 
     private void Authenticate()
@@ -120,7 +133,7 @@ public class ViewMainPresenter : IViewMainPresenter
         if (!repositoryList.Any())
         {
             var infoFiles = path.DirectoryInfo.GetFiles("*"+GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories);
-            repositoryList = infoFiles.Select(x => JsonConvert.DeserializeObject<Repository>(File.ReadAllText(x.FullName),Resource.Jsons.JsonSerializerSettings)).ToList();
+            repositoryList = await _repositoryAppService.GetRepositoriesFromPaths(FilePath.FromFileInfoEnumerable(infoFiles).ToArray());
         }
 
         var metrics = new List<Dictionary<string, string>>();

@@ -1,5 +1,7 @@
 ﻿using System.Text;
 using MetricHunter.Application.Resources;
+using MetricHunter.Core.Jsons;
+using MetricHunter.Core.Paths;
 using Newtonsoft.Json;
 using Octokit;
 using Volo.Abp.DependencyInjection;
@@ -11,28 +13,17 @@ public class RepositoryAppService : IRepositoryAppService, ISingletonDependency
 {
     public async Task<Repository[]> ReadRepositories(string path)
     {
-        return JsonConvert.DeserializeObject<Repository[]>(await File.ReadAllTextAsync(path),
-            Resource.Jsons.JsonSerializerSettings) ?? Array.Empty<Repository>();
+        return await JsonHelper.ReadJsonAsync<Repository[]>(path) ?? Array.Empty<Repository>();
     }
 
-    public async Task WriteRepositories(IEnumerable<Repository> repositories, string path)
+    public Task WriteRepositories(IEnumerable<Repository> repositories, string path)
     {
-        var addedRepositories = new List<Repository>();
+        return JsonHelper.AppendRangeJsonAsync(repositories, path);
+    }
 
-        if (File.Exists(path))
-        {
-            var availableRepositories = await ReadRepositories(path);
-
-            if (availableRepositories.Any()) addedRepositories.AddRange(availableRepositories);
-        }
-
-        addedRepositories.AddRange(repositories);
-
-        var json = JsonConvert.SerializeObject(addedRepositories, Resource.Jsons.JsonSerializerSettings);
-
-        // Save file with create mode
-        await using var fileStream = new FileStream(path, FileMode.Create, FileAccess.Write,
-            FileShare.None, 4096, FileOptions.Asynchronous | FileOptions.SequentialScan);
-        await fileStream.WriteAsync(Encoding.UTF8.GetBytes(json));
+    public async Task<List<Repository>> GetRepositoriesFromPaths(FilePath[] infoFiles)
+    {
+        var enumerable = infoFiles.Select(async x => await JsonHelper.ReadJsonAsync<Repository>(x.FullPath));
+        return (await Task.WhenAll(enumerable)).Where(x=>x != null).Select(x=>x!).ToList();
     }
 }
