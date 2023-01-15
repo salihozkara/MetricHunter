@@ -2,7 +2,7 @@
 using Serilog.Configuration;
 using Serilog.Events;
 
-namespace MetricHunter.Desktop.Logs;
+namespace MetricHunter.Desktop.DesktopLogs;
 
 public static class DesktopLoggerConfigurationExtensions
 {

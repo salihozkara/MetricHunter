@@ -3,7 +3,7 @@ using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Display;
 
-namespace MetricHunter.Desktop.Logs;
+namespace MetricHunter.Desktop.DesktopLogs;
 
 public class DesktopSink : ILogEventSink
 {

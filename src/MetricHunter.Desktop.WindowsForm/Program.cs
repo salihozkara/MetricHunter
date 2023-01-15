@@ -1,5 +1,5 @@
 using MetricHunter.Core.Processes;
-using MetricHunter.Desktop.Logs;
+using MetricHunter.Desktop.DesktopLogs;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
