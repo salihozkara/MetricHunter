@@ -3,9 +3,12 @@ using MetricHunter.Application.Csv;
 using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
+using MetricHunter.Application.Resources;
+using MetricHunter.Core.Paths;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Octokit;
 
 namespace MetricHunter.Desktop.Presenters;
@@ -34,7 +37,15 @@ public class ViewMainPresenter : IViewMainPresenter
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
         _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
         
+        Authenticate();
+
         _gitManager.SearchRepositoriesRequestSuccess += GitManager_SearchRepositoriesRequestSuccess;
+    }
+
+    private void Authenticate()
+    {
+        if (!string.IsNullOrWhiteSpace(View.GithubToken))
+            _gitManager.Authenticate(View.GithubToken);
     }
 
     private void GitManager_SearchRepositoriesRequestSuccess(object? sender, RequestSuccessEventArgs e)
@@ -55,7 +66,11 @@ public class ViewMainPresenter : IViewMainPresenter
                 : _repositories;
         }
 
-        set => _repositories = value.ToList();
+        set
+        {
+            _repositories = value.ToList();
+            View.ShowRepositories(_repositories);
+        }
     }
 
     public IViewMain View { get; }
@@ -74,10 +89,12 @@ public class ViewMainPresenter : IViewMainPresenter
     public void ShowGithubLogin()
     {
         _controller.ShowGithubLogin();
+        Authenticate();
     }
 
     public async Task SearchRepositories()
     {
+        _repositories.Clear();
         var gitInput = new GitInput
         {
             Language = View.SelectedLanguage,
@@ -90,7 +107,6 @@ public class ViewMainPresenter : IViewMainPresenter
         stopwatch.Start();
         await _gitManager.GetRepositoriesAsync(gitInput);
         stopwatch.Stop();
-
         View.ShowRepositories(Repositories);
         
         View.ShowMessage($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
@@ -99,26 +115,31 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> CalculateMetrics()
     {
-        CheckSelectRepositories();
+        var repositoryList = Repositories.ToList();
+        DirectoryPath path = View.CalculateMetricsRepositoryPath!;
+        if (!repositoryList.Any())
+        {
+            var infoFiles = path.DirectoryInfo.GetFiles("*"+GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories);
+            repositoryList = infoFiles.Select(x => JsonConvert.DeserializeObject<Repository>(File.ReadAllText(x.FullName),Resource.Jsons.JsonSerializerSettings)).ToList();
+        }
 
         var metrics = new List<Dictionary<string, string>>();
-        foreach (var item in Repositories)
+        foreach (var item in repositoryList)
         {
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var metric = await manager.CalculateMetricsAsync(item);
+            var metric = await manager.CalculateMetricsAsync(item, View.CalculateMetricsRepositoryPath, View.CalculateMetricsByLocalResultsPath);
             if (metric.IsEmpty())
                 continue;
             var dictList = metric.ToDictionaryListByTopics();
             metrics.AddRange(dictList);
         }
-
         return _csvHelper.MetricsToCsv(metrics);
     }
 
     public async Task DownloadRepositories()
     {
-        if (CheckSelectRepositories())
+        if (!CheckSelectRepositories())
             return;
 
         foreach (var item in Repositories) await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
@@ -154,12 +175,12 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> HuntRepositories()
     {
-        if (CheckSelectRepositories())
+        if (!CheckSelectRepositories())
             return string.Empty;
 
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
-            if (await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath))
+            if (await _gitProvider.CloneRepository(item))
             {
                 var language = GitConsts.LanguagesMap[item.Language];
                 var manager = _metricCalculatorManager.FindMetricCalculator(language);

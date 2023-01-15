@@ -5,7 +5,7 @@ using MetricHunter.Application.Git;
 using MetricHunter.Application.Resources;
 using MetricHunter.Application.Results;
 using MetricHunter.Core.DependencyProcesses;
-using MetricHunter.Core.Helpers;
+using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
 using Octokit;
@@ -22,7 +22,11 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     private const string ProjectLanguageReplacement = "{{project_language}}";
     private const string ReportsPathReplacement = "{{reports_path}}";
 
-    private const string ReportsPath = "Reports";
+    private string _reportsPath;
+    private string _projectsPath;
+    private string _xmlTemplate;
+
+    private const string FileExtension = "xml";
 
     private readonly ILogger<SourceMonitorMetricCalculator> _logger;
     private readonly IProcessManager _processManager;
@@ -33,14 +37,17 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     {
         _processManager = processManager;
         _logger = logger;
+        _xmlTemplate = File.ReadAllText(Resource.SourceMonitor.TemplateXml);
     }
 
 
-    public async Task<IResult> CalculateMetricsAsync(Repository repository, CancellationToken token = default)
+    public async Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "", string baseReportsDirectoryPath = "", CancellationToken token = default)
     {
+        _reportsPath = string.IsNullOrEmpty(baseReportsDirectoryPath) ? PathHelper.TempPath : baseReportsDirectoryPath;
+        _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath) ? PathHelper.TempPath : baseRepositoriesDirectoryPath;
         await ProcessRepository(repository, token);
         var reportsPath =
-            PathHelper.BuildFullPath(repository.Language, ReportsPath, repository.FullName + ".xml");
+            PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
 
         if (!File.Exists(reportsPath))
         {
@@ -53,28 +60,33 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         AddIdToXml(repository, xmlDocument, reportsPath);
 
-        FileNameChangeAndMove(repository, reportsPath);
+        FileNameChange(repository, reportsPath);
 
         return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
     }
 
-    public Task<IResult?[]> CalculateMetricsByLocalResultsAsync(List<Repository> repositories,
+    public Task<IResult[]> CalculateMetricsByLocalResultsAsync(List<Repository> repositories,
+        string baseDirectoryPath = "",
         CancellationToken token = default)
     {
-        var tasks = repositories.Select(repository => Task.Run(() =>
+        if(string.IsNullOrEmpty(baseDirectoryPath))
+            baseDirectoryPath = PathHelper.TempPath;
+        DirectoryPath path = baseDirectoryPath;
+        var files = path.DirectoryInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories); 
+        var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
         {
             var fileName = $"id_{repository.Id}_{repository.Name}.xml";
-            var filePath = Path.Combine(Resource.SourceMonitor.XmlReportsFolder, fileName);
-            if (!File.Exists(filePath))
+            FilePath? filePath = files.FirstOrDefault(file => file.Name == fileName);
+            if (filePath is not { Exists: true })
             {
-                _logger.LogError("SourceMonitor reports file not found");
-                return null;
+                _logger.LogError($"SourceMonitor reports file not found for {repository.FullName}");
+                return new NullResult();
             }
 
             var xmlDocument = new XmlDocument();
             xmlDocument.Load(filePath);
 
-            return new SourceMonitorResult(repository, GetMetrics(xmlDocument)) as IResult;
+            return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
         }, token));
 
         return Task.WhenAll(tasks);
@@ -121,12 +133,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         return metric?.Value ?? "0";
     }
 
-    private static void FileNameChangeAndMove(Repository repository, string reportsPath)
+    private static void FileNameChange(Repository repository, FilePath reportsPath)
     {
-        // file name change and move
+        // file name change
         var fileInfo = new FileInfo(reportsPath);
         var newFileName = $"id_{repository.Id}_{fileInfo.Name}";
-        var newFilePath = Path.Combine(Resource.SourceMonitor.XmlReportsFolder, newFileName);
+        var newFilePath = reportsPath.ParentDirectory / newFileName;
         if (File.Exists(newFilePath))
             File.Delete(newFilePath);
         fileInfo.MoveTo(newFilePath);
@@ -146,23 +158,23 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     {
         if (token.IsCancellationRequested)
             return;
-        var reportsPath = Path.Combine(repository.Language, ReportsPath, repository.FullName + ".xml");
-        if (File.Exists(reportsPath))
+        var reportPath = PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
+        if (File.Exists(reportPath))
         {
             _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.FullName);
             return;
         }
 
-        await CalculateStatisticsUsingSourceMonitor(repository);
+        await CalculateStatisticsUsingSourceMonitor(repository, reportPath.ParentDirectory);
     }
 
-    private async Task CalculateStatisticsUsingSourceMonitor(Repository repository)
+    private async Task CalculateStatisticsUsingSourceMonitor(Repository repository, DirectoryPath workingDirectory)
     {
         _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.FullName);
         var xmlPath = await CreateSourceMonitorXml(repository);
         var result =
-            await _processManager.RunAsync(new ProcessStartInfo(Resource.SourceMonitor.SourceMonitorExe.Path,
-                $"/C \"{xmlPath}\""));
+            await _processManager.RunAsync(new ProcessStartInfo(Resource.SourceMonitor.SourceMonitorExe,
+                $"/C \"{xmlPath}\"", workingDirectory));
         _logger.LogDebug("SourceMonitor log: {SourceMonitorLog}", result.Output);
         _logger.LogError("SourceMonitor error log: {SourceMonitorErrorLog}", result.Error);
         if (result.ExitCode == 0)
@@ -174,11 +186,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     private async Task<string> CreateSourceMonitorXml(Repository repository)
     {
         var xmlDirectory =
-            PathHelper.BuildAndCreateFullPath(repository.Language, "SourceMonitor", repository.Owner.Login);
+            PathHelper.BuildDirectoryPath(_reportsPath, repository.Language, "SourceMonitor", repository.Owner.Login);
+        xmlDirectory.CreateIfNotExists();
 
-        var reportsPath = PathHelper.BuildAndCreateFullPath(repository.Language, "Reports", repository.Owner.Login);
+        var reportsPath = PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension).ParentDirectory;
 
-        var projectDirectory = PathHelper.BuildFullPath(repository.Language + " Repositories", repository.FullName);
+        var projectDirectory = PathHelper.BuildRepositoryDirectoryPath(_projectsPath, repository.Language, repository.FullName);
 
         var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
 
@@ -186,7 +199,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         await ContentErrorHandleRepository(projectDirectory, repository.Language);
 
-        var xml = Resource.SourceMonitor.TemplateXml.Value
+        var xml = _xmlTemplate
             .Replace(ProjectNameReplacement, repository.Name)
             .Replace(ProjectDirectoryReplacement, projectDirectory)
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)

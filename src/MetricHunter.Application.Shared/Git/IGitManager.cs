@@ -4,18 +4,19 @@ namespace MetricHunter.Application.Git;
 
 public interface IGitManager
 {
+
     /// <summary>
     ///     User login
     /// </summary>
     /// <param name="username"></param>
     /// <param name="password"></param>
-    void Authenticate(string username, string password);
+    bool Authenticate(string username, string password);
 
     /// <summary>
     ///     User login
     /// </summary>
     /// <param name="token"></param>
-    void Authenticate(string token);
+    bool Authenticate(string token);
 
     /// <summary>
     ///     Lists repository information from github by input

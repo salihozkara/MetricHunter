@@ -27,6 +27,8 @@ public interface IViewMain : IView<IViewMainPresenter>
     string JsonSavePath { get; set; }
 
     string DownloadRepositoryPath { get; set; }
+    string CalculateMetricsRepositoryPath { get; set; }
+    string CalculateMetricsByLocalResultsPath { get; set; }
     void ShowMessage(string message);
 
     void ShowRepositories(IEnumerable<Repository> repositories);
