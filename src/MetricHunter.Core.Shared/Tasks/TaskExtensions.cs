@@ -15,7 +15,7 @@ public static class TaskExtensions
         }
     }
 
-    public static async Task MaybeCanceled<T>(this Task task, CancellationToken cancellationToken)
+    public static async Task MaybeCanceled(this Task task, CancellationToken cancellationToken)
     {
         try
         {

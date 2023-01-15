@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using MetricHunter.Application.Git;
+using MetricHunter.Core.Paths;
+using MetricHunter.Core.Tasks;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Properties;
@@ -17,6 +19,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     }
 
     public IViewMainPresenter Presenter { get; set; }
+
+    public CancellationTokenSource SearchRepositoriesCancellationTokenSource { get; set; }
+    public CancellationTokenSource DownloadRepositoriesCancellationTokenSource { get; set; }
+    public CancellationTokenSource CalculateMetricsCancellationTokenSource { get; set; }
+    public CancellationTokenSource HuntRepositoriesCancellationTokenSource { get; set; }
 
     public void ShowMessage(string message)
     {
@@ -139,11 +146,23 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _searchButton_Click(object sender, EventArgs e)
     {
+        SearchRepositoriesCancellationTokenSource = new CancellationTokenSource();
         SetSearchProgressBar(0);
+        ButtonDisable(sender);
+        await Presenter.SearchRepositories().MaybeCanceled(SearchRepositoriesCancellationTokenSource.Token);
+        ButtonEnable(sender);
+    }
+
+    private static void ButtonDisable(object sender)
+    {
         var button = sender as Button;
         button!.Enabled = false;
-        await Presenter.SearchRepositories();
-        button.Enabled = true;
+    }
+    
+    private static void ButtonEnable(object sender)
+    {
+        var button = sender as Button;
+        button!.Enabled = true;
     }
 
     private string BuildFileDialogFilter(Dictionary<string, string> fileDialogFilter)
@@ -161,6 +180,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
+        ButtonDisable(sender);
+        CalculateMetricsCancellationTokenSource = new CancellationTokenSource();
         using var fileDialog = new OpenFileDialog();
         fileDialog.Multiselect = false;
         fileDialog.Filter = BuildFileDialogFilter(new Dictionary<string, string>
@@ -168,6 +189,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             { "Metric Hunter Files", GitConsts.RepositoryInfoFileExtension },
             { "Json Files", ".json" }
         });
+        
+        if(string.IsNullOrWhiteSpace(DownloadRepositoryPath))
+            fileDialog.InitialDirectory = PathHelper.TempPath;
 
         if (fileDialog.ShowDialog() == DialogResult.OK)
             CalculateMetricsRepositoryPath = fileDialog.FileName;
@@ -180,9 +204,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         if (folderDialog.ShowDialog() == DialogResult.OK)
             CalculateMetricsByLocalResultsPath = folderDialog.SelectedPath;
-        ;
 
-        var result = await Presenter.CalculateMetrics();
+        var result = await Presenter.CalculateMetrics().MaybeCanceled(CalculateMetricsCancellationTokenSource.Token);
+        ButtonEnable(sender);
+        if(string.IsNullOrEmpty(result))
+            return;
         await SaveCsv(result);
     }
 
@@ -196,13 +222,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (fileDialog.ShowDialog() == DialogResult.OK) await File.WriteAllTextAsync(fileDialog.FileName, result);
     }
 
-    private void _downloadButton_Click(object sender, EventArgs e)
+    private async void _downloadButton_Click(object sender, EventArgs e)
     {
+        ButtonDisable(sender);
+        DownloadRepositoriesCancellationTokenSource = new CancellationTokenSource();
+        
         using var folderDialog = new FolderBrowserDialog();
 
         if (folderDialog.ShowDialog() == DialogResult.OK) DownloadRepositoryPath = folderDialog.SelectedPath;
-        ;
-        Presenter.DownloadRepositories();
+        
+        await Presenter.DownloadRepositories().MaybeCanceled(DownloadRepositoriesCancellationTokenSource.Token);
+        ButtonEnable(sender);
     }
 
     private void showToolStripMenuItem_Click(object sender, EventArgs e)
@@ -294,7 +324,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void huntButton_Click(object sender, EventArgs e)
     {
-        var result = await Presenter.HuntRepositories();
+        ButtonDisable(sender);
+        HuntRepositoriesCancellationTokenSource = new CancellationTokenSource();
+        var result = await Presenter.HuntRepositories().MaybeCanceled(HuntRepositoriesCancellationTokenSource.Token);
+        ButtonEnable(sender);
+        if (string.IsNullOrEmpty(result))
+            return;
         await SaveCsv(result);
     }
 }
