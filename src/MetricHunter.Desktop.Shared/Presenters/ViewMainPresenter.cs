@@ -116,10 +116,10 @@ public class ViewMainPresenter : IViewMainPresenter
     public async Task<string> CalculateMetrics()
     {
         var repositoryList = Repositories.ToList();
-        DirectoryPath path = View.CalculateMetricsRepositoryPath!;
+        var directoryInfo = new DirectoryInfo(View.CalculateMetricsRepositoryPath);
         if (!repositoryList.Any())
         {
-            var infoFiles = path.DirectoryInfo.GetFiles("*"+GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories);
+            var infoFiles = directoryInfo.GetFiles("*"+GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories);
             repositoryList = infoFiles.Select(x => JsonConvert.DeserializeObject<Repository>(File.ReadAllText(x.FullName),Resource.Jsons.JsonSerializerSettings)).ToList();
         }
 

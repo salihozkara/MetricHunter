@@ -71,12 +71,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     {
         if(string.IsNullOrEmpty(baseDirectoryPath))
             baseDirectoryPath = PathHelper.TempPath;
-        DirectoryPath path = baseDirectoryPath;
-        var files = path.DirectoryInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories); 
+        var directoryInfo = new DirectoryInfo(baseDirectoryPath);
+        var files = directoryInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories); 
         var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
         {
             var fileName = $"id_{repository.Id}_{repository.Name}.xml";
-            FilePath? filePath = files.FirstOrDefault(file => file.Name == fileName);
+            var filePath = files.FirstOrDefault(file => file.Name == fileName);
             if (filePath is not { Exists: true })
             {
                 _logger.LogError($"SourceMonitor reports file not found for {repository.FullName}");
@@ -84,7 +84,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             }
 
             var xmlDocument = new XmlDocument();
-            xmlDocument.Load(filePath);
+            xmlDocument.Load(filePath.FullName);
 
             return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
         }, token));
@@ -133,12 +133,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         return metric?.Value ?? "0";
     }
 
-    private static void FileNameChange(Repository repository, FilePath reportsPath)
+    private static void FileNameChange(Repository repository, string reportsPath)
     {
         // file name change
         var fileInfo = new FileInfo(reportsPath);
         var newFileName = $"id_{repository.Id}_{fileInfo.Name}";
-        var newFilePath = reportsPath.ParentDirectory / newFileName;
+        var newFilePath = Path.Combine(Directory.GetParent(reportsPath)?.FullName!, newFileName);
         if (File.Exists(newFilePath))
             File.Delete(newFilePath);
         fileInfo.MoveTo(newFilePath);
@@ -165,10 +165,10 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             return;
         }
 
-        await CalculateStatisticsUsingSourceMonitor(repository, reportPath.ParentDirectory);
+        await CalculateStatisticsUsingSourceMonitor(repository, Directory.GetParent(reportPath)?.FullName!);
     }
 
-    private async Task CalculateStatisticsUsingSourceMonitor(Repository repository, DirectoryPath workingDirectory)
+    private async Task CalculateStatisticsUsingSourceMonitor(Repository repository, string workingDirectory)
     {
         _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.FullName);
         var xmlPath = await CreateSourceMonitorXml(repository);
@@ -187,9 +187,9 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     {
         var xmlDirectory =
             PathHelper.BuildDirectoryPath(_reportsPath, repository.Language, "SourceMonitor", repository.Owner.Login);
-        xmlDirectory.CreateIfNotExists();
+        Directory.CreateDirectory(xmlDirectory);
 
-        var reportsPath = PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension).ParentDirectory;
+        var reportsPath = Directory.GetParent(PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension))?.FullName!;
 
         var projectDirectory = PathHelper.BuildRepositoryDirectoryPath(_projectsPath, repository.Language, repository.FullName);
 

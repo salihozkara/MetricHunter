@@ -14,7 +14,7 @@ public static class Resource
 {
     private const string ResFolder = "Res";
 
-    private static readonly DirectoryPath DynamicResFolder = "./" + ResFolder;
+    private static readonly string DynamicResFolder = "./" + ResFolder;
 
     private static string GetOrCreateResFolder()
     {
@@ -39,9 +39,9 @@ public static class Resource
 
     public static class SourceMonitor
     {
-        public static readonly FilePath TemplateXml = $"{DynamicResFolder}/SourceMonitor/template.xml";
+        public static readonly string TemplateXml = $"{DynamicResFolder}/SourceMonitor/template.xml";
 
-        public static FilePath SourceMonitorExe => $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe";
+        public static string SourceMonitorExe => $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe";
     }
 
     public static class Jsons

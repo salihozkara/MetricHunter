@@ -34,7 +34,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
             var repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
 
-            var path = repositoryPath.ParentDirectory;
+            var path = Directory.GetParent(repositoryPath)?.FullName;
             if (Directory.Exists(repositoryPath))
             {
                 if (!File.Exists(Path.Combine(repositoryPath, GitConsts.RepositoryInfoFileExtension)))
@@ -164,10 +164,10 @@ public class GitProvider : IGitProvider, ISingletonDependency
         CloneRepositorySuccess?.Invoke(this, e);
     }
     
-    private void AddRepositoryInfoFile(DirectoryPath repositoryPath, Repository repository)
+    private void AddRepositoryInfoFile(string repositoryPath, Repository repository)
     {
-        FilePath repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension)!;
-        repositoryInfoFilePath.CreateIfNotExists();
+        var repositoryInfoFilePath = Path.Combine(repositoryPath, GitConsts.RepositoryInfoFileExtension)!;
+        Directory.CreateDirectory(Path.GetDirectoryName(repositoryInfoFilePath)!);
         File.WriteAllText(repositoryInfoFilePath, JsonConvert.SerializeObject(repository));
     }
 }

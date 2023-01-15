@@ -7,7 +7,7 @@ public class SourceMonitorProcessDependency : IProcessDependency
 {
     public bool Check()
     {
-        return Resource.SourceMonitor.SourceMonitorExe.Exists;
+        return File.Exists(Resource.SourceMonitor.SourceMonitorExe);
     }
 
     public string ProcessName => "SourceMonitor";

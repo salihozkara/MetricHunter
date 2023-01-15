@@ -2,33 +2,33 @@
 
 public static class PathHelper
 {
-    public static readonly DirectoryPath TempPath = (Path.GetTempPath() + "MetricHunter\\")!;
+    public static readonly string TempPath = Path.GetTempPath() + "MetricHunter\\";
     private const string ReportsPrefix = "Reports";
     private const string RepositoriesPrefix = "Repositories";
 
-    public static AnonymousPath? BuildPath(params string?[] paths)
+    private static string BuildPath(params string?[] paths)
     {
         var newPaths = paths.Where(p => !string.IsNullOrWhiteSpace(p)).Select(p => p!).ToArray();
         var path = Path.Combine(newPaths);
         return path;
     }
     
-    public static DirectoryPath BuildDirectoryPath(params string?[] paths)
+    public static string BuildDirectoryPath(params string?[] paths)
     {
         var newPaths = paths.Where(p => !string.IsNullOrWhiteSpace(p)).Select(p => p!).ToArray();
-        DirectoryPath? path = Path.Combine(newPaths);
-        return path ?? TempPath;
+        var path = Path.Combine(newPaths);
+        return path;
     }
 
-    public static AnonymousPath BuildAndCreateFullPath(params string[] paths)
+    public static string BuildAndCreateFullPath(params string[] paths)
     {
         var path = BuildPath(paths);
-        path?.CreateDirectory();
+        Directory.CreateDirectory(path);
 
         return path!;
     }
 
-    public static FilePath BuildReportPath(string reportPath, string language, string fullName,
+    public static string BuildReportPath(string reportPath, string language, string fullName,
         string extension)
     {
         var fileName = $"{fullName}.{extension}";
@@ -36,13 +36,13 @@ public static class PathHelper
         return path!;
     }
 
-    public static DirectoryPath BuildRepositoryDirectoryPath(string repositoryPath, string language, string fullname)
+    public static string BuildRepositoryDirectoryPath(string repositoryPath, string language, string fullname)
     {
         var path = BuildPath(repositoryPath, language, RepositoriesPrefix, fullname);
         return path!;
     }
     
-    public static DirectoryPath BuildRandomTempDirectoryPath()
+    public static string BuildRandomTempDirectoryPath()
     {
         var path = TempPath + Guid.NewGuid();
         return path;
