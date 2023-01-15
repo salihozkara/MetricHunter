@@ -24,6 +24,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
     private string _reportsPath;
     private string _projectsPath;
+    private string _xmlTemplate;
 
     private const string FileExtension = "xml";
 
@@ -36,6 +37,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     {
         _processManager = processManager;
         _logger = logger;
+        _xmlTemplate = File.ReadAllText(Resource.SourceMonitor.TemplateXml);
     }
 
 
@@ -171,7 +173,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.FullName);
         var xmlPath = await CreateSourceMonitorXml(repository);
         var result =
-            await _processManager.RunAsync(new ProcessStartInfo(Resource.SourceMonitor.SourceMonitorExe.Path,
+            await _processManager.RunAsync(new ProcessStartInfo(Resource.SourceMonitor.SourceMonitorExe,
                 $"/C \"{xmlPath}\"", workingDirectory));
         _logger.LogDebug("SourceMonitor log: {SourceMonitorLog}", result.Output);
         _logger.LogError("SourceMonitor error log: {SourceMonitorErrorLog}", result.Error);
@@ -197,7 +199,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         await ContentErrorHandleRepository(projectDirectory, repository.Language);
 
-        var xml = Resource.SourceMonitor.TemplateXml.Value
+        var xml = _xmlTemplate
             .Replace(ProjectNameReplacement, repository.Name)
             .Replace(ProjectDirectoryReplacement, projectDirectory)
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)

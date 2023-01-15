@@ -21,6 +21,7 @@ public class FilePath : MetricHunterPath<FilePath>
     
     public static implicit operator FilePath?(AnonymousPath? path) => path is null ? null : new FilePath(path!);
     public static implicit operator FilePath?(FileInfo? path) => path == null ? null : new FilePath(path);
+    public static implicit operator FilePath?(string? path) => path == null ? null : new FilePath(path);
     public static implicit operator string(FilePath path) => path.Path;
 
     public void CreateIfNotExists()
