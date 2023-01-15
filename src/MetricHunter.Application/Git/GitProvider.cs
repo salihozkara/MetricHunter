@@ -35,9 +35,9 @@ public class GitProvider : IGitProvider, ISingletonDependency
             var repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
 
             var path = repositoryPath.ParentDirectory;
-            if (Directory.Exists(repositoryPath))
+            if (repositoryPath.Exists)
             {
-                if (!File.Exists(Path.Combine(repositoryPath, GitConsts.RepositoryInfoFileExtension)))
+                if (!(repositoryPath + GitConsts.RepositoryInfoFileExtension).Exists)
                     await DeleteLocalRepository(repositoryPath, token);
                 else
                 {

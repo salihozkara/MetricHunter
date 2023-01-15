@@ -76,8 +76,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
         {
             var fileName = $"id_{repository.Id}_{repository.Name}.xml";
-            FilePath? filePath = files.FirstOrDefault(file => file.Name == fileName);
-            if (filePath is not { Exists: true })
+            FilePath filePath = files.FirstOrDefault(file => file.Name == fileName)!;
+            if (filePath.Exists)
             {
                 _logger.LogError($"SourceMonitor reports file not found for {repository.FullName}");
                 return new NullResult();
