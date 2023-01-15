@@ -14,7 +14,7 @@ public static class Resource
 {
     private const string ResFolder = "Res";
 
-    private static readonly DirectoryPath DynamicResFolder = "./" + ResFolder;
+    private static readonly DirectoryPath DynamicResFolder = ((DirectoryPath)AppDomain.CurrentDomain.BaseDirectory) + ResFolder;
 
     private static string GetOrCreateResFolder()
     {

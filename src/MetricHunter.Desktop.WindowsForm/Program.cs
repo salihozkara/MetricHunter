@@ -17,7 +17,7 @@ public class Program
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Volo.Abp", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "Logs/logs.txt"))
+            .WriteTo.File(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Logs/logs.txt"))
             .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}")
             .CreateLogger();
 
