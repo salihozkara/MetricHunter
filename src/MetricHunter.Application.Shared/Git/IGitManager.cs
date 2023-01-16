@@ -4,7 +4,6 @@ namespace MetricHunter.Application.Git;
 
 public interface IGitManager
 {
-
     /// <summary>
     ///     User login
     /// </summary>

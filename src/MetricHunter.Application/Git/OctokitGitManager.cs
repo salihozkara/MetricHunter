@@ -1,6 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
 using Octokit;
-using Octokit.Internal;
 using Volo.Abp.DependencyInjection;
 using Range = Octokit.Range;
 
