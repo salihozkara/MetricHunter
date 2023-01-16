@@ -2,11 +2,13 @@ using System.Diagnostics;
 using MetricHunter.Application.Git;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Tasks;
+using MetricHunter.Desktop.DesktopLogs;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
 using Octokit;
+using Serilog.Events;
 using Volo.Abp.DependencyInjection;
 
 namespace MetricHunter.Desktop;
@@ -16,6 +18,13 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public ViewMain()
     {
         InitializeComponent();
+        DesktopSink.LogAction += (s, e) =>
+        {
+            if (e.Level == LogEventLevel.Error)
+            {
+                MessageBox.Show(s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        };
     }
 
     public IViewMainPresenter Presenter { get; set; }
@@ -196,7 +205,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (fileDialog.ShowDialog() == DialogResult.OK)
             CalculateMetricsRepositoryPath = fileDialog.FileName;
         else
+        {
+            ButtonEnable(sender);
             return;
+        }
 
         using var folderDialog = new FolderBrowserDialog();
 
