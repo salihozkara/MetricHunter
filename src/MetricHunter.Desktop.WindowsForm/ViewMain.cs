@@ -300,4 +300,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         var result = await Presenter.HuntRepositories();
         await SaveCsv(result);
     }
+
+    private void openLogsStripMenuItem_Click(object sender, EventArgs e)
+    {
+
+    }
 }
