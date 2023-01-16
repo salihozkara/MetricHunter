@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Windows.Forms;
 using MetricHunter.Application.Git;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Tasks;
@@ -18,13 +19,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public ViewMain()
     {
         InitializeComponent();
-        DesktopSink.LogAction += (s, e) =>
-        {
-            if (e.Level == LogEventLevel.Error)
-            {
-                MessageBox.Show(s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-        };
     }
 
     public IViewMainPresenter Presenter { get; set; }
@@ -151,6 +145,19 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void _viewMain_Load(object sender, EventArgs e)
     {
         Presenter.LoadForm();
+        logScrollToBottom();
+
+        DesktopSink.LogAction += (s, e) =>
+        {
+            logTextBox.Text += s;
+            logScrollToBottom();
+        };
+    }
+
+    private void logScrollToBottom()
+    {
+        logTextBox.SelectionStart = logTextBox.Text.Length;
+        logTextBox.ScrollToCaret();
     }
 
     private async void _searchButton_Click(object sender, EventArgs e)
@@ -346,6 +353,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     }
 
     private void openLogsStripMenuItem_Click(object sender, EventArgs e)
+    {
+
+    }
+
+    private void cancelButton_Click(object sender, EventArgs e)
     {
 
     }
