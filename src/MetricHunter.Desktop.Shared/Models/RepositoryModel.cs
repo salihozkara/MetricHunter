@@ -10,5 +10,5 @@ public class RepositoryModel
     public int Stars { get; set; }
     public string Url { get; set; }
     public string License { get; set; }
-    public string SizeString { get; set; }
+    public string Size { get; set; }
 }

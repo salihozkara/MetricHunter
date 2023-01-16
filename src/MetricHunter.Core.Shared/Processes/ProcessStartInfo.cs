@@ -4,7 +4,8 @@ namespace MetricHunter.Core.Processes;
 
 public class ProcessStartInfo
 {
-    public ProcessStartInfo(string command, string arguments, DirectoryPath? workingDirectory = null, Action? exited = null,
+    public ProcessStartInfo(string command, string arguments, DirectoryPath? workingDirectory = null,
+        Action? exited = null,
         Action<string>? outputDataReceived = null, Action<string>? errorDataReceived = null)
     {
         Command = command;
@@ -13,7 +14,7 @@ public class ProcessStartInfo
         WorkingDirectory = workingDirectory;
         OutputDataReceived = outputDataReceived;
         ErrorDataReceived = errorDataReceived;
-        
+
         workingDirectory?.CreateIfNotExists();
     }
 

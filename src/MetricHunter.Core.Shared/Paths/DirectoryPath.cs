@@ -1,27 +1,50 @@
 ﻿namespace MetricHunter.Core.Paths;
 
-public class DirectoryPath : MetricHunterPath<DirectoryPath>
+public class DirectoryPath : BasePath
 {
-    public readonly DirectoryInfo DirectoryInfo;
     public DirectoryPath(string path) : base(path)
     {
-        DirectoryInfo = new DirectoryInfo(path);
     }
 
-    private DirectoryPath(DirectoryInfo directoryDirectoryInfo) : base(directoryDirectoryInfo.FullName)
+    public DirectoryInfo DirectoryInfo
     {
-        DirectoryInfo = directoryDirectoryInfo;
+        get
+        {
+            if (FileSystemInfo is not DirectoryInfo directoryInfo)
+                FileSystemInfo = directoryInfo = new DirectoryInfo(_path);
+            return directoryInfo;
+        }
     }
 
-    protected override FileSystemInfo Info => DirectoryInfo;
-    public override DirectoryPath ParentDirectory => new(Directory.GetParent(Path)!);
+    public override DirectoryPath Directory => this;
 
-    public void CreateIfNotExists()
+    public static implicit operator DirectoryPath(DirectoryInfo fileSystemInfo)
     {
-        if (!Exists) DirectoryInfo.Create();
+        var path = new DirectoryPath(fileSystemInfo.FullName)
+        {
+            FileSystemInfo = fileSystemInfo
+        };
+        return path;
     }
 
-    public static implicit operator DirectoryPath?(AnonymousPath? path) => path is null ? null : new DirectoryPath(path!);
-    public static implicit operator DirectoryPath?(string? path) => string.IsNullOrWhiteSpace(path) ? null : new DirectoryPath(path);
-    public static implicit operator DirectoryPath?(DirectoryInfo? info) => info is null ? null : new DirectoryPath(info);
+    public static implicit operator DirectoryPath(UnknownPath unknownPath)
+    {
+        return new(unknownPath);
+    }
+
+    public static implicit operator string(DirectoryPath pathBase)
+    {
+        return pathBase._path;
+    }
+
+    public static implicit operator DirectoryPath(string path)
+    {
+        return new DirectoryPath(path);
+    }
+
+    public override void CreateIfNotExists()
+    {
+        if (Exists) return;
+        System.IO.Directory.CreateDirectory(_path);
+    }
 }

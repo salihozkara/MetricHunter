@@ -12,6 +12,6 @@ public class CloneRepositorySuccessEventArgs
     }
 
     public Repository Repository { get; set; }
-    
+
     public DirectoryPath LocalPath { get; set; }
 }

@@ -1,11 +1,14 @@
 using System.Diagnostics;
 using MetricHunter.Application.Git;
-using MetricHunter.Application.Resources;
+using MetricHunter.Core.Paths;
+using MetricHunter.Core.Tasks;
+using MetricHunter.Desktop.DesktopLogs;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
+using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
-using Newtonsoft.Json;
 using Octokit;
+using Serilog.Events;
 using Volo.Abp.DependencyInjection;
 
 namespace MetricHunter.Desktop;
@@ -15,20 +18,25 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public ViewMain()
     {
         InitializeComponent();
-        var args = Environment.GetCommandLineArgs();
-        if (args.Length > 1)
+        DesktopSink.LogAction += (s, e) =>
         {
-            var files = args.Skip(1).Where(x=>x.EndsWith(GitConsts.RepositoryInfoFileExtension)).ToArray();
-            var repositories = files.Select(x => JsonConvert.DeserializeObject<Repository>(File.ReadAllText(x),Resource.Jsons.JsonSerializerSettings)).ToArray();
-            ShowRepositories(repositories);
-        }
+            if (e.Level == LogEventLevel.Error)
+            {
+                MessageBox.Show(s, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        };
     }
 
     public IViewMainPresenter Presenter { get; set; }
 
+    public CancellationTokenSource SearchRepositoriesCancellationTokenSource { get; set; }
+    public CancellationTokenSource DownloadRepositoriesCancellationTokenSource { get; set; }
+    public CancellationTokenSource CalculateMetricsCancellationTokenSource { get; set; }
+    public CancellationTokenSource HuntRepositoriesCancellationTokenSource { get; set; }
+
     public void ShowMessage(string message)
     {
-        MessageBox.Show(message);   
+        MessageBox.Show(message);
     }
 
     public void SetSearchProgressBar(int value)
@@ -44,44 +52,44 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         {
             try
             {
-                return Properties.Settings.Default.GithubToken;
+                return Settings.Default.GithubToken;
             }
             catch (Exception e)
             {
                 return "";
             }
         }
-    } 
+    }
 
     public IEnumerable<long> SelectedRepositories
     {
         get
         {
             return _repositoryDataGridView.SelectedRows.Cast<DataGridViewRow>()
-              .Select(r => r.Cells[0].Value)
-              .Cast<long>()
-              .ToList();
+                .Select(r => r.Cells[0].Value)
+                .Cast<long>()
+                .ToList();
         }
     }
 
     public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
 
     public SortDirection SortDirection =>
-      _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
+        _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
 
     public int RepositoryCount =>
-      int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
+        int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
 
     public string Topics => _topicsTextBox.Text;
-    
+
     public string JsonLoadPath { get; set; }
-    
+
     public string JsonSavePath { get; set; }
-    
+
     public string DownloadRepositoryPath { get; set; }
-    
+
     public string CalculateMetricsRepositoryPath { get; set; }
-    
+
     public string CalculateMetricsByLocalResultsPath { get; set; }
 
     public IEnumerable<Language>? LanguageSelectList
@@ -93,7 +101,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         set => _sortDirectionComboBox.DataSource = value;
     }
-    
+
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
         var index = 0;
@@ -107,7 +115,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             Url = x.HtmlUrl,
             License = x.License?.Name ?? "No License",
             Owner = x.Owner.Login,
-            SizeString = ToSizeString(x.Size)
+            Size = ToSizeString(x.Size)
         }).ToList();
         _repositoryDataGridView.DataSource = repositoryModelList.ToList();
 
@@ -115,7 +123,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         SetHyperLink();
     }
-    
+
+    public void Run()
+    {
+        System.Windows.Forms.Application.Run(this);
+    }
+
     private static string ToSizeString(long size) // size in kilobytes
     {
         return size switch
@@ -129,17 +142,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void SetHyperLink()
     {
         if (_repositoryDataGridView.Columns.Contains("Url"))
-        {
             _repositoryDataGridView.Columns["Url"]!.DefaultCellStyle = new DataGridViewCellStyle
             {
-                ForeColor = Color.Blue,
+                ForeColor = Color.Blue
             };
-        }
-    }
-
-    public void Run()
-    {
-        System.Windows.Forms.Application.Run(this);
     }
 
     private void _viewMain_Load(object sender, EventArgs e)
@@ -149,37 +155,75 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _searchButton_Click(object sender, EventArgs e)
     {
+        SearchRepositoriesCancellationTokenSource = new CancellationTokenSource();
         SetSearchProgressBar(0);
+        ButtonDisable(sender);
+        await Presenter.SearchRepositories().MaybeCanceled(SearchRepositoriesCancellationTokenSource.Token);
+        ButtonEnable(sender);
+    }
+
+    private static void ButtonDisable(object sender)
+    {
         var button = sender as Button;
         button!.Enabled = false;
-        await Presenter.SearchRepositories();
-        button.Enabled = true;
+    }
+    
+    private static void ButtonEnable(object sender)
+    {
+        var button = sender as Button;
+        button!.Enabled = true;
+    }
+
+    private string BuildFileDialogFilter(Dictionary<string, string> fileDialogFilter)
+    {
+        var filter = "";
+        foreach (var (key, value) in fileDialogFilter)
+        {
+            if (filter != "")
+                filter += "|";
+            filter += $"{key}|*{value}";
+        }
+
+        return filter;
     }
 
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
-        using var folderDialog = new FolderBrowserDialog();
+        ButtonDisable(sender);
+        CalculateMetricsCancellationTokenSource = new CancellationTokenSource();
+        using var fileDialog = new OpenFileDialog();
+        fileDialog.Multiselect = false;
+        fileDialog.Filter = BuildFileDialogFilter(new Dictionary<string, string>
+        {
+            { "Metric Hunter Files", GitConsts.RepositoryInfoFileExtension },
+            { "Json Files", ".json" }
+        });
         
-        folderDialog.UseDescriptionForTitle = true;
-        folderDialog.Description = "Select the repositories folder";
+        if(string.IsNullOrWhiteSpace(DownloadRepositoryPath))
+            fileDialog.InitialDirectory = PathHelper.TempPath;
+
+        if (fileDialog.ShowDialog() == DialogResult.OK)
+            CalculateMetricsRepositoryPath = fileDialog.FileName;
+        else
+        {
+            ButtonEnable(sender);
+            return;
+        }
+
+        using var folderDialog = new FolderBrowserDialog();
+
+        folderDialog.Description = "Select the local results folder";
 
         if (folderDialog.ShowDialog() == DialogResult.OK)
-        {
-            CalculateMetricsRepositoryPath = folderDialog.SelectedPath;
-        };
-        
-        
-        folderDialog.Description = "Select the local results folder";
-        
-        if (folderDialog.ShowDialog() == DialogResult.OK)
-        {
             CalculateMetricsByLocalResultsPath = folderDialog.SelectedPath;
-        };
-        
-        var result = await Presenter.CalculateMetrics();
+
+        var result = await Presenter.CalculateMetrics().MaybeCanceled(CalculateMetricsCancellationTokenSource.Token);
+        ButtonEnable(sender);
+        if(string.IsNullOrEmpty(result))
+            return;
         await SaveCsv(result);
     }
-    
+
     private static async Task SaveCsv(string result)
     {
         using var fileDialog = new SaveFileDialog
@@ -187,21 +231,20 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             Filter = "Csv files | *.csv"
         };
 
-        if (fileDialog.ShowDialog() == DialogResult.OK)
-        {
-            await File.WriteAllTextAsync(fileDialog.FileName, result);
-        }
+        if (fileDialog.ShowDialog() == DialogResult.OK) await File.WriteAllTextAsync(fileDialog.FileName, result);
     }
 
-    private void _downloadButton_Click(object sender, EventArgs e)
+    private async void _downloadButton_Click(object sender, EventArgs e)
     {
-        using var folderDialog = new FolderBrowserDialog();
+        ButtonDisable(sender);
+        DownloadRepositoriesCancellationTokenSource = new CancellationTokenSource();
         
-        if (folderDialog.ShowDialog() == DialogResult.OK)
-        {
-            DownloadRepositoryPath = folderDialog.SelectedPath;
-        };
-        Presenter.DownloadRepositories();
+        using var folderDialog = new FolderBrowserDialog();
+
+        if (folderDialog.ShowDialog() == DialogResult.OK) DownloadRepositoryPath = folderDialog.SelectedPath;
+        
+        await Presenter.DownloadRepositories().MaybeCanceled(DownloadRepositoriesCancellationTokenSource.Token);
+        ButtonEnable(sender);
     }
 
     private void showToolStripMenuItem_Click(object sender, EventArgs e)
@@ -211,10 +254,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             Filter = "Json files | *.json"
         };
 
-        if (fileDialog.ShowDialog() == DialogResult.OK)
-        {
-            JsonLoadPath = fileDialog.FileName;
-        }
+        if (fileDialog.ShowDialog() == DialogResult.OK) JsonLoadPath = fileDialog.FileName;
 
         Presenter.ShowRepositories();
     }
@@ -228,16 +268,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         };
 
         if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
-        
+
         JsonSavePath = saveFileDialog.FileName;
         Presenter.SaveRepositories();
-
     }
 
     private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
     {
         if (!_repositoryDataGridView.Columns[_repositoryDataGridView.CurrentCell.ColumnIndex].HeaderText
-              .Contains("Url")) return;
+                .Contains("Url")) return;
 
         if (!string.IsNullOrWhiteSpace(_repositoryDataGridView.CurrentCell.EditedFormattedValue.ToString()))
         {
@@ -297,7 +336,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void huntButton_Click(object sender, EventArgs e)
     {
-        var result = await Presenter.HuntRepositories();
+        ButtonDisable(sender);
+        HuntRepositoriesCancellationTokenSource = new CancellationTokenSource();
+        var result = await Presenter.HuntRepositories().MaybeCanceled(HuntRepositoriesCancellationTokenSource.Token);
+        ButtonEnable(sender);
+        if (string.IsNullOrEmpty(result))
+            return;
         await SaveCsv(result);
     }
 

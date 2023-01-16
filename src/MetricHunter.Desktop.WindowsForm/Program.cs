@@ -1,4 +1,5 @@
 using MetricHunter.Core.Processes;
+using MetricHunter.Desktop.DesktopLogs;
 using Microsoft.Extensions.DependencyInjection;
 using Serilog;
 using Serilog.Events;
@@ -12,15 +13,22 @@ public class Program
     public static void Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
+        
+        AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
+        {
+            Log.Fatal(eventArgs.ExceptionObject as Exception, "Unhandled exception");
+            MessageBox.Show(eventArgs.ExceptionObject.ToString(), "Unhandled Exception");
+        };
+        
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()
             .MinimumLevel.Override("Volo.Abp", LogEventLevel.Warning)
             .Enrich.FromLogContext()
-            .WriteTo.File(Path.Combine(Directory.GetCurrentDirectory(), "Logs/logs.txt"))
+            .WriteTo.File(DesktopLogsConsts.LogFilePath, rollingInterval: RollingInterval.Month)
             .WriteTo.Console(outputTemplate: "{Message:lj}{NewLine}{Exception}")
+            .WriteTo.Desktop()
             .CreateLogger();
-
 
         using var application = AbpApplicationFactory.Create<DesktopWindowsFormModule>(
             options =>
