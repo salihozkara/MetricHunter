@@ -2,7 +2,8 @@
 
 public static class TaskExtensions
 {
-    public static async Task<T?> MaybeCanceled<T>(this Task<T> task, CancellationToken cancellationToken, T? defaultValue = default)
+    public static async Task<T?> MaybeCanceled<T>(this Task<T> task, CancellationToken cancellationToken,
+        T? defaultValue = default)
     {
         try
         {
@@ -13,8 +14,8 @@ public static class TaskExtensions
             return defaultValue;
         }
     }
-    
-    public static async Task MaybeCanceled<T>(this Task task, CancellationToken cancellationToken)
+
+    public static async Task MaybeCanceled(this Task task, CancellationToken cancellationToken)
     {
         try
         {

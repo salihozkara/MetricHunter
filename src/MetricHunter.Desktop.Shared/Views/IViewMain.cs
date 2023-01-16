@@ -1,5 +1,4 @@
 ﻿using MetricHunter.Desktop.Core;
-using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
 using Octokit;
 
@@ -32,6 +31,12 @@ public interface IViewMain : IView<IViewMainPresenter>
     void ShowMessage(string message);
 
     void ShowRepositories(IEnumerable<Repository> repositories);
-    
+
     void SetSearchProgressBar(int value);
+    
+    
+    CancellationTokenSource SearchRepositoriesCancellationTokenSource { get; set; }
+    CancellationTokenSource DownloadRepositoriesCancellationTokenSource { get; set; }
+    CancellationTokenSource CalculateMetricsCancellationTokenSource { get; set; }
+    CancellationTokenSource HuntRepositoriesCancellationTokenSource { get; set; }
 }

@@ -4,7 +4,7 @@ namespace MetricHunter.Application.Repositories;
 
 public interface IRepositoryAppService
 {
-    Task<Repository[]> ReadRepositories(string path);
+    Task<Repository[]> ReadRepositoriesAsync(string path);
 
-    Task WriteRepositories(IEnumerable<Repository> repositories, string path);
+    Task WriteRepositoriesAsync(IEnumerable<Repository> repositories, string path);
 }

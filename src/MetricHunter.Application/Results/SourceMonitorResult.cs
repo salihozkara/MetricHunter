@@ -12,7 +12,7 @@ public class SourceMonitorResult : IResult
         Metrics = metrics;
         Id = repository.Id;
         FullName = repository.FullName;
-        Description = repository.Description;
+        // Description = repository.Description;
         Language = repository.Language;
         Stars = repository.StargazersCount;
         Forks = repository.ForksCount;
@@ -25,7 +25,7 @@ public class SourceMonitorResult : IResult
 
     public long Id { get; }
     public string FullName { get; }
-    public string Description { get; }
+    // public string Description { get; }
     public string Language { get; }
     public int Stars { get; }
     public int Forks { get; }
@@ -44,7 +44,7 @@ public class SourceMonitorResult : IResult
         {
             { Normalize(nameof(Id)), Id.ToString() },
             { Normalize(nameof(FullName)), FullName },
-            { Normalize(nameof(Description)), Description },
+            // { Normalize(nameof(Description)), Description },
             { Normalize(nameof(Language)), Language },
             { Normalize(nameof(Stars)), Stars.ToString() },
             { Normalize(nameof(Forks)), Forks.ToString() },
