@@ -64,12 +64,12 @@ partial class ViewMain
             this.bottomLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.logTextBox = new System.Windows.Forms.RichTextBox();
             this.operationGroupBox = new System.Windows.Forms.GroupBox();
-            this.huntButton = new System.Windows.Forms.Button();
+            this._huntButton = new System.Windows.Forms.Button();
             this._downloadButton = new System.Windows.Forms.Button();
             this._calculateMetricsButton = new System.Windows.Forms.Button();
             this.panel1 = new System.Windows.Forms.Panel();
-            this.cancelButton = new System.Windows.Forms.Button();
-            this._searchProgressBar = new System.Windows.Forms.ProgressBar();
+            this._cancelButton = new System.Windows.Forms.Button();
+            this._progressBar = new System.Windows.Forms.ProgressBar();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).BeginInit();
             this.menu.SuspendLayout();
             this.basePanel.SuspendLayout();
@@ -420,7 +420,7 @@ partial class ViewMain
             // operationGroupBox
             // 
             this.operationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-            this.operationGroupBox.Controls.Add(this.huntButton);
+            this.operationGroupBox.Controls.Add(this._huntButton);
             this.operationGroupBox.Controls.Add(this._downloadButton);
             this.operationGroupBox.Controls.Add(this._calculateMetricsButton);
             this.operationGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
@@ -433,17 +433,17 @@ partial class ViewMain
             // 
             // huntButton
             // 
-            this.huntButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.huntButton.ImageKey = "knife.png";
-            this.huntButton.ImageList = this.IconList;
-            this.huntButton.Location = new System.Drawing.Point(552, 61);
-            this.huntButton.Name = "huntButton";
-            this.huntButton.Size = new System.Drawing.Size(121, 41);
-            this.huntButton.TabIndex = 8;
-            this.huntButton.Text = "Hunt";
-            this.huntButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this.huntButton.UseVisualStyleBackColor = true;
-            this.huntButton.Click += new System.EventHandler(this.huntButton_Click);
+            this._huntButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this._huntButton.ImageKey = "knife.png";
+            this._huntButton.ImageList = this.IconList;
+            this._huntButton.Location = new System.Drawing.Point(552, 61);
+            this._huntButton.Name = "_huntButton";
+            this._huntButton.Size = new System.Drawing.Size(121, 41);
+            this._huntButton.TabIndex = 8;
+            this._huntButton.Text = "Hunt";
+            this._huntButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
+            this._huntButton.UseVisualStyleBackColor = true;
+            this._huntButton.Click += new System.EventHandler(this.huntButton_Click);
             // 
             // _downloadButton
             // 
@@ -475,8 +475,8 @@ partial class ViewMain
             // 
             // panel1
             // 
-            this.panel1.Controls.Add(this.cancelButton);
-            this.panel1.Controls.Add(this._searchProgressBar);
+            this.panel1.Controls.Add(this._cancelButton);
+            this.panel1.Controls.Add(this._progressBar);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(3, 360);
             this.panel1.Name = "panel1";
@@ -485,23 +485,23 @@ partial class ViewMain
             // 
             // cancelButton
             // 
-            this.cancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this.cancelButton.ImageKey = "close.png";
-            this.cancelButton.ImageList = this.IconList;
-            this.cancelButton.Location = new System.Drawing.Point(1052, -8);
-            this.cancelButton.Name = "cancelButton";
-            this.cancelButton.Size = new System.Drawing.Size(40, 35);
-            this.cancelButton.TabIndex = 19;
-            this.cancelButton.UseVisualStyleBackColor = true;
-            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
+            this._cancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
+            this._cancelButton.ImageKey = "close.png";
+            this._cancelButton.ImageList = this.IconList;
+            this._cancelButton.Location = new System.Drawing.Point(1052, -8);
+            this._cancelButton.Name = "_cancelButton";
+            this._cancelButton.Size = new System.Drawing.Size(40, 35);
+            this._cancelButton.TabIndex = 19;
+            this._cancelButton.UseVisualStyleBackColor = true;
+            this._cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // _searchProgressBar
             // 
-            this._searchProgressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._searchProgressBar.Location = new System.Drawing.Point(0, -8);
-            this._searchProgressBar.Name = "_searchProgressBar";
-            this._searchProgressBar.Size = new System.Drawing.Size(1057, 34);
-            this._searchProgressBar.TabIndex = 18;
+            this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
+            this._progressBar.Location = new System.Drawing.Point(0, -8);
+            this._progressBar.Name = "_progressBar";
+            this._progressBar.Size = new System.Drawing.Size(1057, 34);
+            this._progressBar.TabIndex = 18;
             // 
             // ViewMain
             // 
@@ -563,13 +563,13 @@ partial class ViewMain
     private ToolStripMenuItem helpToolStripMenuItem;
     private Panel bottomPanel;
     private TableLayoutPanel bottomLayoutPanel;
-    private ProgressBar _searchProgressBar;
+    private ProgressBar _progressBar;
     private RichTextBox logTextBox;
     private GroupBox operationGroupBox;
-    private Button huntButton;
+    private Button _huntButton;
     private Button _downloadButton;
     private Button _calculateMetricsButton;
     private ToolStripMenuItem openLogsStripMenuItem;
     private Panel panel1;
-    private Button cancelButton;
+    private Button _cancelButton;
 }

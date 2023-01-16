@@ -7,6 +7,7 @@ using MetricHunter.Core.Strings;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Octokit;
 
 namespace MetricHunter.Desktop.Presenters;
@@ -20,6 +21,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
     private List<Repository> _repositories;
+    private readonly ILogger<ViewMainPresenter> _logger;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -34,6 +36,7 @@ public class ViewMainPresenter : IViewMainPresenter
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
         _csvHelper = _controller.ServiceProvider.GetRequiredService<ICsvHelper>();
         _repositoryAppService = _controller.ServiceProvider.GetRequiredService<IRepositoryAppService>();
+        _logger = _controller.ServiceProvider.GetRequiredService<ILogger<ViewMainPresenter>>();
 
         Authenticate();
 
@@ -94,7 +97,7 @@ public class ViewMainPresenter : IViewMainPresenter
         stopwatch.Stop();
         View.ShowRepositories(Repositories);
 
-        View.ShowMessage($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+        _logger.LogInformation($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
     }
 
 
@@ -105,6 +108,9 @@ public class ViewMainPresenter : IViewMainPresenter
             repositoryList = repositoryList.Where(x => Repositories.Any(x2 => x2.Id == x.Id)).ToArray();
 
         var metrics = new List<Dictionary<string, string>>();
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        View.SetProgressBar(0);
         foreach (var item in repositoryList)
         {
             var language = GitConsts.LanguagesMap[item.Language];
@@ -115,8 +121,11 @@ public class ViewMainPresenter : IViewMainPresenter
                 continue;
             var dictList = metric.ToDictionaryListByTopics();
             metrics.AddRange(dictList);
+            View.SetProgressBar((int) ((double) metrics.Count / repositoryList.Length * 100));
         }
-
+        
+        stopwatch.Stop();
+        _logger.LogInformation($"Metrics calculated in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
     }
 
@@ -125,7 +134,16 @@ public class ViewMainPresenter : IViewMainPresenter
         if (!CheckSelectRepositories())
             return;
 
-        foreach (var item in Repositories) await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        View.SetProgressBar(0);
+        foreach (var item in Repositories)
+        {
+            await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
+            View.SetProgressBar((int) ((double) _repositories.IndexOf(item) / _repositories.Count * 100));
+        }
+        stopwatch.Stop();
+        _logger.LogInformation($"Repositories downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
     }
 
     public async Task ShowRepositories()
@@ -161,6 +179,9 @@ public class ViewMainPresenter : IViewMainPresenter
         if (!CheckSelectRepositories())
             return string.Empty;
 
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        View.SetProgressBar(0);
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
             if (await _gitProvider.CloneRepository(item))
@@ -171,8 +192,11 @@ public class ViewMainPresenter : IViewMainPresenter
                 var dictList = metric.ToDictionaryListByTopics();
                 metrics.AddRange(dictList);
                 await _gitProvider.DeleteLocalRepository(item);
+                View.SetProgressBar((int) ((double) _repositories.IndexOf(item) / _repositories.Count * 100));
             }
 
+        stopwatch.Stop();
+        _logger.LogInformation($"Repositories hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
     }
 
@@ -206,7 +230,7 @@ public class ViewMainPresenter : IViewMainPresenter
         _repositories.AddRange(e.Result.Items);
         _repositories = _repositories.DistinctBy(x => x.Id).Take(View.RepositoryCount).ToList();
         var progressBarValue = (int)Math.Round((double)_repositories.Count / View.RepositoryCount * 100);
-        View.SetSearchProgressBar(progressBarValue);
+        View.SetProgressBar(progressBarValue);
         View.ShowRepositories(Repositories);
     }
 

@@ -1,4 +1,6 @@
-﻿namespace MetricHunter.Core.Tasks;
+﻿using Nito.AsyncEx;
+
+namespace MetricHunter.Core.Tasks;
 
 public static class TaskExtensions
 {
@@ -7,7 +9,7 @@ public static class TaskExtensions
     {
         try
         {
-            return await task;
+            return await task.WaitAsync(cancellationToken);
         }
         catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
         {

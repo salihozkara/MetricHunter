@@ -2,42 +2,47 @@ using System.Diagnostics;
 using System.Windows.Forms;
 using MetricHunter.Application.Git;
 using MetricHunter.Core.Paths;
+using MetricHunter.Core.Processes;
 using MetricHunter.Core.Tasks;
 using MetricHunter.Desktop.DesktopLogs;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
+using Microsoft.Extensions.Logging;
+using Nito.AsyncEx;
 using Octokit;
 using Serilog.Events;
 using Volo.Abp.DependencyInjection;
+using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 namespace MetricHunter.Desktop;
 
 public partial class ViewMain : Form, ISingletonDependency, IViewMain
 {
-    public ViewMain()
+    private readonly IProcessManager _processManager;
+    public ViewMain(ILogger<ViewMain> logger, IProcessManager processManager)
     {
+        _logger = logger;
+        _processManager = processManager;
         InitializeComponent();
     }
 
     public IViewMainPresenter Presenter { get; set; }
-
-    public CancellationTokenSource SearchRepositoriesCancellationTokenSource { get; set; }
-    public CancellationTokenSource DownloadRepositoriesCancellationTokenSource { get; set; }
-    public CancellationTokenSource CalculateMetricsCancellationTokenSource { get; set; }
-    public CancellationTokenSource HuntRepositoriesCancellationTokenSource { get; set; }
+    private readonly ILogger<ViewMain> _logger;
+    
+    public CancellationTokenSource CancellationTokenSource { get; set; }
 
     public void ShowMessage(string message)
     {
         MessageBox.Show(message);
     }
 
-    public void SetSearchProgressBar(int value)
+    public void SetProgressBar(int value)
     {
         value = value > 100 ? 100 : value;
         value = value < 0 ? 0 : value;
-        _searchProgressBar.Value = value;
+        _progressBar.Value = value;
     }
 
     public string GithubToken
@@ -145,16 +150,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void _viewMain_Load(object sender, EventArgs e)
     {
         Presenter.LoadForm();
-        logScrollToBottom();
+        LogScrollToBottom();
 
-        DesktopSink.LogAction += (s, e) =>
+        DesktopSink.LogAction += (s, logEvent) =>
         {
+            if(logEvent.Level != LogEventLevel.Information) return;
             logTextBox.Text += s;
-            logScrollToBottom();
+            LogScrollToBottom();
         };
     }
 
-    private void logScrollToBottom()
+    private void LogScrollToBottom()
     {
         logTextBox.SelectionStart = logTextBox.Text.Length;
         logTextBox.ScrollToCaret();
@@ -162,23 +168,31 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _searchButton_Click(object sender, EventArgs e)
     {
-        SearchRepositoriesCancellationTokenSource = new CancellationTokenSource();
-        SetSearchProgressBar(0);
-        ButtonDisable(sender);
-        await Presenter.SearchRepositories().MaybeCanceled(SearchRepositoriesCancellationTokenSource.Token);
-        ButtonEnable(sender);
+        _logger.LogInformation("Search operation started");
+        CancellationTokenSource = new CancellationTokenSource();
+        SetProgressBar(0);
+        ButtonDisable();
+        await Presenter.SearchRepositories().MaybeCanceled(CancellationTokenSource.Token);
+        ButtonEnable();
+        _logger.LogInformation("Search operation finished");
     }
 
-    private static void ButtonDisable(object sender)
+    private void ButtonDisable()
     {
-        var button = sender as Button;
-        button!.Enabled = false;
+        _searchButton.Enabled = false;
+        _downloadButton.Enabled = false;
+        _calculateMetricsButton.Enabled = false;
+        _huntButton.Enabled = false;
+        _cancelButton.Enabled = true;
     }
     
-    private static void ButtonEnable(object sender)
+    private void ButtonEnable()
     {
-        var button = sender as Button;
-        button!.Enabled = true;
+        _searchButton.Enabled = true;
+        _downloadButton.Enabled = true;
+        _calculateMetricsButton.Enabled = true;
+        _huntButton.Enabled = true;
+        _cancelButton.Enabled = false;
     }
 
     private string BuildFileDialogFilter(Dictionary<string, string> fileDialogFilter)
@@ -196,8 +210,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _calculateMetricsButton_Click(object sender, EventArgs e)
     {
-        ButtonDisable(sender);
-        CalculateMetricsCancellationTokenSource = new CancellationTokenSource();
+        _logger.LogInformation("Calculate metrics operation started");
+        ButtonDisable();
+        CancellationTokenSource = new CancellationTokenSource();
         using var fileDialog = new OpenFileDialog();
         fileDialog.Multiselect = false;
         fileDialog.Filter = BuildFileDialogFilter(new Dictionary<string, string>
@@ -213,7 +228,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             CalculateMetricsRepositoryPath = fileDialog.FileName;
         else
         {
-            ButtonEnable(sender);
+            _logger.LogInformation("Calculate metrics operation canceled");
+            ButtonEnable();
             return;
         }
 
@@ -224,10 +240,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (folderDialog.ShowDialog() == DialogResult.OK)
             CalculateMetricsByLocalResultsPath = folderDialog.SelectedPath;
 
-        var result = await Presenter.CalculateMetrics().MaybeCanceled(CalculateMetricsCancellationTokenSource.Token);
-        ButtonEnable(sender);
+        var result = await Presenter.CalculateMetrics().MaybeCanceled(CancellationTokenSource.Token);
+        ButtonEnable();
         if(string.IsNullOrEmpty(result))
             return;
+        _logger.LogInformation("Calculate metrics operation finished");
         await SaveCsv(result);
     }
 
@@ -243,15 +260,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void _downloadButton_Click(object sender, EventArgs e)
     {
-        ButtonDisable(sender);
-        DownloadRepositoriesCancellationTokenSource = new CancellationTokenSource();
+        _logger.LogInformation("Download operation started");
+        ButtonDisable();
+        CancellationTokenSource = new CancellationTokenSource();
         
         using var folderDialog = new FolderBrowserDialog();
 
         if (folderDialog.ShowDialog() == DialogResult.OK) DownloadRepositoryPath = folderDialog.SelectedPath;
         
-        await Presenter.DownloadRepositories().MaybeCanceled(DownloadRepositoriesCancellationTokenSource.Token);
-        ButtonEnable(sender);
+        await Presenter.DownloadRepositories().MaybeCanceled(CancellationTokenSource.Token);
+        ButtonEnable();
     }
 
     private void showToolStripMenuItem_Click(object sender, EventArgs e)
@@ -343,22 +361,32 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private async void huntButton_Click(object sender, EventArgs e)
     {
-        ButtonDisable(sender);
-        HuntRepositoriesCancellationTokenSource = new CancellationTokenSource();
-        var result = await Presenter.HuntRepositories().MaybeCanceled(HuntRepositoriesCancellationTokenSource.Token);
-        ButtonEnable(sender);
+        _logger.LogInformation("Hunt operation started");
+        ButtonDisable();
+        CancellationTokenSource = new CancellationTokenSource();
+        var result = await Presenter.HuntRepositories().MaybeCanceled(CancellationTokenSource.Token);
+        ButtonEnable();
         if (string.IsNullOrEmpty(result))
             return;
+        _logger.LogInformation("Hunt operation finished");
         await SaveCsv(result);
     }
 
     private void openLogsStripMenuItem_Click(object sender, EventArgs e)
     {
+        var ps = new ProcessStartInfo(DesktopLogsConsts.LogFilePath.Directory)
+        {
+            UseShellExecute = true,
+            Verb = "open"
+        };
 
+        Process.Start(ps);
     }
 
     private void cancelButton_Click(object sender, EventArgs e)
     {
-
+        CancellationTokenSource.Cancel(true);
+        _logger.LogInformation("Operation canceled by user");
+        ButtonEnable();
     }
 }

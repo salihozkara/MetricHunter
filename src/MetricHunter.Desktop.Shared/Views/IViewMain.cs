@@ -32,11 +32,8 @@ public interface IViewMain : IView<IViewMainPresenter>
 
     void ShowRepositories(IEnumerable<Repository> repositories);
 
-    void SetSearchProgressBar(int value);
+    void SetProgressBar(int value);
     
     
-    CancellationTokenSource SearchRepositoriesCancellationTokenSource { get; set; }
-    CancellationTokenSource DownloadRepositoriesCancellationTokenSource { get; set; }
-    CancellationTokenSource CalculateMetricsCancellationTokenSource { get; set; }
-    CancellationTokenSource HuntRepositoriesCancellationTokenSource { get; set; }
+    CancellationTokenSource CancellationTokenSource { get; set; }
 }
