@@ -28,12 +28,12 @@ public interface IViewMain : IView<IViewMainPresenter>
     string DownloadRepositoryPath { get; set; }
     string CalculateMetricsRepositoryPath { get; set; }
     string CalculateMetricsByLocalResultsPath { get; set; }
+
+
+    CancellationTokenSource CancellationTokenSource { get; set; }
     void ShowMessage(string message);
 
     void ShowRepositories(IEnumerable<Repository> repositories);
 
     void SetProgressBar(int value);
-    
-    
-    CancellationTokenSource CancellationTokenSource { get; set; }
 }

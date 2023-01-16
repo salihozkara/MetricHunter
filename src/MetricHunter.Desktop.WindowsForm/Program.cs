@@ -13,13 +13,13 @@ public class Program
     public static void Main(string[] args)
     {
         ApplicationConfiguration.Initialize();
-        
+
         AppDomain.CurrentDomain.UnhandledException += (sender, eventArgs) =>
         {
             Log.Fatal(eventArgs.ExceptionObject as Exception, "Unhandled exception");
             MessageBox.Show(eventArgs.ExceptionObject.ToString(), "Unhandled Exception");
         };
-        
+
 
         Log.Logger = new LoggerConfiguration()
             .MinimumLevel.Debug()

@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Windows.Forms;
 using MetricHunter.Application.Git;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
@@ -10,7 +9,6 @@ using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.Logging;
-using Nito.AsyncEx;
 using Octokit;
 using Serilog.Events;
 using Volo.Abp.DependencyInjection;
@@ -20,7 +18,9 @@ namespace MetricHunter.Desktop;
 
 public partial class ViewMain : Form, ISingletonDependency, IViewMain
 {
+    private readonly ILogger<ViewMain> _logger;
     private readonly IProcessManager _processManager;
+
     public ViewMain(ILogger<ViewMain> logger, IProcessManager processManager)
     {
         _logger = logger;
@@ -29,8 +29,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     }
 
     public IViewMainPresenter Presenter { get; set; }
-    private readonly ILogger<ViewMain> _logger;
-    
+
     public CancellationTokenSource CancellationTokenSource { get; set; }
 
     public void ShowMessage(string message)
@@ -40,6 +39,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void SetProgressBar(int value)
     {
+        if (CancellationTokenSource.IsCancellationRequested)
+            return;
         value = value > 100 ? 100 : value;
         value = value < 0 ? 0 : value;
         _progressBar.Value = value;
@@ -154,7 +155,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         DesktopSink.LogAction += (s, logEvent) =>
         {
-            if(logEvent.Level != LogEventLevel.Information) return;
+            if (logEvent.Level != LogEventLevel.Information) return;
             logTextBox.Text += s;
             LogScrollToBottom();
         };
@@ -172,7 +173,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         CancellationTokenSource = new CancellationTokenSource();
         SetProgressBar(0);
         ButtonDisable();
-        await Presenter.SearchRepositories().MaybeCanceled(CancellationTokenSource.Token);
+        await Presenter.SearchRepositoriesAsync(CancellationTokenSource.Token)
+            .MaybeCanceled(CancellationTokenSource.Token);
         ButtonEnable();
         _logger.LogInformation("Search operation finished");
     }
@@ -185,7 +187,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _huntButton.Enabled = false;
         _cancelButton.Enabled = true;
     }
-    
+
     private void ButtonEnable()
     {
         _searchButton.Enabled = true;
@@ -220,12 +222,14 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             { "Metric Hunter Files", GitConsts.RepositoryInfoFileExtension },
             { "Json Files", ".json" }
         });
-        
-        if(string.IsNullOrWhiteSpace(DownloadRepositoryPath))
+
+        if (string.IsNullOrWhiteSpace(DownloadRepositoryPath))
             fileDialog.InitialDirectory = PathHelper.TempPath;
 
         if (fileDialog.ShowDialog() == DialogResult.OK)
+        {
             CalculateMetricsRepositoryPath = fileDialog.FileName;
+        }
         else
         {
             _logger.LogInformation("Calculate metrics operation canceled");
@@ -240,9 +244,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (folderDialog.ShowDialog() == DialogResult.OK)
             CalculateMetricsByLocalResultsPath = folderDialog.SelectedPath;
 
-        var result = await Presenter.CalculateMetrics().MaybeCanceled(CancellationTokenSource.Token);
+        var result = await Presenter.CalculateMetricsAsync(CancellationTokenSource.Token)
+            .MaybeCanceled(CancellationTokenSource.Token);
         ButtonEnable();
-        if(string.IsNullOrEmpty(result))
+        if (string.IsNullOrEmpty(result))
             return;
         _logger.LogInformation("Calculate metrics operation finished");
         await SaveCsv(result);
@@ -263,12 +268,13 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _logger.LogInformation("Download operation started");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
-        
+
         using var folderDialog = new FolderBrowserDialog();
 
         if (folderDialog.ShowDialog() == DialogResult.OK) DownloadRepositoryPath = folderDialog.SelectedPath;
-        
-        await Presenter.DownloadRepositories().MaybeCanceled(CancellationTokenSource.Token);
+
+        await Presenter.DownloadRepositoriesAsync(CancellationTokenSource.Token)
+            .MaybeCanceled(CancellationTokenSource.Token);
         ButtonEnable();
     }
 
@@ -281,7 +287,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         if (fileDialog.ShowDialog() == DialogResult.OK) JsonLoadPath = fileDialog.FileName;
 
-        Presenter.ShowRepositories();
+        Presenter.ShowRepositoriesAsync();
     }
 
     private void saveToolStripMenuItem_Click(object sender, EventArgs e)
@@ -295,7 +301,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         if (saveFileDialog.ShowDialog() != DialogResult.OK) return;
 
         JsonSavePath = saveFileDialog.FileName;
-        Presenter.SaveRepositories();
+        Presenter.SaveRepositoriesAsync();
     }
 
     private void _repositoryDataGridView_CellContentClick(object sender, DataGridViewCellEventArgs e)
@@ -364,7 +370,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _logger.LogInformation("Hunt operation started");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
-        var result = await Presenter.HuntRepositories().MaybeCanceled(CancellationTokenSource.Token);
+        var result = await Presenter.HuntRepositoriesAsync(CancellationTokenSource.Token)
+            .MaybeCanceled(CancellationTokenSource.Token);
         ButtonEnable();
         if (string.IsNullOrEmpty(result))
             return;
@@ -385,7 +392,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void cancelButton_Click(object sender, EventArgs e)
     {
-        CancellationTokenSource.Cancel(true);
+        CancellationTokenSource.Cancel();
+        _processManager.KillAllProcesses(true);
         _logger.LogInformation("Operation canceled by user");
         ButtonEnable();
     }

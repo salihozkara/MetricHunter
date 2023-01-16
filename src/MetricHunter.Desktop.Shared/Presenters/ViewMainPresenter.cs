@@ -18,10 +18,10 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly ICsvHelper _csvHelper;
     private readonly IGitManager _gitManager;
     private readonly IGitProvider _gitProvider;
+    private readonly ILogger<ViewMainPresenter> _logger;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
     private List<Repository> _repositories;
-    private readonly ILogger<ViewMainPresenter> _logger;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -80,7 +80,7 @@ public class ViewMainPresenter : IViewMainPresenter
         Authenticate();
     }
 
-    public async Task SearchRepositories()
+    public async Task SearchRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         _repositories.Clear();
         var gitInput = new GitInput
@@ -93,7 +93,7 @@ public class ViewMainPresenter : IViewMainPresenter
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        await _gitManager.GetRepositoriesAsync(gitInput);
+        await _gitManager.GetRepositoriesAsync(gitInput, cancellationToken);
         stopwatch.Stop();
         View.ShowRepositories(Repositories);
 
@@ -101,9 +101,10 @@ public class ViewMainPresenter : IViewMainPresenter
     }
 
 
-    public async Task<string> CalculateMetrics()
+    public async Task<string> CalculateMetricsAsync(CancellationToken cancellationToken = default)
     {
-        var repositoryList = await _repositoryAppService.ReadRepositoriesAsync(View.CalculateMetricsRepositoryPath);
+        var repositoryList =
+            await _repositoryAppService.ReadRepositoriesAsync(View.CalculateMetricsRepositoryPath, cancellationToken);
         if (_repositories.Any())
             repositoryList = repositoryList.Where(x => Repositories.Any(x2 => x2.Id == x.Id)).ToArray();
 
@@ -116,20 +117,21 @@ public class ViewMainPresenter : IViewMainPresenter
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
             var metric = await manager.CalculateMetricsAsync(item,
-                View.CalculateMetricsRepositoryPath.ToFilePath().Directory, View.CalculateMetricsByLocalResultsPath);
+                View.CalculateMetricsRepositoryPath.ToFilePath().Directory, View.CalculateMetricsByLocalResultsPath,
+                cancellationToken);
             if (metric.IsEmpty())
                 continue;
             var dictList = metric.ToDictionaryListByTopics();
             metrics.AddRange(dictList);
-            View.SetProgressBar((int) ((double) metrics.Count / repositoryList.Length * 100));
+            View.SetProgressBar((int)((double)metrics.Count / repositoryList.Length * 100));
         }
-        
+
         stopwatch.Stop();
         _logger.LogInformation($"Metrics calculated in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
     }
 
-    public async Task DownloadRepositories()
+    public async Task DownloadRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         if (!CheckSelectRepositories())
             return;
@@ -137,16 +139,19 @@ public class ViewMainPresenter : IViewMainPresenter
         var stopwatch = new Stopwatch();
         stopwatch.Start();
         View.SetProgressBar(0);
+        var count = Repositories.Count();
+        var i = 0;
         foreach (var item in Repositories)
         {
-            await _gitProvider.CloneRepository(item, View.DownloadRepositoryPath);
-            View.SetProgressBar((int) ((double) _repositories.IndexOf(item) / _repositories.Count * 100));
+            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, cancellationToken);
+            View.SetProgressBar((int)((double)++i / count * 100));
         }
+
         stopwatch.Stop();
         _logger.LogInformation($"Repositories downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
     }
 
-    public async Task ShowRepositories()
+    public async Task ShowRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         if (View.JsonLoadPath.IsNullOrEmpty())
         {
@@ -154,7 +159,7 @@ public class ViewMainPresenter : IViewMainPresenter
             return;
         }
 
-        var repositories = await _repositoryAppService.ReadRepositoriesAsync(View.JsonLoadPath);
+        var repositories = await _repositoryAppService.ReadRepositoriesAsync(View.JsonLoadPath, cancellationToken);
 
         if (!repositories.Any()) return;
 
@@ -163,7 +168,7 @@ public class ViewMainPresenter : IViewMainPresenter
         View.ShowRepositories(Repositories);
     }
 
-    public async Task SaveRepositories()
+    public async Task SaveRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         if (!Repositories.Any())
         {
@@ -171,10 +176,10 @@ public class ViewMainPresenter : IViewMainPresenter
             return;
         }
 
-        await _repositoryAppService.WriteRepositoriesAsync(Repositories, View.JsonSavePath);
+        await _repositoryAppService.WriteRepositoriesAsync(Repositories, View.JsonSavePath, cancellationToken);
     }
 
-    public async Task<string> HuntRepositories()
+    public async Task<string> HuntRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         if (!CheckSelectRepositories())
             return string.Empty;
@@ -184,15 +189,15 @@ public class ViewMainPresenter : IViewMainPresenter
         View.SetProgressBar(0);
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
-            if (await _gitProvider.CloneRepository(item))
+            if (await _gitProvider.CloneRepositoryAsync(item, cancellationToken: cancellationToken))
             {
                 var language = GitConsts.LanguagesMap[item.Language];
                 var manager = _metricCalculatorManager.FindMetricCalculator(language);
-                var metric = await manager.CalculateMetricsAsync(item);
+                var metric = await manager.CalculateMetricsAsync(item, token: cancellationToken);
                 var dictList = metric.ToDictionaryListByTopics();
                 metrics.AddRange(dictList);
-                await _gitProvider.DeleteLocalRepository(item);
-                View.SetProgressBar((int) ((double) _repositories.IndexOf(item) / _repositories.Count * 100));
+                await _gitProvider.DeleteLocalRepositoryAsync(item, token: cancellationToken);
+                View.SetProgressBar((int)((double)_repositories.IndexOf(item) / _repositories.Count * 100));
             }
 
         stopwatch.Stop();
@@ -200,7 +205,7 @@ public class ViewMainPresenter : IViewMainPresenter
         return _csvHelper.MetricsToCsv(metrics);
     }
 
-    private async void LoadFromArgsAsync()
+    private async void LoadFromArgsAsync(CancellationToken cancellationToken = default)
     {
         var args = Environment.GetCommandLineArgs();
         if (args.Length > 1)
@@ -210,7 +215,7 @@ public class ViewMainPresenter : IViewMainPresenter
             var repositories = new List<Repository>();
             foreach (var file in files)
             {
-                var repository = await _repositoryAppService.ReadRepositoriesAsync(file);
+                var repository = await _repositoryAppService.ReadRepositoriesAsync(file, cancellationToken);
                 repositories.AddRange(repository);
             }
 

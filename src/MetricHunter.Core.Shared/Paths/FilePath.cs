@@ -45,7 +45,7 @@ public class FilePath : BasePath
 
     public static implicit operator FilePath(UnknownPath unknownPath)
     {
-        return new(unknownPath);
+        return new FilePath(unknownPath);
     }
 
     public static implicit operator string(FilePath pathBase)

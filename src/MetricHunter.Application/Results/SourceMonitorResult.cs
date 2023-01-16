@@ -24,7 +24,9 @@ public class SourceMonitorResult : IResult
     }
 
     public long Id { get; }
+
     public string FullName { get; }
+
     // public string Description { get; }
     public string Language { get; }
     public int Stars { get; }

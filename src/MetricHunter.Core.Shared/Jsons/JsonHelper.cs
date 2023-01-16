@@ -35,18 +35,21 @@ public static class JsonHelper
         ContractResolver = new PrivateSetterContractResolver()
     };
 
-    public static Task WriteJsonAsync<T>(T obj, FilePath path)
+    public static Task WriteJsonAsync<T>(T obj, FilePath path, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var json = JsonConvert.SerializeObject(obj);
         path.CreateDirectoryIfNotExists();
-        return File.WriteAllTextAsync(path, json);
+        return File.WriteAllTextAsync(path, json, cancellationToken);
     }
 
-    public static async Task<T?> ReadJsonAsync<T>(FilePath path) where T : class
+    public static async Task<T?> ReadJsonAsync<T>(FilePath path, CancellationToken cancellationToken = default)
+        where T : class
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T));
         if (!path.Exists) return default;
-        var json = await File.ReadAllTextAsync(path);
+        var json = await File.ReadAllTextAsync(path, cancellationToken);
         var jToken = JToken.Parse(json);
         if (isEnumerable)
         {
@@ -81,39 +84,44 @@ public static class JsonHelper
         }
     }
 
-    public static async Task AppendJson<T, TKey>(T obj, FilePath path, Func<T, TKey>? distinctBy)
+    public static async Task AppendJsonAsync<T, TKey>(T obj, FilePath path, Func<T, TKey>? distinctBy,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (!path.Exists)
         {
-            await WriteJsonAsync(obj, path);
+            await WriteJsonAsync(obj, path, cancellationToken);
             return;
         }
 
-        var result = await ReadJsonAsync<List<T>>(path);
+        var result = await ReadJsonAsync<List<T>>(path, cancellationToken);
         if (result != null)
         {
             result.Add(obj);
             if (distinctBy != null) result = result.DistinctBy(distinctBy).ToList();
-            await WriteJsonAsync(result, path);
+            await WriteJsonAsync(result, path, cancellationToken);
             return;
         }
 
-        await WriteJsonAsync(obj, path);
+        await WriteJsonAsync(obj, path, cancellationToken);
     }
 
-    public static Task AppendJson<T>(T obj, FilePath path)
+    public static Task AppendJsonAsync<T>(T obj, FilePath path, CancellationToken cancellationToken = default)
     {
-        return AppendJson<T, object>(obj, path, null);
+        cancellationToken.ThrowIfCancellationRequested();
+        return AppendJsonAsync<T, object>(obj, path, null, cancellationToken);
     }
 
-    public static async Task AppendRangeJsonAsync<T>(IEnumerable<T> obj, FilePath path)
+    public static async Task AppendRangeJsonAsync<T>(IEnumerable<T> obj, FilePath path,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (path.Exists)
         {
-            var result = await ReadJsonAsync<List<T>>(path);
+            var result = await ReadJsonAsync<List<T>>(path, cancellationToken);
             if (result != null) obj = obj.Concat(result);
         }
 
-        await WriteJsonAsync(obj, path);
+        await WriteJsonAsync(obj, path, cancellationToken);
     }
 }

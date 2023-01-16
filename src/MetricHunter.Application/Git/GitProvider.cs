@@ -20,13 +20,13 @@ public class GitProvider : IGitProvider, ISingletonDependency
         _logger = logger;
     }
 
-    public async Task<bool> CloneRepository(Repository repository, string cloneBaseDirectoryPath = "",
-        CancellationToken token = default)
+    public async Task<bool> CloneRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",
+        CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
         try
         {
-            if (token.IsCancellationRequested) return false;
+            cancellationToken.ThrowIfCancellationRequested();
 
             _logger.LogInformation($"Cloning {repository.FullName}...");
 
@@ -39,7 +39,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
             {
                 if (!(repositoryPath + GitConsts.RepositoryInfoFileExtension).Exists)
                 {
-                    await DeleteLocalRepository(repositoryPath, token);
+                    await DeleteLocalRepositoryAsync(repositoryPath, cancellationToken);
                 }
                 else
                 {
@@ -48,12 +48,12 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
                     var r = await _processManager.RunAsync(new ProcessStartInfo("git",
                         $"pull {repository.CloneUrl} --allow-unrelated-histories",
-                        repositoryPath));
+                        repositoryPath), cancellationToken);
                     if (r.ExitCode != 0)
                     {
                         _logger.LogWarning(
                             $"Repository {repository.FullName} is not a git repository. Deleting and cloning again...");
-                        await DeleteLocalRepository(repositoryPath, token);
+                        await DeleteLocalRepositoryAsync(repositoryPath, cancellationToken);
                     }
                     else
                     {
@@ -67,7 +67,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
             {
                 var result =
                     await _processManager.RunAsync(new ProcessStartInfo("git",
-                        $"clone -c core.longpaths=true {repository.CloneUrl}", path));
+                        $"clone -c core.longpaths=true {repository.CloneUrl}", path), cancellationToken);
                 if (result.ExitCode == 0)
                     _logger.LogInformation($"Cloned {repository.FullName} successfully.");
                 else
@@ -75,10 +75,10 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
                 if (result.ExitCode == 128)
                 {
-                    await Task.Delay(TimeSpan.FromSeconds(15), token);
+                    await Task.Delay(TimeSpan.FromSeconds(15), cancellationToken);
                     result =
                         await _processManager.RunAsync(new ProcessStartInfo("git",
-                            $"clone -c core.longpaths=true {repository.CloneUrl}", path));
+                            $"clone -c core.longpaths=true {repository.CloneUrl}", path), cancellationToken);
                     if (result.ExitCode == 0)
                         _logger.LogInformation($"Cloned {repository.FullName} successfully.");
                     else
@@ -116,17 +116,17 @@ public class GitProvider : IGitProvider, ISingletonDependency
     public event EventHandler<CloneRepositorySuccessEventArgs>? CloneRepositorySuccess;
 
 
-    public Task<bool> DeleteLocalRepository(Repository repository, string cloneBaseDirectoryPath = "",
+    public Task<bool> DeleteLocalRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",
         CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
         var repositoryPath =
             PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
 
-        return DeleteLocalRepository(repositoryPath, token);
+        return DeleteLocalRepositoryAsync(repositoryPath, token);
     }
 
-    public Task<bool> DeleteLocalRepository(string path, CancellationToken token = default)
+    public Task<bool> DeleteLocalRepositoryAsync(string path, CancellationToken token = default)
     {
         token.ThrowIfCancellationRequested();
 
@@ -173,6 +173,6 @@ public class GitProvider : IGitProvider, ISingletonDependency
     private async void AddRepositoryInfoFile(DirectoryPath repositoryPath, Repository repository)
     {
         FilePath repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension)!;
-        await JsonHelper.AppendJson(repository, repositoryInfoFilePath, r => r.Id);
+        await JsonHelper.AppendJsonAsync(repository, repositoryInfoFilePath, r => r.Id);
     }
 }

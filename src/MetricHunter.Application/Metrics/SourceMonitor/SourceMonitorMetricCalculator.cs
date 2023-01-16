@@ -2,6 +2,7 @@
 using System.Text.RegularExpressions;
 using System.Xml;
 using MetricHunter.Application.Git;
+using MetricHunter.Application.Metrics.SourceMonitor.SourceMonitorMetrics;
 using MetricHunter.Application.Resources;
 using MetricHunter.Application.Results;
 using MetricHunter.Core.DependencyProcesses;
@@ -26,11 +27,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
     private readonly ILogger<SourceMonitorMetricCalculator> _logger;
     private readonly IProcessManager _processManager;
-    private string _projectsPath;
-
-    private string _reportsPath;
     private readonly string _xmlTemplate;
 
+
+    private string? _projectsPath;
+
+    private string? _reportsPath;
 
     public SourceMonitorMetricCalculator(IProcessManager processManager,
         ILogger<SourceMonitorMetricCalculator> logger)
@@ -42,13 +44,14 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
 
     public async Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "",
-        string baseReportsDirectoryPath = "", CancellationToken token = default)
+        string baseReportsDirectoryPath = "", CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _reportsPath = string.IsNullOrEmpty(baseReportsDirectoryPath) ? PathHelper.TempPath : baseReportsDirectoryPath;
         _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath)
             ? PathHelper.TempPath
             : baseRepositoriesDirectoryPath;
-        await ProcessRepository(repository, token);
+        await ProcessRepositoryAsync(repository, cancellationToken);
         var reportsPath =
             PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
 
@@ -70,8 +73,9 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
     public Task<IResult[]> CalculateMetricsByLocalResultsAsync(List<Repository> repositories,
         string baseDirectoryPath = "",
-        CancellationToken token = default)
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrEmpty(baseDirectoryPath))
             baseDirectoryPath = PathHelper.TempPath;
         DirectoryPath path = baseDirectoryPath;
@@ -90,9 +94,9 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             xmlDocument.Load(filePath);
 
             return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
-        }, token));
+        }, cancellationToken));
 
-        return Task.WhenAll(tasks);
+        return Task.WhenAll(tasks).WaitAsync(cancellationToken);
     }
 
     private List<IMetric> GetMetrics(XmlNode xmlNode)
@@ -157,28 +161,29 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         xmlDocument.Save(reportsPath);
     }
 
-    private async Task ProcessRepository(Repository repository, CancellationToken token = default)
+    private async Task ProcessRepositoryAsync(Repository repository, CancellationToken cancellationToken = default)
     {
-        if (token.IsCancellationRequested)
-            return;
+        cancellationToken.ThrowIfCancellationRequested();
         var reportPath =
-            PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
+            PathHelper.BuildReportPath(_reportsPath!, repository.Language, repository.FullName, FileExtension);
         if (File.Exists(reportPath))
         {
             _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.FullName);
             return;
         }
 
-        await CalculateStatisticsUsingSourceMonitor(repository, reportPath.ParentDirectory);
+        await CalculateStatisticsUsingSourceMonitorAsync(repository, reportPath.ParentDirectory, cancellationToken);
     }
 
-    private async Task CalculateStatisticsUsingSourceMonitor(Repository repository, DirectoryPath workingDirectory)
+    private async Task CalculateStatisticsUsingSourceMonitorAsync(Repository repository, DirectoryPath workingDirectory,
+        CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.FullName);
-        var xmlPath = await CreateSourceMonitorXml(repository);
+        var xmlPath = await CreateSourceMonitorXmlAsync(repository, cancellationToken);
         var result =
             await _processManager.RunAsync(new ProcessStartInfo(Resource.SourceMonitor.SourceMonitorExe,
-                $"/C \"{xmlPath}\"", workingDirectory));
+                $"/C \"{xmlPath}\"", workingDirectory), cancellationToken);
         _logger.LogDebug("SourceMonitor log: {SourceMonitorLog}", result.Output);
         _logger.LogError("SourceMonitor error log: {SourceMonitorErrorLog}", result.Error);
         if (result.ExitCode == 0)
@@ -187,23 +192,24 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             _logger.LogError("Error while calculating statistics for {RepositoryName}", repository.FullName);
     }
 
-    private async Task<string> CreateSourceMonitorXml(Repository repository)
+    private async Task<string> CreateSourceMonitorXmlAsync(Repository repository, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var xmlDirectory =
             PathHelper.BuildDirectoryPath(_reportsPath, repository.Language, "SourceMonitor", repository.Owner.Login);
         xmlDirectory.CreateIfNotExists();
 
         var reportsPath = PathHelper
-            .BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension).ParentDirectory;
+            .BuildReportPath(_reportsPath!, repository.Language, repository.FullName, FileExtension).ParentDirectory;
 
         var projectDirectory =
-            PathHelper.BuildRepositoryDirectoryPath(_projectsPath, repository.Language, repository.FullName);
+            PathHelper.BuildRepositoryDirectoryPath(_projectsPath!, repository.Language, repository.FullName);
 
         var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
 
         if (File.Exists(xmlPath)) File.Delete(xmlPath);
 
-        await ContentErrorHandleRepository(projectDirectory, repository.Language);
+        await ContentErrorHandleRepositoryAsync(projectDirectory, repository.Language, cancellationToken);
 
         var xml = _xmlTemplate
             .Replace(ProjectNameReplacement, repository.Name)
@@ -211,12 +217,13 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)
             .Replace(ProjectLanguageReplacement, repository.Language)
             .Replace(ReportsPathReplacement, reportsPath);
-        await File.WriteAllTextAsync(xmlPath, xml);
+        await File.WriteAllTextAsync(xmlPath, xml, cancellationToken);
         return xmlPath;
     }
 
-    private async Task ContentErrorHandleRepository(string path, string lang)
+    private async Task ContentErrorHandleRepositoryAsync(string path, string lang, CancellationToken cancellationToken)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var language = GitConsts.LanguagesMap[lang];
 
         var handlerMethods = GetType().GetMethods().Where(m =>
@@ -229,7 +236,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             try
             {
                 if (typeof(Task).IsAssignableFrom(handlerMethod.ReturnType))
-                    await (handlerMethod.Invoke(this, new object[] { path }) as Task)!;
+                    await (handlerMethod.Invoke(this, new object[] { path, cancellationToken }) as Task)!;
                 else
                     handlerMethod.Invoke(this, new object[] { path });
             }
@@ -240,15 +247,16 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     }
 
     [Language(Language.CSharp)]
-    private async Task SwitchExpressionHandle(string path)
+    private async Task SwitchExpressionHandleAsync(string path, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var files = Directory.GetFiles(path, "*.cs", SearchOption.AllDirectories);
 
         foreach (var filePath in files)
             try
             {
                 var regex = new Regex(@"\bswitch\s*\{[^}]+\}");
-                var text = await File.ReadAllTextAsync(filePath);
+                var text = await File.ReadAllTextAsync(filePath, cancellationToken);
                 var matches = regex.Matches(text);
                 foreach (Match match in matches)
 
@@ -261,7 +269,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
                     text = text.Replace(matchLine, newValue);
                 }
 
-                await File.WriteAllTextAsync(filePath, text);
+                await File.WriteAllTextAsync(filePath, text, cancellationToken);
             }
             catch
             {

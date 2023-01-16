@@ -29,7 +29,7 @@ public class DirectoryPath : BasePath
 
     public static implicit operator DirectoryPath(UnknownPath unknownPath)
     {
-        return new(unknownPath);
+        return new DirectoryPath(unknownPath);
     }
 
     public static implicit operator string(DirectoryPath pathBase)

@@ -2,7 +2,7 @@
 
 public interface IProcessManager
 {
-    Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo);
+    Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo, CancellationToken cancellationToken = default);
 
-    void KillAllProcesses();
+    void KillAllProcesses(bool allowNewProcesses = false);
 }
