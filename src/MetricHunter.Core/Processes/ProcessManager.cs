@@ -1,5 +1,4 @@
-﻿using System.Collections.Immutable;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using Volo.Abp.DependencyInjection;
 
 namespace MetricHunter.Core.Processes;
@@ -10,8 +9,10 @@ public class ProcessManager : IProcessManager, ISingletonDependency
 
     private bool _killAllProcessesRequested;
 
-    public async Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo)
+    public async Task<ProcessResult> RunAsync(ProcessStartInfo processStartInfo,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (_killAllProcessesRequested)
             throw new InvalidOperationException(
                 "Cannot run a new process after KillAllProcessesAsync() has been called.");
@@ -35,15 +36,22 @@ public class ProcessManager : IProcessManager, ISingletonDependency
             processStartInfo.OutputDataReceived?.Invoke(args.Data);
         };
 
-        process.Start();
+        try
+        {
+            process.Start();
 
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
 
-        _processes.Add(process);
+            _processes.Add(process);
 
-        await process.WaitForExitAsync();
-        processStartInfo.Exited?.Invoke();
+            await process.WaitForExitAsync(cancellationToken);
+            processStartInfo.Exited?.Invoke();
+        }
+        catch (Exception e)
+        {
+            ProcessKill(process);
+        }
 
         return new ProcessResult
         {
@@ -53,18 +61,26 @@ public class ProcessManager : IProcessManager, ISingletonDependency
         };
     }
 
-    public void KillAllProcesses()
+    public void KillAllProcesses(bool allowNewProcesses = false)
     {
         _killAllProcessesRequested = true;
-        var processes = _processes.Where(process => !process.HasExited).ToImmutableArray();
+        var processes = _processes.ToList();
         foreach (var process in processes)
         {
-            process.Kill(true);
-            process.WaitForExit();
-            process.Close();
-            process.Dispose();
+            ProcessKill(process);
             _processes.Remove(process);
         }
+
+        _killAllProcessesRequested = !allowNewProcesses;
+    }
+
+    private void ProcessKill(Process process)
+    {
+        process.Kill(true);
+        process.WaitForExit();
+        process.Close();
+        process.Dispose();
+        _processes.Remove(process);
     }
 
     private static Process CreateProcess(ProcessStartInfo processStartInfo)

@@ -21,22 +21,26 @@ public interface IGitManager
     ///     Lists repository information from github by input
     /// </summary>
     /// <param name="input"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<GitOutput> GetRepositoriesAsync(GitInput input);
+    Task<GitOutput> GetRepositoriesAsync(GitInput input, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Returns the repository visibility
     /// </summary>
     /// <param name="repository"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<bool> IsRepositoryPublicAsync(Repository repository);
+    Task<bool> IsRepositoryPublicAsync(Repository repository, CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     Reruns failed requests
     /// </summary>
     /// <param name="failedRequests"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    Task<GitOutput> RetryFailedRequestAsync(List<SearchRepositoriesRequest> failedRequests);
+    Task<GitOutput> RetryFailedRequestAsync(List<SearchRepositoriesRequest> failedRequests,
+        CancellationToken cancellationToken = default);
 
     /// <summary>
     ///     This event is triggered when a request fails.

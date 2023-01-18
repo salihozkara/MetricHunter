@@ -1,4 +1,4 @@
-﻿namespace MetricHunter.Application.Metrics.SourceMonitor;
+﻿namespace MetricHunter.Application.Metrics.SourceMonitor.SourceMonitorMetrics;
 
 public class AverageBlockDepthMetric : ISourceMonitorMetric
 {

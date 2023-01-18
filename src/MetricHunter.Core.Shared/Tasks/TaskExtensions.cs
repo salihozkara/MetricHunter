@@ -1,6 +1,4 @@
-﻿using Nito.AsyncEx;
-
-namespace MetricHunter.Core.Tasks;
+﻿namespace MetricHunter.Core.Tasks;
 
 public static class TaskExtensions
 {

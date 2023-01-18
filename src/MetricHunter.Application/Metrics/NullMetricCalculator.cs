@@ -26,6 +26,6 @@ public class NullMetricCalculator : IMetricCalculator
     {
         _logger.LogInformation("No language statistics available for {RepositoryCount} repositories",
             repositories.Count);
-        return Task.FromResult(Array.Empty<IResult?>());
+        return Task.FromResult(Array.Empty<IResult>());
     }
 }

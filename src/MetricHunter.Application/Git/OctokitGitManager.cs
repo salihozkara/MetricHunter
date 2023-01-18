@@ -87,8 +87,9 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     ///     Lists repository information from github by input
     /// </summary>
     /// <param name="input"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<GitOutput> GetRepositoriesAsync(GitInput input)
+    public async Task<GitOutput> GetRepositoriesAsync(GitInput input, CancellationToken cancellationToken = default)
     {
         List<SearchRepositoriesRequest> failedRequests = new();
         List<Repository> repositories = new();
@@ -96,9 +97,10 @@ public class OctokitGitManager : IGitManager, ITransientDependency
 
         while (repositories.Count < input.Count)
         {
+            cancellationToken.ThrowIfCancellationRequested();
             var requests = GetPageNumbers(input.Count - repositories.Count).Select(p => CreateRequest(input, p, stars))
                 .ToList();
-            var results = await RunRequests(requests, failedRequests);
+            var results = await RunRequestsAsync(requests, failedRequests, cancellationToken);
             var items = ConvertToRepositories(results);
             repositories.AddRange(items);
             var count = repositories.Count;
@@ -123,15 +125,17 @@ public class OctokitGitManager : IGitManager, ITransientDependency
         return new GitOutput(repositories.Take(input.Count).ToList(), failedRequests);
     }
 
-    public async Task<bool> IsRepositoryPublicAsync(Repository repository)
+    public async Task<bool> IsRepositoryPublicAsync(Repository repository,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         var defaultDate = new DateTime(2000, 1, 1, 0, 0, 0, DateTimeKind.Utc);
         if (repository.CreatedAt < defaultDate || repository.UpdatedAt < defaultDate)
             return false;
         try
         {
             var client = new HttpClient();
-            var response = await client.GetAsync(repository.HtmlUrl);
+            var response = await client.GetAsync(repository.HtmlUrl, cancellationToken);
             return response.IsSuccessStatusCode;
         }
         catch (Exception e)
@@ -145,13 +149,16 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     ///     Reruns failed requests
     /// </summary>
     /// <param name="failedRequests"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    public async Task<GitOutput> RetryFailedRequestAsync(List<SearchRepositoriesRequest> failedRequests)
+    public async Task<GitOutput> RetryFailedRequestAsync(List<SearchRepositoriesRequest> failedRequests,
+        CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         _logger.LogWarning("Retrying failed requests");
         var requests = failedRequests.ToList();
         failedRequests.Clear();
-        var results = await RunRequests(requests, failedRequests);
+        var results = await RunRequestsAsync(requests, failedRequests, cancellationToken);
         _logger.LogWarning("Retrying finished");
         return new GitOutput(ConvertToRepositories(results), failedRequests);
     }
@@ -186,12 +193,14 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// </summary>
     /// <param name="requests"></param>
     /// <param name="failedRequests"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<SearchRepositoryResult?[]> RunRequests(IEnumerable<SearchRepositoriesRequest> requests,
-        List<SearchRepositoriesRequest> failedRequests)
+    private async Task<SearchRepositoryResult?[]> RunRequestsAsync(IEnumerable<SearchRepositoriesRequest> requests,
+        List<SearchRepositoriesRequest> failedRequests, CancellationToken cancellationToken = default)
     {
-        var tasks = requests.Select(r => RunRequest(r, failedRequests));
-        return await Task.WhenAll(tasks);
+        cancellationToken.ThrowIfCancellationRequested();
+        var tasks = requests.Select(r => RunRequestAsync(r, failedRequests, cancellationToken));
+        return await Task.WhenAll(tasks).WaitAsync(cancellationToken);
     }
 
     /// <summary>
@@ -199,24 +208,26 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// </summary>
     /// <param name="request"></param>
     /// <param name="failedRequests"></param>
+    /// <param name="cancellationToken"></param>
     /// <returns></returns>
-    private async Task<SearchRepositoryResult?> RunRequest(SearchRepositoriesRequest request,
-        List<SearchRepositoriesRequest> failedRequests)
+    private async Task<SearchRepositoryResult?> RunRequestAsync(SearchRepositoriesRequest request,
+        ICollection<SearchRepositoriesRequest> failedRequests, CancellationToken cancellationToken = default)
     {
+        cancellationToken.ThrowIfCancellationRequested();
         if (!failedRequests.Contains(request))
             failedRequests.Add(request);
         SearchRepositoryResult? result = null;
         try
         {
-            result = await Client.Search.SearchRepo(request);
+            result = await Client.Search.SearchRepo(request).WaitAsync(cancellationToken);
         }
         catch (RateLimitExceededException)
         {
-            await RateLimitWait();
+            await RateLimitWaitAsync(cancellationToken);
             try
             {
                 _logger.LogWarning("Retrying request");
-                result = await RunRequest(request, failedRequests);
+                result = await RunRequestAsync(request, failedRequests, cancellationToken);
             }
             catch (Exception exception)
             {
@@ -242,11 +253,12 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     /// <summary>
     ///     Waits for rate limit to reset or client handle to be available
     /// </summary>
-    private async Task RateLimitWait()
+    private async Task RateLimitWaitAsync(CancellationToken cancellationToken = default)
     {
         try
         {
-            var rateLimits = await Client.RateLimit.GetRateLimits();
+            cancellationToken.ThrowIfCancellationRequested();
+            var rateLimits = await Client.RateLimit.GetRateLimits().WaitAsync(cancellationToken);
             // wait rate limit
             if (rateLimits.Resources.Search.Remaining == 0)
             {
@@ -259,13 +271,13 @@ public class OctokitGitManager : IGitManager, ITransientDependency
                     if (waitTime.TotalSeconds > 0)
                     {
                         _logger.LogWarning("Rate limit exceeded, waiting {0} seconds", waitTime.TotalSeconds);
-                        await Task.Delay(waitTime);
+                        await Task.Delay(waitTime, cancellationToken);
                         _logger.LogWarning("Rate limit reset");
                     }
                 }
             }
         }
-        catch (Exception e)
+        catch (Exception e) when (e is not TaskCanceledException)
         {
             _logger.LogError(e, "Rate limit check failed");
             // wait 1 minute
@@ -274,13 +286,13 @@ public class OctokitGitManager : IGitManager, ITransientDependency
             if (args.ThrowException)
                 throw;
             if (args.Retry)
-                await RateLimitWait();
+                await RateLimitWaitAsync(cancellationToken);
             if (args.Handled)
                 return;
             if (args.DefaultExceptionHandling)
             {
                 _logger.LogWarning("Waiting 1 minute");
-                await Task.Delay(TimeSpan.FromMinutes(1));
+                await Task.Delay(TimeSpan.FromMinutes(1), cancellationToken);
                 _logger.LogWarning("Wait finished");
             }
         }
