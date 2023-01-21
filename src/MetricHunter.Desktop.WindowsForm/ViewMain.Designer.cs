@@ -431,7 +431,7 @@ partial class ViewMain
             this.operationGroupBox.TabStop = false;
             this.operationGroupBox.Text = "Operations";
             // 
-            // huntButton
+            // _huntButton
             // 
             this._huntButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this._huntButton.ImageKey = "knife.png";
@@ -483,7 +483,7 @@ partial class ViewMain
             this.panel1.Size = new System.Drawing.Size(1092, 19);
             this.panel1.TabIndex = 20;
             // 
-            // cancelButton
+            // _cancelButton
             // 
             this._cancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this._cancelButton.ImageKey = "close.png";
@@ -495,7 +495,7 @@ partial class ViewMain
             this._cancelButton.UseVisualStyleBackColor = true;
             this._cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
-            // _searchProgressBar
+            // _progressBar
             // 
             this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this._progressBar.Location = new System.Drawing.Point(0, -8);
@@ -512,6 +512,7 @@ partial class ViewMain
             this.Controls.Add(this.basePanel);
             this.Controls.Add(this.menu);
             this.ForeColor = System.Drawing.Color.Black;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu;
             this.MinimumSize = new System.Drawing.Size(897, 806);
             this.Name = "ViewMain";

@@ -1,23 +1,28 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Exe</OutputType>
+        <OutputType>WinExe</OutputType>
         <TargetFramework>net7.0-windows</TargetFramework>
         <RootNamespace>MetricHunter.Desktop</RootNamespace>
         <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
         <ImplicitUsings>enable</ImplicitUsings>
+        <ApplicationIcon>MetricHunter.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MetricHunter.Application\MetricHunter.Application.csproj"/>
-        <ProjectReference Include="..\MetricHunter.Desktop.Shared\MetricHunter.Desktop.Shared.csproj"/>
+        <ProjectReference Include="..\MetricHunter.Application\MetricHunter.Application.csproj" />
+        <ProjectReference Include="..\MetricHunter.Desktop.Shared\MetricHunter.Desktop.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
         <Content Include="Res\**\*.*">
             <CopyToOutputDirectory>Always</CopyToOutputDirectory>
         </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Include="MetricHunter.ico" />
     </ItemGroup>
 
     <ItemGroup>
