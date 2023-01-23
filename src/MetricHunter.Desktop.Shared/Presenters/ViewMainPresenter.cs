@@ -1,9 +1,9 @@
 using System.Diagnostics;
+using AdvancedPath;
 using MetricHunter.Application.Csv;
 using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
-using MetricHunter.Core.Strings;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -94,6 +94,7 @@ public class ViewMainPresenter : IViewMainPresenter
         var stopwatch = new Stopwatch();
         stopwatch.Start();
         await _gitManager.GetRepositoriesAsync(gitInput, cancellationToken);
+        View.SetProgressBar(100);
         stopwatch.Stop();
         View.ShowRepositories(Repositories);
 
@@ -117,7 +118,8 @@ public class ViewMainPresenter : IViewMainPresenter
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
             var metric = await manager.CalculateMetricsAsync(item,
-                View.CalculateMetricsRepositoryPath.ToFilePath().Directory, View.CalculateMetricsByLocalResultsPath,
+                View.CalculateMetricsRepositoryPath.ToFilePathString().ParentDirectory,
+                View.CalculateMetricsByLocalResultsPath,
                 cancellationToken);
             if (metric.IsEmpty())
                 continue;
@@ -126,6 +128,7 @@ public class ViewMainPresenter : IViewMainPresenter
             View.SetProgressBar((int)((double)metrics.Count / repositoryList.Length * 100));
         }
 
+        View.SetProgressBar(100);
         stopwatch.Stop();
         _logger.LogInformation($"Metrics calculated in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
@@ -147,6 +150,7 @@ public class ViewMainPresenter : IViewMainPresenter
             View.SetProgressBar((int)((double)++i / count * 100));
         }
 
+        View.SetProgressBar(100);
         stopwatch.Stop();
         _logger.LogInformation($"Repositories downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
     }
@@ -200,6 +204,7 @@ public class ViewMainPresenter : IViewMainPresenter
                 View.SetProgressBar((int)((double)_repositories.IndexOf(item) / _repositories.Count * 100));
             }
 
+        View.SetProgressBar(100);
         stopwatch.Stop();
         _logger.LogInformation($"Repositories hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);

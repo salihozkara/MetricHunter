@@ -1,6 +1,7 @@
 ﻿using System.Reflection;
 using System.Text.RegularExpressions;
 using System.Xml;
+using AdvancedPath;
 using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics.SourceMonitor.SourceMonitorMetrics;
 using MetricHunter.Application.Resources;
@@ -78,12 +79,13 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         cancellationToken.ThrowIfCancellationRequested();
         if (string.IsNullOrEmpty(baseDirectoryPath))
             baseDirectoryPath = PathHelper.TempPath;
-        DirectoryPath path = baseDirectoryPath;
-        var files = path.DirectoryInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories);
+        DirectoryPathString path = baseDirectoryPath;
+
+        var files = new DirectoryInfo(path).GetFiles($"*.{FileExtension}", SearchOption.AllDirectories);
         var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
         {
             var fileName = $"id_{repository.Id}_{repository.Name}.xml";
-            FilePath filePath = files.FirstOrDefault(file => file.Name == fileName)!;
+            FilePathString filePath = files.FirstOrDefault(file => file.Name == fileName)!;
             if (filePath.Exists)
             {
                 _logger.LogError($"SourceMonitor reports file not found for {repository.FullName}");
@@ -140,12 +142,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         return metric?.Value ?? "0";
     }
 
-    private static void FileNameChange(Repository repository, FilePath reportsPath)
+    private static void FileNameChange(Repository repository, FilePathString reportsPath)
     {
         // file name change
         var fileInfo = new FileInfo(reportsPath);
         var newFileName = $"id_{repository.Id}_{fileInfo.Name}";
-        var newFilePath = reportsPath.ParentDirectory / newFileName;
+        var newFilePath = reportsPath.ParentDirectory + newFileName;
         if (File.Exists(newFilePath))
             File.Delete(newFilePath);
         fileInfo.MoveTo(newFilePath);
@@ -175,7 +177,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         await CalculateStatisticsUsingSourceMonitorAsync(repository, reportPath.ParentDirectory, cancellationToken);
     }
 
-    private async Task CalculateStatisticsUsingSourceMonitorAsync(Repository repository, DirectoryPath workingDirectory,
+    private async Task CalculateStatisticsUsingSourceMonitorAsync(Repository repository,
+        DirectoryPathString workingDirectory,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

@@ -1,10 +1,9 @@
-﻿using MetricHunter.Core.Paths;
-using MetricHunter.Core.Strings;
+﻿using AdvancedPath;
 
 namespace MetricHunter.Desktop.DesktopLogs;
 
 public class DesktopLogsConsts
 {
-    public static readonly FilePath LogFilePath =
-        AppDomain.CurrentDomain.BaseDirectory + "Logs\\MetricHunter.log".ToFilePath();
+    public static readonly FilePathString LogFilePath =
+        AppDomain.CurrentDomain.BaseDirectory + "Logs\\MetricHunter.log".ToFilePathString();
 }

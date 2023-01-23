@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Globalization;
+using AdvancedPath;
 using JsonNet.ContractResolvers;
-using MetricHunter.Core.Paths;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
@@ -35,15 +35,15 @@ public static class JsonHelper
         ContractResolver = new PrivateSetterContractResolver()
     };
 
-    public static Task WriteJsonAsync<T>(T obj, FilePath path, CancellationToken cancellationToken = default)
+    public static Task WriteJsonAsync<T>(T obj, FilePathString path, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var json = JsonConvert.SerializeObject(obj);
-        path.CreateDirectoryIfNotExists();
+        path.ParentDirectory.CreateIfNotExists();
         return File.WriteAllTextAsync(path, json, cancellationToken);
     }
 
-    public static async Task<T?> ReadJsonAsync<T>(FilePath path, CancellationToken cancellationToken = default)
+    public static async Task<T?> ReadJsonAsync<T>(FilePathString path, CancellationToken cancellationToken = default)
         where T : class
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -84,7 +84,7 @@ public static class JsonHelper
         }
     }
 
-    public static async Task AppendJsonAsync<T, TKey>(T obj, FilePath path, Func<T, TKey>? distinctBy,
+    public static async Task AppendJsonAsync<T, TKey>(T obj, FilePathString path, Func<T, TKey>? distinctBy,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
@@ -106,13 +106,13 @@ public static class JsonHelper
         await WriteJsonAsync(obj, path, cancellationToken);
     }
 
-    public static Task AppendJsonAsync<T>(T obj, FilePath path, CancellationToken cancellationToken = default)
+    public static Task AppendJsonAsync<T>(T obj, FilePathString path, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         return AppendJsonAsync<T, object>(obj, path, null, cancellationToken);
     }
 
-    public static async Task AppendRangeJsonAsync<T>(IEnumerable<T> obj, FilePath path,
+    public static async Task AppendRangeJsonAsync<T>(IEnumerable<T> obj, FilePathString path,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
