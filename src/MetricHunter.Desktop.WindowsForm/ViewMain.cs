@@ -381,7 +381,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void openLogsStripMenuItem_Click(object sender, EventArgs e)
     {
-        var ps = new ProcessStartInfo(DesktopLogsConsts.LogFilePath.Directory)
+        var ps = new ProcessStartInfo(DesktopLogsConsts.LogFilePath.ParentDirectory)
         {
             UseShellExecute = true,
             Verb = "open"

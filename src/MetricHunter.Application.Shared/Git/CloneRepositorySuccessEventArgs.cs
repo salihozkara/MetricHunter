@@ -1,11 +1,11 @@
-﻿using MetricHunter.Core.Paths;
+﻿using AdvancedPath;
 using Octokit;
 
 namespace MetricHunter.Application.Git;
 
 public class CloneRepositorySuccessEventArgs
 {
-    public CloneRepositorySuccessEventArgs(Repository repository, DirectoryPath localPath)
+    public CloneRepositorySuccessEventArgs(Repository repository, DirectoryPathString localPath)
     {
         Repository = repository;
         LocalPath = localPath;
@@ -13,5 +13,5 @@ public class CloneRepositorySuccessEventArgs
 
     public Repository Repository { get; set; }
 
-    public DirectoryPath LocalPath { get; set; }
+    public DirectoryPathString LocalPath { get; set; }
 }

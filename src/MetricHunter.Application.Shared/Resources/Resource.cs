@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
+using AdvancedPath;
 using MetricHunter.Core;
-using MetricHunter.Core.Paths;
 
 namespace MetricHunter.Application.Resources;
 
 // TODO: Refactor
 public static class Resource
 {
-    private static readonly DirectoryPath ResFolder = "Res";
+    private static readonly DirectoryPathString ResFolder = "Res";
 
-    private static readonly DirectoryPath DynamicResFolder = AppDomain.CurrentDomain.BaseDirectory + ResFolder;
+    private static readonly DirectoryPathString DynamicResFolder =
+        (AppDomain.CurrentDomain.BaseDirectory + ResFolder).ToDirectoryPathString();
 
     private static string GetOrCreateResFolder()
     {
@@ -34,8 +35,8 @@ public static class Resource
 
     public static class SourceMonitor
     {
-        public static readonly FilePath TemplateXml = $"{DynamicResFolder}/SourceMonitor/template.xml";
+        public static readonly FilePathString TemplateXml = $"{DynamicResFolder}/SourceMonitor/template.xml";
 
-        public static FilePath SourceMonitorExe => $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe";
+        public static FilePathString SourceMonitorExe => $"{DynamicResFolder}/SourceMonitor/SourceMonitor.exe";
     }
 }
