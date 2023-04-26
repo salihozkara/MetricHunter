@@ -1,4 +1,4 @@
-﻿using Octokit;
+﻿using MetricHunter.Core.Languages;
 
 namespace MetricHunter.Application.Metrics;
 

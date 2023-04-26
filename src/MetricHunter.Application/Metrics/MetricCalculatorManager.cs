@@ -1,7 +1,7 @@
 ﻿using System.Reflection;
+using MetricHunter.Core.Languages;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Octokit;
 using Volo.Abp.DependencyInjection;
 
 namespace MetricHunter.Application.Metrics;
