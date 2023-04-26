@@ -8,7 +8,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="AdvancedPath" Version="1.0.0"/>
+        <PackageReference Include="AdvancedPath" Version="1.0.1"/>
         <PackageReference Include="JsonNet.ContractResolvers" Version="2.0.0"/>
         <PackageReference Include="Newtonsoft.Json" Version="13.0.2"/>
         <PackageReference Include="Serilog" Version="2.12.0"/>
