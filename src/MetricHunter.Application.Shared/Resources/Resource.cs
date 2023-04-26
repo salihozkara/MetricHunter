@@ -4,7 +4,6 @@ using MetricHunter.Core;
 
 namespace MetricHunter.Application.Resources;
 
-// TODO: Refactor
 public static class Resource
 {
     private static readonly DirectoryPathString ResFolder = "Res";

@@ -81,7 +81,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             baseDirectoryPath = PathHelper.TempPath;
         DirectoryPathString path = baseDirectoryPath;
 
-        var files = new DirectoryInfo(path).GetFiles($"*.{FileExtension}", SearchOption.AllDirectories);
+        var files = path.FileSystemInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories);
         var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
         {
             var fileName = $"id_{repository.Id}_{repository.Name}.xml";
