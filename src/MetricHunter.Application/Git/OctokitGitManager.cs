@@ -41,6 +41,43 @@ public class OctokitGitManager : IGitManager, ITransientDependency
     ///     This event is triggered when there is an unknown error in a request.
     /// </summary>
     public event EventHandler<ExceptionEventArgs>? OnException;
+    
+    private (string owner, string name) GetOwnerAndName(string repositoryFullNameOrUrl)
+    {
+        if (Uri.TryCreate(repositoryFullNameOrUrl, UriKind.Absolute, out var uriResult) && (uriResult.Scheme == Uri.UriSchemeHttp || uriResult.Scheme == Uri.UriSchemeHttps))
+        {
+            var split = uriResult.AbsolutePath.Split('/');
+            var owner = split[1];
+            var name = split[2];
+            return (owner, name);
+        }
+        else
+        {
+            var split = repositoryFullNameOrUrl.Split('/');
+            var owner = split[0];
+            var name = split[1];
+            return (owner, name);
+        }
+    }
+
+    public Task<Repository> GetRepositoryAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default)
+    {
+        
+        var (owner, name) = GetOwnerAndName(repositoryFullNameOrUrl);
+        return Client.Repository.Get(owner, name);
+    }
+    
+    public Task<IReadOnlyList<Branch>> GetBranchesAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default)
+    {
+        var (owner, name) = GetOwnerAndName(repositoryFullNameOrUrl);
+        return Client.Repository.Branch.GetAll(owner, name).WaitAsync(cancellationToken);
+    }
+
+    public Task<IReadOnlyList<Release>> GetReleasesAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default)
+    {
+        var (owner, name) = GetOwnerAndName(repositoryFullNameOrUrl);
+        return Client.Repository.Release.GetAll(owner, name);
+    }
 
     /// <summary>
     ///     User login

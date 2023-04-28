@@ -13,7 +13,7 @@ public class NullMetricCalculator : IMetricCalculator
         _logger = logger;
     }
 
-    public Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "",
+    public Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "", string branchName = "",
         string baseReportsDirectoryPath = "", CancellationToken token = default)
     {
         _logger.LogInformation("No language statistics available for {Repository}", repository.Name);

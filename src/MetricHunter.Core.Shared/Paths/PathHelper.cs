@@ -20,18 +20,16 @@ public static class PathHelper
         return BuildPath(paths).ToDirectoryPathString();
     }
 
-    public static FilePathString BuildReportPath(string reportPath, string language, string fullName,
-        string extension)
+    public static FilePathString BuildReportPath(string reportPath, string language, string fullName,string branchName, string extension)
     {
-        var fileName = $"{fullName}.{extension}";
+        var fileName = $"{fullName}-{branchName}.{extension}";
         var path = BuildPath(reportPath, language, ReportsPrefix, fileName);
         return path.ToFilePathString();
     }
 
-    public static DirectoryPathString BuildRepositoryDirectoryPath(string repositoryPath, string language,
-        string fullname)
+    public static DirectoryPathString BuildRepositoryDirectoryPath(string repositoryPath, string language, string fullname, string branchName = "")
     {
-        var path = BuildPath(repositoryPath, language, RepositoriesPrefix, fullname);
+        var path = BuildPath(repositoryPath, language, RepositoriesPrefix, fullname, branchName);
         return path.ToDirectoryPathString();
     }
 }

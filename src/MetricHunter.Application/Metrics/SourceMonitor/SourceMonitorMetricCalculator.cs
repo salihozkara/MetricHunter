@@ -44,17 +44,18 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     }
 
 
-    public async Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "",
+    public async Task<IResult> CalculateMetricsAsync(Repository repository, string branchName = "", string baseRepositoriesDirectoryPath = "",
         string baseReportsDirectoryPath = "", CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        if (string.IsNullOrWhiteSpace(branchName)) branchName = repository.DefaultBranch;
         _reportsPath = string.IsNullOrEmpty(baseReportsDirectoryPath) ? PathHelper.TempPath : baseReportsDirectoryPath;
         _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath)
             ? PathHelper.TempPath
             : baseRepositoriesDirectoryPath;
-        await ProcessRepositoryAsync(repository, cancellationToken);
+        await ProcessRepositoryAsync(repository, branchName, cancellationToken);
         var reportsPath =
-            PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, FileExtension);
+            PathHelper.BuildReportPath(_reportsPath, repository.Language, repository.FullName, branchName.Replace('/', '-'), FileExtension);
 
         if (!File.Exists(reportsPath))
         {
@@ -163,27 +164,28 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         xmlDocument.Save(reportsPath);
     }
 
-    private async Task ProcessRepositoryAsync(Repository repository, CancellationToken cancellationToken = default)
+    private async Task ProcessRepositoryAsync(Repository repository, string branchName, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var reportPath =
-            PathHelper.BuildReportPath(_reportsPath!, repository.Language, repository.FullName, FileExtension);
+            PathHelper.BuildReportPath(_reportsPath!, repository.Language, repository.FullName, branchName.Replace('/', '-'),FileExtension);
         if (File.Exists(reportPath))
         {
             _logger.LogInformation("Reports already exist for {RepositoryName}. Skipping...", repository.FullName);
             return;
         }
 
-        await CalculateStatisticsUsingSourceMonitorAsync(repository, reportPath.ParentDirectory, cancellationToken);
+        await CalculateStatisticsUsingSourceMonitorAsync(repository, branchName, reportPath.ParentDirectory, cancellationToken);
     }
 
-    private async Task CalculateStatisticsUsingSourceMonitorAsync(Repository repository,
+    private async Task CalculateStatisticsUsingSourceMonitorAsync(Repository repository, string branchName,
         DirectoryPathString workingDirectory,
         CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         _logger.LogInformation("Calculating statistics for {RepositoryName}", repository.FullName);
-        var xmlPath = await CreateSourceMonitorXmlAsync(repository, cancellationToken);
+        var xmlPath = await CreateSourceMonitorXmlAsync(repository, branchName, cancellationToken);
+        workingDirectory = xmlPath.ToFilePathString().ParentDirectory;
         var result =
             await _processManager.RunAsync(new ProcessStartInfo(Resource.SourceMonitor.SourceMonitorExe,
                 $"/C \"{xmlPath}\"", workingDirectory), cancellationToken);
@@ -195,7 +197,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             _logger.LogError("Error while calculating statistics for {RepositoryName}", repository.FullName);
     }
 
-    private async Task<string> CreateSourceMonitorXmlAsync(Repository repository, CancellationToken cancellationToken)
+    private async Task<string> CreateSourceMonitorXmlAsync(Repository repository, string branchName, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var xmlDirectory =
@@ -203,23 +205,25 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         xmlDirectory.CreateIfNotExists();
 
         var reportsPath = PathHelper
-            .BuildReportPath(_reportsPath!, repository.Language, repository.FullName, FileExtension).ParentDirectory;
+            .BuildReportPath(_reportsPath!, repository.Language, repository.FullName, branchName.Replace('/', '-'),FileExtension).ParentDirectory;
 
         var projectDirectory =
-            PathHelper.BuildRepositoryDirectoryPath(_projectsPath!, repository.Language, repository.FullName);
+            PathHelper.BuildRepositoryDirectoryPath(_projectsPath!, repository.Language, repository.FullName, branchName);
 
-        var xmlPath = Path.Combine(xmlDirectory, $"{repository.Name}.xml");
+        var projectName = $"{repository.Name}-{branchName.Replace('/', '-')}";
+        var xmlPath = xmlDirectory + $"{projectName}.xml".ToFilePathString();
 
-        if (File.Exists(xmlPath)) File.Delete(xmlPath);
+        xmlPath.DeleteIfExists();
 
         await ContentErrorHandleRepositoryAsync(projectDirectory, repository.Language, cancellationToken);
 
         var xml = _xmlTemplate
-            .Replace(ProjectNameReplacement, repository.Name)
+            .Replace(ProjectNameReplacement, projectName)
             .Replace(ProjectDirectoryReplacement, projectDirectory)
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)
             .Replace(ProjectLanguageReplacement, repository.Language)
             .Replace(ReportsPathReplacement, reportsPath);
+
         await File.WriteAllTextAsync(xmlPath, xml, cancellationToken);
         return xmlPath;
     }
@@ -229,7 +233,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         cancellationToken.ThrowIfCancellationRequested();
         var language = GitConsts.LanguagesMap[lang];
 
-        var handlerMethods = GetType().GetMethods().Where(m =>
+        var handlerMethods = GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.DeclaredOnly).Where(m =>
         {
             var attribute = m.GetCustomAttribute<LanguageAttribute>();
             return attribute != null && attribute.Languages.Contains(language);

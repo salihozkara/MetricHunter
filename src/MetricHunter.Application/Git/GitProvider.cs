@@ -1,4 +1,5 @@
-﻿using AdvancedPath;
+﻿using System.Text;
+using AdvancedPath;
 using MetricHunter.Core.DependencyProcesses;
 using MetricHunter.Core.Jsons;
 using MetricHunter.Core.Paths;
@@ -9,6 +10,7 @@ using Volo.Abp.DependencyInjection;
 
 namespace MetricHunter.Application.Git;
 
+// TODO: Refactor this class
 [ProcessDependency<GitProcessDependency>]
 public class GitProvider : IGitProvider, ISingletonDependency
 {
@@ -20,55 +22,53 @@ public class GitProvider : IGitProvider, ISingletonDependency
         _processManager = processManager;
         _logger = logger;
     }
-
-    public async Task<bool> CloneRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",
-        CancellationToken cancellationToken = default)
+    
+    public async Task<bool> CloneRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",string branchName = "", CancellationToken cancellationToken = default)
     {
+        var @return = false;
+        Exception? exception = null;
+        DirectoryPathString repositoryPath = string.Empty;
         if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
+        if(string.IsNullOrWhiteSpace(branchName)) branchName = repository.DefaultBranch;
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            _logger.LogInformation($"Cloning {repository.FullName}...");
+            _logger.LogInformation($"Cloning {repository.FullName} branch {branchName}...");
 
-            var repositoryPath =
-                PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language,
-                    repository.FullName);
+            repositoryPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName, branchName);
+            
+            var defaultBranchPath = PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName, repository.DefaultBranch);
 
             var path = repositoryPath.ParentDirectory;
             if (repositoryPath.Exists)
             {
-                if (!(repositoryPath + GitConsts.RepositoryInfoFileExtension).Exists)
+                if (await LocalRepositoryCheck(repository, branchName, repositoryPath, cancellationToken)) return true;
+                await DeleteLocalRepositoryAsync(repositoryPath, cancellationToken);
+            }
+            if (defaultBranchPath.Exists)
+            {
+                if (await LocalRepositoryCheck(repository, repository.DefaultBranch, defaultBranchPath, cancellationToken))
                 {
-                    await DeleteLocalRepositoryAsync(repositoryPath, cancellationToken);
+                    @return = await CreateNewLocalRepositoryWithBranchName(repository, branchName, path, defaultBranchPath, repositoryPath);
+                    return @return;
                 }
-                else
-                {
-                    _logger.LogInformation($"Repository {repository.FullName} already exists.");
-                    _logger.LogInformation($"Updating {repository.FullName}...");
 
-                    var r = await _processManager.RunAsync(new ProcessStartInfo("git",
-                        $"pull {repository.CloneUrl} --allow-unrelated-histories",
-                        repositoryPath), cancellationToken);
-                    if (r.ExitCode != 0)
-                    {
-                        _logger.LogWarning(
-                            $"Repository {repository.FullName} is not a git repository. Deleting and cloning again...");
-                        await DeleteLocalRepositoryAsync(repositoryPath, cancellationToken);
-                    }
-                    else
-                    {
-                        _logger.LogInformation($"Repository {repository.FullName} updated.");
-                        return true;
-                    }
-                }
+                await DeleteLocalRepositoryAsync(defaultBranchPath, cancellationToken);
             }
 
             try
             {
+                var args = new StringBuilder();
+                args.Append($"clone -c core.longpaths=true {repository.CloneUrl}");
+                
+                args.Append($" {repository.DefaultBranch} -b {repository.DefaultBranch}");
+                
+                var argsString = args.ToString();
+                
                 var result =
                     await _processManager.RunAsync(new ProcessStartInfo("git",
-                        $"clone -c core.longpaths=true {repository.CloneUrl}", path), cancellationToken);
+                        argsString, path), cancellationToken);
                 if (result.ExitCode == 0)
                     _logger.LogInformation($"Cloned {repository.FullName} successfully.");
                 else
@@ -79,7 +79,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
                     await Task.Delay(TimeSpan.FromSeconds(15), cancellationToken);
                     result =
                         await _processManager.RunAsync(new ProcessStartInfo("git",
-                            $"clone -c core.longpaths=true {repository.CloneUrl}", path), cancellationToken);
+                            argsString, path), cancellationToken);
                     if (result.ExitCode == 0)
                         _logger.LogInformation($"Cloned {repository.FullName} successfully.");
                     else
@@ -88,41 +88,184 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
                 if (result.ExitCode == 0)
                 {
-                    AddRepositoryInfoFile(cloneBaseDirectoryPath, repository);
-                    OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
+                    AddRepositoryInfoFile(defaultBranchPath, repository, repository.DefaultBranch);
+                    @return = await CreateNewLocalRepositoryWithBranchName(repository, branchName, path, defaultBranchPath, repositoryPath);
+                    return @return;
                 }
 
-                else
-                {
-                    OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, null));
-                }
-
-                return result.ExitCode == 0;
+                @return = false;
+                return @return;
             }
             catch (Exception e)
             {
                 _logger.LogError(e, $"Failed to clone {repository.FullName}");
-                OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, e));
-                return false;
+                exception = e;
+                @return = false;
+                return @return;
             }
         }
         catch (Exception e)
         {
-            OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, e));
+            _logger.LogError(e, $"Failed to clone {repository.FullName}");
+            exception = e;
+            @return = false;
+            return @return;
+        }
+        finally
+        {
+            if (@return)
+            {
+                OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
+            }
+            else
+            {
+                OnCloneRepositoryError(new CloneRepositoryErrorEventArgs(repository, exception));
+            }
+        }
+    }
+
+    private async Task<bool> CreateNewLocalRepositoryWithBranchName(Repository repository, string branchName, DirectoryPathString path,
+        DirectoryPathString defaultBranchPath, DirectoryPathString repositoryPath)
+    {
+        if (branchName != repository.DefaultBranch)
+        {
+            await CloneRepositoryOtherBranchAsync(defaultBranchPath, repositoryPath);
+            if(!await ChangeBranchAsync(repositoryPath, branchName)) return false;
+            AddRepositoryInfoFile(path, repository, branchName);
+        }
+
+        OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
+        return true;
+    }
+
+    private async Task<bool> LocalRepositoryCheck(Repository repository, string branchName,
+        DirectoryPathString repositoryPath, CancellationToken cancellationToken)
+    {
+        if (!(repositoryPath + GitConsts.RepositoryInfoFileExtension).Exists)
+        {
             return false;
         }
+
+        _logger.LogInformation($"Repository {repository.FullName} branch {branchName} exists. Updating...");
+
+        var args = new StringBuilder();
+        args.Append($"pull origin {branchName}");
+
+        var r = await _processManager.RunAsync(new ProcessStartInfo("git",
+            args.ToString(),
+            repositoryPath), cancellationToken);
+
+        if (r.ExitCode != 0)
+        {
+            _logger.LogWarning(
+                $"Repository {repository.FullName} branch {branchName} update failed, exit code: {r.ExitCode}");
+            return false;
+        }
+
+        _logger.LogInformation($"Repository {repository.FullName} branch {branchName} updated successfully.");
+        return true;
     }
 
     public event EventHandler<CloneRepositoryErrorEventArgs>? CloneRepositoryError;
     public event EventHandler<CloneRepositorySuccessEventArgs>? CloneRepositorySuccess;
 
+    private async Task CloneRepositoryOtherBranchAsync(DirectoryPathString path, DirectoryPathString repositoryPath)
+    {
+        await FolderCopyAsync(path, repositoryPath);
+    }
+    
+    private async Task<bool> ChangeBranchAsync(DirectoryPathString path, string branchName)
+    {
+        // git reset --hard
+        var resetResult = await _processManager.RunAsync(new ProcessStartInfo("git",
+            $"reset --hard", path), CancellationToken.None);
 
-    public Task<bool> DeleteLocalRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",
-        CancellationToken token = default)
+        if (resetResult.ExitCode == 0)
+        {
+            _logger.LogInformation($"Reset repository successfully.");
+        }
+        
+        // git clean -fxd
+        var cleanResult = await _processManager.RunAsync(new ProcessStartInfo("git",
+            $"clean -fxd", path), CancellationToken.None);
+        
+        if (cleanResult.ExitCode == 0)
+        {
+            _logger.LogInformation($"Clean repository successfully.");
+        }
+        
+        // git checkout {branchName}
+        var result = await _processManager.RunAsync(new ProcessStartInfo("git",
+            $"checkout {branchName}", path), CancellationToken.None);
+        if (result.ExitCode == 0)
+            _logger.LogInformation($"Changed branch to {branchName} successfully.");
+        else
+            _logger.LogError($"Failed to change branch to {branchName}, exit code: {result.ExitCode}");
+        
+        return result.ExitCode == 0;
+    }
+    
+    private Task FolderCopyAsync(string source, string destination)
+    {
+        return Task.Run(async () =>
+        {
+            var sourceDirectory = new DirectoryInfo(source);
+            var destinationDirectory = new DirectoryInfo(destination);
+            var taskList = new List<Task>();
+            if (!sourceDirectory.Exists)
+            {
+                throw new DirectoryNotFoundException($"Source directory {source} does not exist.");
+            }
+
+            if (!destinationDirectory.Exists)
+            {
+                destinationDirectory.Create();
+            }
+
+            foreach (var file in sourceDirectory.GetFiles())
+            {
+                taskList.Add(FileCopyAsync(file.FullName, Path.Combine(destinationDirectory.FullName, file.Name)));
+            }
+            
+            await Task.WhenAll(taskList);
+            
+            taskList.Clear();
+
+            foreach (var directory in sourceDirectory.GetDirectories())
+            {
+                taskList.Add(FolderCopyAsync(directory.FullName, Path.Combine(destinationDirectory.FullName, directory.Name)));
+            }
+            
+            await Task.WhenAll(taskList);
+        });
+    }
+    
+    private static Task FileCopyAsync(string source, string destination)
+    {
+        return Task.Run(() =>
+        {
+            var sourceFile = new FileInfo(source);
+            var destinationFile = new FileInfo(destination);
+            if (!sourceFile.Exists)
+            {
+                throw new FileNotFoundException($"Source file {source} does not exist.");
+            }
+
+            if (destinationFile.Directory?.Exists == false)
+            {
+                destinationFile.Directory.Create();
+            }
+
+            File.Copy(source, destination, true);
+        });
+    }
+
+
+    public Task<bool> DeleteLocalRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",string branchName = "", CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
         var repositoryPath =
-            PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName);
+            PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName, branchName);
 
         return DeleteLocalRepositoryAsync(repositoryPath, token);
     }
@@ -171,9 +314,9 @@ public class GitProvider : IGitProvider, ISingletonDependency
         CloneRepositorySuccess?.Invoke(this, e);
     }
 
-    private async void AddRepositoryInfoFile(DirectoryPathString repositoryPath, Repository repository)
+    private static async void AddRepositoryInfoFile(PathString repositoryPath, Repository repository, string branchName)
     {
         var repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
-        await JsonHelper.AppendJsonAsync(repository, repositoryInfoFilePath, r => r.Id);
+        await JsonHelper.AppendJsonAsync(new {repository, branchName}, repositoryInfoFilePath, r => new {r.repository.Id,r.branchName});
     }
 }

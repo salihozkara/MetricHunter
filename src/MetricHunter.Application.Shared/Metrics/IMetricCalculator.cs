@@ -6,7 +6,7 @@ namespace MetricHunter.Application.Metrics;
 
 public interface IMetricCalculator : ISingletonDependency
 {
-    Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "",
+    Task<IResult> CalculateMetricsAsync(Repository repository, string branchName = "", string baseRepositoriesDirectoryPath = "",
         string baseReportsDirectoryPath = "", CancellationToken token = default);
 
     Task<IResult[]> CalculateMetricsByLocalResultsAsync(List<Repository> repositories, string baseDirectoryPath = "",
