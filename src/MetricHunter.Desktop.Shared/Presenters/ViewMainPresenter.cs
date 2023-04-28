@@ -117,7 +117,7 @@ public class ViewMainPresenter : IViewMainPresenter
         {
             var language = GitConsts.LanguagesMap[item.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var metric = await manager.CalculateMetricsAsync(item,
+            var metric = await manager.CalculateMetricsAsync(item, item.DefaultBranch,
                 View.CalculateMetricsRepositoryPath.ToFilePathString().ParentDirectory,
                 View.CalculateMetricsByLocalResultsPath,
                 cancellationToken);
@@ -146,7 +146,7 @@ public class ViewMainPresenter : IViewMainPresenter
         var i = 0;
         foreach (var item in Repositories)
         {
-            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, cancellationToken);
+            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, item.DefaultBranch, cancellationToken);
             View.SetProgressBar((int)((double)++i / count * 100));
         }
 
