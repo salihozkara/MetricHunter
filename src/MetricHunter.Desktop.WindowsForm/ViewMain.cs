@@ -256,9 +256,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private static async Task SaveCsv(string result)
     {
+        var fileName = $"result_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
+        
         using var fileDialog = new SaveFileDialog
         {
-            Filter = "Csv files | *.csv"
+            Filter = "Csv files | *.csv",
+            FileName = fileName
         };
 
         if (fileDialog.ShowDialog() == DialogResult.OK) await File.WriteAllTextAsync(fileDialog.FileName, result);
