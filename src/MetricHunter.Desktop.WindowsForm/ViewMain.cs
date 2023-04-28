@@ -251,6 +251,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             return;
         _logger.LogInformation("Calculate metrics operation finished");
         await SaveCsv(result);
+        _progressBar.Value = 0;
     }
 
     private static async Task SaveCsv(string result)
@@ -269,6 +270,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void _downloadButton_Click(object sender, EventArgs e)
     {
         _logger.LogInformation("Download operation started");
+        _logger.LogInformation("Please wait...");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
 
@@ -371,6 +373,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void huntButton_Click(object sender, EventArgs e)
     {
         _logger.LogInformation("Hunt operation started");
+        _logger.LogInformation("This process may take some time. Please wait...");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
         var result = await Presenter.HuntRepositoriesAsync(CancellationTokenSource.Token)
@@ -380,6 +383,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             return;
         _logger.LogInformation("Hunt operation finished");
         await SaveCsv(result);
+        _progressBar.Value = 0;
     }
 
     private void openLogsStripMenuItem_Click(object sender, EventArgs e)
@@ -398,6 +402,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         CancellationTokenSource.Cancel();
         _processManager.KillAllProcesses(true);
         _logger.LogInformation("Operation canceled by user");
+        _progressBar.Value = 0;
         ButtonEnable();
     }
 }
