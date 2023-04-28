@@ -78,6 +78,12 @@ public class OctokitGitManager : IGitManager, ITransientDependency
         var (owner, name) = GetOwnerAndName(repositoryFullNameOrUrl);
         return Client.Repository.Release.GetAll(owner, name);
     }
+    
+    public Task<IReadOnlyList<GitHubCommit>> GetCommitsAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default)
+    {
+        var (owner, name) = GetOwnerAndName(repositoryFullNameOrUrl);
+        return Client.Repository.Commit.GetAll(owner, name);
+    }
 
     /// <summary>
     ///     User login
