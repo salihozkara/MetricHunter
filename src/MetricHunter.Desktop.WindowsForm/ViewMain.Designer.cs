@@ -232,6 +232,7 @@ partial class ViewMain
             this._repositoryDataGridView.RowTemplate.Height = 50;
             this._repositoryDataGridView.Size = new System.Drawing.Size(1112, 589);
             this._repositoryDataGridView.TabIndex = 4;
+            this._repositoryDataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellClick);
             this._repositoryDataGridView.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
             this._repositoryDataGridView.SelectionChanged += new System.EventHandler(this._repositoryDataGridView_SelectionChanged);
             // 

@@ -60,13 +60,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             }
         }
     }
+    
+    private int _checkBoxColumnIndex = 0;
 
     public IEnumerable<long> SelectedRepositories
     {
         get
         {
-            return _repositoryDataGridView.SelectedRows.Cast<DataGridViewRow>()
-                .Select(r => r.Cells[0].Value)
+            return _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
+                .Where(r => r.Cells[_checkBoxColumnIndex].Value != null && (bool) r.Cells[_checkBoxColumnIndex].Value)
+                .Select(r => r.Cells["Id"].Value)
                 .Cast<long>()
                 .ToList();
         }
@@ -106,7 +109,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     {
         _repositoryDataGridView.Columns.Clear();
         
-        _repositoryDataGridView.Columns.Add(new DataGridViewCheckBoxColumn()
+        _checkBoxColumnIndex = _repositoryDataGridView.Columns.Add(new DataGridViewCheckBoxColumn()
         {
             Name = "IsSelected",
             HeaderText = "",
@@ -345,6 +348,48 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         }
     }
 
+    private void _repositoryDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+    {
+        if (e.ColumnIndex == -1)
+        {
+            if (e.RowIndex == -1)
+            {
+                if (IsAllSelected)
+                {
+                    UnSelectAllRepositories();
+                }
+                else
+                {
+                    SelectAllRepositories();
+                }
+            }
+            // else if(e.RowIndex >= 0)
+            // {
+            //     if (_repositoryDataGridView.Rows[e.RowIndex].Cells[_checkBoxColumnIndex] is not DataGridViewCheckBoxCell cell) return;
+            //     cell.Value = (bool?)cell.Value != true;
+            // }
+        }
+        else if (e is { ColumnIndex: >= 0, RowIndex: >= 0 })
+        {
+            if (_repositoryDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex] is not DataGridViewCheckBoxCell cell) return;
+                    cell.Value = (bool?)cell.Value != true;
+        }
+    }
+
+    private void SelectAllRepositories()
+    {
+        _repositoryDataGridView.Rows.Cast<DataGridViewRow>().ToList()
+            .ForEach(row => row.Cells[_checkBoxColumnIndex].Value = true);
+    }
+
+    private void UnSelectAllRepositories()
+    {
+        _repositoryDataGridView.Rows.Cast<DataGridViewRow>().ToList()
+            .ForEach(row => row.Cells[_checkBoxColumnIndex].Value = false);
+    }
+
+    private bool IsAllSelected => _repositoryDataGridView.Rows.Cast<DataGridViewRow>().All(row => (bool?) row.Cells[_checkBoxColumnIndex].Value == true);
+
     private void loginGithubToolStripMenuItem_Click(object sender, EventArgs e)
     {
         Presenter.ShowGithubLogin();
@@ -427,13 +472,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void _repositoryDataGridView_SelectionChanged(object sender, EventArgs e)
     {
-        if (_repositoryDataGridView.RowCount == 0) return;
+        var selectedRows = _repositoryDataGridView.SelectedRows;
+        if(selectedRows.Count == 0) return;
         
-        foreach (var item in _repositoryDataGridView.Rows)
-        {
-            if (item is not DataGridViewRow row) continue;
+        UnSelectAllRepositories();
 
-            row.Cells[0].Value = row.Selected;
+        foreach (DataGridViewRow selectedRow in selectedRows)
+        {
+            if (selectedRow.Cells[_checkBoxColumnIndex] is not DataGridViewCheckBoxCell cell) return;
+            cell.Value = true;
         }
     }
 }
