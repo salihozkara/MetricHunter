@@ -482,5 +482,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             if (selectedRow.Cells[_checkBoxColumnIndex] is not DataGridViewCheckBoxCell cell) return;
             cell.Value = true;
         }
+        
+        _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = IsAllSelected ? "Unselect All" : "Select All";
     }
 }
