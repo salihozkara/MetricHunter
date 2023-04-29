@@ -9,7 +9,7 @@ public enum Language
     CPlusPlus,
     [LanguageInfo("C#", "csharp")] 
     CSharp,
-    [LanguageInfo("Pascal", "delphi")]
+    [LanguageInfo("Delphi", "pascal", GitHubLanguage = "Pascal")]
     Delphi,
     Html,
     Java,
@@ -19,6 +19,18 @@ public enum Language
 
 public static class LanguageExtensions
 {
+    public static string GetParameterName(this Language language)
+    {
+        var info = language.GetType().GetField(language.ToString())?.GetCustomAttribute<LanguageInfoAttribute>();
+        return info?.ParameterName ?? language.ToString();
+    }
+    
+    public static string GetNormalizedLanguage(this Language language)
+    {
+        var info = language.GetType().GetField(language.ToString())?.GetCustomAttribute<LanguageInfoAttribute>();
+        return info?.NormalizedName ?? language.ToString();
+    }
+    
     public static string GetGitHubLanguage(this Language language)
     {
         var info = language.GetType().GetField(language.ToString())?.GetCustomAttribute<LanguageInfoAttribute>();

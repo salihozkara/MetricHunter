@@ -196,7 +196,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             .Replace(ProjectNameReplacement, repository.Name)
             .Replace(ProjectDirectoryReplacement, projectDirectory)
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)
-            .Replace(ProjectLanguageReplacement, repository.Language)
+            .Replace(ProjectLanguageReplacement, GitConsts.LanguagesMap[repository.Language].GetNormalizedLanguage())
             .Replace(ReportsPathReplacement, reportsPath);
         await File.WriteAllTextAsync(xmlPath, xml, cancellationToken);
         return xmlPath;

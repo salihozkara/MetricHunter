@@ -11,8 +11,9 @@ public class SourceMonitorResult : IResult
     {
         Metrics = metrics;
         Id = repository.Id;
-        FullName = repository.FullName;
-        // Description = repository.Description;
+        Owner = repository.Owner.Login;
+        Name = repository.Name;
+        Description = repository.Description;
         Language = repository.Language;
         Stars = repository.StargazersCount;
         Forks = repository.ForksCount;
@@ -21,13 +22,21 @@ public class SourceMonitorResult : IResult
         UpdatedAt = repository.UpdatedAt;
         PushedAt = repository.PushedAt;
         Topics = repository.Topics;
+        IsTemplate = repository.IsTemplate;
+        DefaultBranch = repository.DefaultBranch;
+        OpenIssuesCount = repository.OpenIssuesCount;
+        HasIssues = repository.HasIssues;
+        HasWiki = repository.HasWiki;
+        HasDownloads = repository.HasDownloads;
+        HasPages = repository.HasPages;
+        Archived = repository.Archived;
+        SubscribersCount = repository.SubscribersCount;
     }
 
     public long Id { get; }
-
-    public string FullName { get; }
-
-    // public string Description { get; }
+    public string Owner { get; }
+    public string Name { get; }
+    public string Description { get; }
     public string Language { get; }
     public int Stars { get; }
     public int Forks { get; }
@@ -35,18 +44,28 @@ public class SourceMonitorResult : IResult
     public DateTimeOffset CreatedAt { get; }
     public DateTimeOffset UpdatedAt { get; }
     public DateTimeOffset? PushedAt { get; }
+    public IReadOnlyList<string> Topics { get; }
+    public bool IsTemplate { get; }
+    public string DefaultBranch { get; }
+    public int OpenIssuesCount { get; }
+    public bool HasIssues { get; }
+    public bool HasWiki { get; }
+    public bool HasDownloads { get; }
+    public bool HasPages { get; }
+    public bool Archived { get; }
+    public int SubscribersCount { get; }
 
     public List<IMetric> Metrics { get; }
 
-    public IReadOnlyList<string> Topics { get; }
 
     public Dictionary<string, string> ToDictionary()
     {
         var dictionary = new Dictionary<string, string>
         {
             { Normalize(nameof(Id)), Id.ToString() },
-            { Normalize(nameof(FullName)), FullName },
-            // { Normalize(nameof(Description)), Description },
+            { Normalize(nameof(Owner)), Owner },
+            { Normalize(nameof(Name)), Name },
+            { Normalize(nameof(Description)), Description },
             { Normalize(nameof(Language)), Language },
             { Normalize(nameof(Stars)), Stars.ToString() },
             { Normalize(nameof(Forks)), Forks.ToString() },
@@ -54,10 +73,19 @@ public class SourceMonitorResult : IResult
             { Normalize(nameof(CreatedAt)), CreatedAt.ToUnixTimeSeconds().ToString() },
             { Normalize(nameof(UpdatedAt)), UpdatedAt.ToUnixTimeSeconds().ToString() },
             { Normalize(nameof(PushedAt)), (PushedAt ?? CreatedAt).ToUnixTimeSeconds().ToString() },
-            { Normalize(nameof(Topics)), Topics.JoinAsString("|") }
+            { Normalize(nameof(Topics)), Topics.JoinAsString("|") },
+            { Normalize(nameof(IsTemplate)), IsTemplate.ToString() },
+            { Normalize(nameof(DefaultBranch)), DefaultBranch },
+            { Normalize(nameof(OpenIssuesCount)), OpenIssuesCount.ToString() },
+            { Normalize(nameof(HasIssues)), HasIssues.ToString() },
+            { Normalize(nameof(HasWiki)), HasWiki.ToString() },
+            { Normalize(nameof(HasDownloads)), HasDownloads.ToString() },
+            { Normalize(nameof(HasPages)), HasPages.ToString() },
+            { Normalize(nameof(Archived)), Archived.ToString() },
+            { Normalize(nameof(SubscribersCount)), SubscribersCount.ToString() }
         };
 
-        foreach (var metric in Metrics) dictionary.Add(Normalize(metric.Name), metric.Value);
+        foreach (var metric in Metrics) dictionary[Normalize(metric.Name)] = metric.Value;
 
         return dictionary;
     }
