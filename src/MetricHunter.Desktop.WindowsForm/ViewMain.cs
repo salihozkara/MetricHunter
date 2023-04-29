@@ -104,20 +104,39 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
+        _repositoryDataGridView.Columns.Clear();
+        
+        _repositoryDataGridView.Columns.Add(new DataGridViewCheckBoxColumn()
+        {
+            Name = "IsSelected",
+            HeaderText = "",
+            DataPropertyName = "IsSelected",
+            ValueType = typeof(bool),
+            ReadOnly = true,
+            Width = 50,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells,
+        });
+        
         var index = 0;
         var repositoryModelList = repositories.Select(x => new RepositoryModel
         {
             Id = x.Id,
             Index = ++index,
-            Name = x.Name,
-            Description = x.Description,
             Stars = x.StargazersCount,
+            Name = x.Name,
             Url = x.HtmlUrl,
+            Description = x.Description,
             License = x.License?.Name ?? "No License",
             Owner = x.Owner.Login,
             Size = ToSizeString(x.Size)
         }).ToList();
+
         _repositoryDataGridView.DataSource = repositoryModelList.ToList();
+        _repositoryDataGridView.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+        _repositoryDataGridView.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+        _repositoryDataGridView.Columns[7].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+        _repositoryDataGridView.Columns[8].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+        _repositoryDataGridView.Columns[9].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
         if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
 
@@ -257,7 +276,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private static async Task SaveCsv(string result)
     {
         var fileName = $"result_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
-        
+
         using var fileDialog = new SaveFileDialog
         {
             Filter = "Csv files | *.csv",
@@ -404,5 +423,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _logger.LogInformation("Operation canceled by user");
         _progressBar.Value = 0;
         ButtonEnable();
+    }
+
+    private void _repositoryDataGridView_SelectionChanged(object sender, EventArgs e)
+    {
+        if (_repositoryDataGridView.RowCount == 0) return;
+        
+        foreach (var item in _repositoryDataGridView.Rows)
+        {
+            if (item is not DataGridViewRow row) continue;
+
+            row.Cells[0].Value = row.Selected;
+        }
     }
 }

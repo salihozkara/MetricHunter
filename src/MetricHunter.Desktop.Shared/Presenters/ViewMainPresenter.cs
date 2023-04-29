@@ -96,7 +96,6 @@ public class ViewMainPresenter : IViewMainPresenter
         await _gitManager.GetRepositoriesAsync(gitInput, cancellationToken);
         View.SetProgressBar(100);
         stopwatch.Stop();
-        View.ShowRepositories(Repositories);
 
         _logger.LogInformation($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
     }
@@ -174,8 +173,6 @@ public class ViewMainPresenter : IViewMainPresenter
         if (!repositories.Any()) return;
 
         Repositories = repositories;
-
-        View.ShowRepositories(Repositories);
     }
 
     public async Task SaveRepositoriesAsync(CancellationToken cancellationToken = default)
