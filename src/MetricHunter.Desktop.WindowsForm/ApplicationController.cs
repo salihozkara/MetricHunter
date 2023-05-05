@@ -1,6 +1,7 @@
 ﻿using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Views;
+using Octokit;
 using Volo.Abp.DependencyInjection;
 
 namespace MetricHunter.Desktop;
@@ -22,7 +23,7 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
 
     public void SuccessMessage(string message)
     {
-        throw new NotImplementedException();
+        MessageBox.Show(message);
     }
 
     public IServiceProvider ServiceProvider { get; }
@@ -31,6 +32,30 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
     {
         var presenter = new ViewMainPresenter(ViewMain, this);
         presenter.Run();
+    }
+
+    public void ShowExploreRepositories()
+    {
+        using var viewExploreRepositories = new ViewExploreRepositories();
+        var presenter = new ViewExploreRepositoriesPresenter(this, viewExploreRepositories);
+        presenter.Run();
+    }
+
+    public void ShowFindRepository()
+    {
+        using var viewFindRepositories = new ViewFindRepository();
+        var presenter = new ViewFindRepositoryPresenter(this, viewFindRepositories);
+        presenter.Run();
+    }
+
+    public void ShowRepositories(IEnumerable<Repository> repositories)
+    {
+        ViewMain.ShowRepositories(repositories);
+    }
+
+    public void SetProgressBar(int i)
+    {
+        ViewMain.SetProgressBar(i);
     }
 
     public void ShowGithubLogin()

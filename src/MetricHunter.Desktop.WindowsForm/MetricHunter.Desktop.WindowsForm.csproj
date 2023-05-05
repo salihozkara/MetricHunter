@@ -11,8 +11,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MetricHunter.Application\MetricHunter.Application.csproj"/>
-        <ProjectReference Include="..\MetricHunter.Desktop.Shared\MetricHunter.Desktop.Shared.csproj"/>
+        <ProjectReference Include="..\MetricHunter.Application\MetricHunter.Application.csproj" />
+        <ProjectReference Include="..\MetricHunter.Desktop.Shared\MetricHunter.Desktop.Shared.csproj" />
     </ItemGroup>
 
     <ItemGroup>
@@ -22,7 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <Content Include="MetricHunter.ico"/>
+        <Content Include="MetricHunter.ico" />
     </ItemGroup>
 
     <ItemGroup>

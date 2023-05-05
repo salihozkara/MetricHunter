@@ -3,21 +3,22 @@ using MetricHunter.Desktop.Views;
 
 namespace MetricHunter.Desktop.Presenters;
 
-public class ViewGithubLoginPresenter : IViewGithubLoginPresenter
+public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
 {
     private readonly IApplicationController _controller;
 
-    public ViewGithubLoginPresenter(IApplicationController controller, IViewGithubLogin viewGithubLogin)
+    public ViewFindRepositoryPresenter(IApplicationController controller, IViewFindRepository viewFindRepository)
     {
         _controller = controller;
-        View = viewGithubLogin;
+        View = viewFindRepository;
         View.Presenter = this;
     }
-
-    public IViewGithubLogin View { get; }
+    
+    public IViewFindRepository View { get; }
 
     public void Run()
     {
         View.Run();
     }
+
 }

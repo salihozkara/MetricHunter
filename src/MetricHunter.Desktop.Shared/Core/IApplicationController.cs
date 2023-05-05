@@ -1,4 +1,5 @@
 ﻿using MetricHunter.Desktop.Views;
+using Octokit;
 
 namespace MetricHunter.Desktop.Core;
 
@@ -15,4 +16,8 @@ public interface IApplicationController
     void ShowGithubLogin();
 
     void StartApplication();
+    void ShowExploreRepositories();
+    void ShowFindRepository();
+    void ShowRepositories(IEnumerable<Repository> repositories);
+    void SetProgressBar(int i);
 }

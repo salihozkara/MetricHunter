@@ -22,6 +22,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
     private List<Repository> _repositories;
+    private List<Branch> _branches;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -30,6 +31,7 @@ public class ViewMainPresenter : IViewMainPresenter
         View.Presenter = this;
 
         _repositories = new List<Repository>();
+        _branches = new List<Branch>();
 
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
         _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
@@ -39,9 +41,7 @@ public class ViewMainPresenter : IViewMainPresenter
         _logger = _controller.ServiceProvider.GetRequiredService<ILogger<ViewMainPresenter>>();
 
         Authenticate();
-
-        _gitManager.SearchRepositoriesRequestSuccess += GitManager_SearchRepositoriesRequestSuccess;
-
+        
         LoadFromArgsAsync();
     }
 
@@ -67,41 +67,7 @@ public class ViewMainPresenter : IViewMainPresenter
     {
         View.Run();
     }
-
-    public void LoadForm()
-    {
-        View.LanguageSelectList = _metricCalculatorManager.GetSupportedLanguages();
-        View.SortDirectionSelectList = Enum.GetValues<SortDirection>().Reverse().ToList();
-    }
-
-    public void ShowGithubLogin()
-    {
-        _controller.ShowGithubLogin();
-        Authenticate();
-    }
-
-    public async Task SearchRepositoriesAsync(CancellationToken cancellationToken = default)
-    {
-        _repositories.Clear();
-        var gitInput = new GitInput
-        {
-            Language = View.SelectedLanguage,
-            Order = View.SortDirection,
-            Count = View.RepositoryCount,
-            Topic = View.Topics
-        };
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        await _gitManager.GetRepositoriesAsync(gitInput, cancellationToken);
-        View.SetProgressBar(100);
-        stopwatch.Stop();
-        View.ShowRepositories(Repositories);
-
-        _logger.LogInformation($"Search completed in {stopwatch.Elapsed:hh\\:mm\\:ss}");
-    }
-
-
+    
     public async Task<string> CalculateMetricsAsync(CancellationToken cancellationToken = default)
     {
         var repositoryList =
@@ -146,7 +112,8 @@ public class ViewMainPresenter : IViewMainPresenter
         var i = 0;
         foreach (var item in Repositories)
         {
-            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, item.DefaultBranch, cancellationToken);
+            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, item.DefaultBranch,
+                cancellationToken);
             View.SetProgressBar((int)((double)++i / count * 100));
         }
 
@@ -228,6 +195,22 @@ public class ViewMainPresenter : IViewMainPresenter
             Repositories = repositories;
         }
     }
+    
+    public void ShowGithubLogin()
+    {
+        _controller.ShowGithubLogin();
+        Authenticate();
+    }
+
+    public void ShowExploreRepositories()
+    {
+        _controller.ShowExploreRepositories();
+    }
+
+    public void ShowFindRepository()
+    {
+        _controller.ShowFindRepository();
+    }
 
     private void Authenticate()
     {
@@ -235,23 +218,11 @@ public class ViewMainPresenter : IViewMainPresenter
             _gitManager.Authenticate(View.GithubToken);
     }
 
-    private void GitManager_SearchRepositoriesRequestSuccess(object? sender, RequestSuccessEventArgs e)
-    {
-        _repositories.AddRange(e.Result.Items);
-        _repositories = _repositories.DistinctBy(x => x.Id).Take(View.RepositoryCount).ToList();
-        var progressBarValue = (int)Math.Round((double)_repositories.Count / View.RepositoryCount * 100);
-        View.SetProgressBar(progressBarValue);
-        View.ShowRepositories(Repositories);
-    }
-
     private bool CheckSelectRepositories()
     {
-        if (!Repositories.Any())
-        {
-            _controller.ErrorMessage("No repositories selected");
-            return false;
-        }
+        if (Repositories.Any()) return true;
+        _controller.ErrorMessage("No repositories selected");
+        return false;
 
-        return true;
     }
 }

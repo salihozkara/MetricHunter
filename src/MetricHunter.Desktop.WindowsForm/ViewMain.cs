@@ -39,8 +39,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void SetProgressBar(int value)
     {
-        if (CancellationTokenSource.IsCancellationRequested)
-            return;
         value = value > 100 ? 100 : value;
         value = value < 0 ? 0 : value;
         _progressBar.Value = value;
@@ -71,17 +69,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
                 .ToList();
         }
     }
-
-    public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
-
-    public SortDirection SortDirection =>
-        _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
-
-    public int RepositoryCount =>
-        int.TryParse(_repositoryCountTextBox.Text, out var repositoryCount) ? repositoryCount : 10;
-
-    public string Topics => _topicsTextBox.Text;
-
+    
     public string JsonLoadPath { get; set; }
 
     public string JsonSavePath { get; set; }
@@ -91,17 +79,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public string CalculateMetricsRepositoryPath { get; set; }
 
     public string CalculateMetricsByLocalResultsPath { get; set; }
-
-    public IEnumerable<Language>? LanguageSelectList
-    {
-        set => _languageComboBox.DataSource = value;
-    }
-
-    public IEnumerable<SortDirection> SortDirectionSelectList
-    {
-        set => _sortDirectionComboBox.DataSource = value;
-    }
-
+    
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
         var index = 0;
@@ -150,7 +128,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void _viewMain_Load(object sender, EventArgs e)
     {
-        Presenter.LoadForm();
         LogScrollToBottom();
 
         DesktopSink.LogAction += (s, logEvent) =>
@@ -166,22 +143,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         logTextBox.SelectionStart = logTextBox.Text.Length;
         logTextBox.ScrollToCaret();
     }
-
-    private async void _searchButton_Click(object sender, EventArgs e)
-    {
-        _logger.LogInformation("Search operation started");
-        CancellationTokenSource = new CancellationTokenSource();
-        SetProgressBar(0);
-        ButtonDisable();
-        await Presenter.SearchRepositoriesAsync(CancellationTokenSource.Token)
-            .MaybeCanceled(CancellationTokenSource.Token);
-        ButtonEnable();
-        _logger.LogInformation("Search operation finished");
-    }
-
+    
     private void ButtonDisable()
     {
-        _searchButton.Enabled = false;
         _downloadButton.Enabled = false;
         _calculateMetricsButton.Enabled = false;
         _huntButton.Enabled = false;
@@ -190,7 +154,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void ButtonEnable()
     {
-        _searchButton.Enabled = true;
         _downloadButton.Enabled = true;
         _calculateMetricsButton.Enabled = true;
         _huntButton.Enabled = true;
@@ -396,5 +359,15 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _processManager.KillAllProcesses(true);
         _logger.LogInformation("Operation canceled by user");
         ButtonEnable();
+    }
+
+    private void findRepositoryToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        Presenter.ShowFindRepository();
+    }
+
+    private void exploreRepositoriesToolStripMenuItem_Click(object sender, EventArgs e)
+    {
+        Presenter.ShowExploreRepositories();
     }
 }
