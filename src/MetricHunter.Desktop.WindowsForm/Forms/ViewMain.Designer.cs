@@ -353,7 +353,7 @@ partial class ViewMain
             // bottomPanel
             // 
             this.bottomPanel.Controls.Add(this.bottomLayoutPanel);
-            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.bottomPanel.Location = new System.Drawing.Point(3, 749);
             this.bottomPanel.Name = "bottomPanel";
             this.bottomPanel.Size = new System.Drawing.Size(1098, 366);

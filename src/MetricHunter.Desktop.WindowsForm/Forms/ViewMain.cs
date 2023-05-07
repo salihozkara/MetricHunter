@@ -69,7 +69,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
                 .ToList();
         }
     }
-    
+
     public string JsonLoadPath { get; set; }
 
     public string JsonSavePath { get; set; }
@@ -79,7 +79,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public string CalculateMetricsRepositoryPath { get; set; }
 
     public string CalculateMetricsByLocalResultsPath { get; set; }
-    
+
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
         var index = 0;
@@ -104,7 +104,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void Run()
     {
-        System.Windows.Forms.Application.Run(this);
+        ShowDialog();
     }
 
     private static string ToSizeString(long size) // size in kilobytes
@@ -128,14 +128,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     private void _viewMain_Load(object sender, EventArgs e)
     {
-        LogScrollToBottom();
-
         DesktopSink.LogAction += (s, logEvent) =>
         {
             if (logEvent.Level != LogEventLevel.Information) return;
             logTextBox.Text += s;
             LogScrollToBottom();
         };
+        
+        _logger.LogInformation("Application initialized");
+
+        LogScrollToBottom();
     }
 
     private void LogScrollToBottom()
@@ -143,7 +145,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         logTextBox.SelectionStart = logTextBox.Text.Length;
         logTextBox.ScrollToCaret();
     }
-    
+
     private void ButtonDisable()
     {
         _downloadButton.Enabled = false;
