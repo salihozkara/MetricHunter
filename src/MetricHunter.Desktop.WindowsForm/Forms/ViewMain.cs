@@ -104,7 +104,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void Run()
     {
-        ShowDialog();
+        System.Windows.Forms.Application.Run(this);
     }
 
     private static string ToSizeString(long size) // size in kilobytes

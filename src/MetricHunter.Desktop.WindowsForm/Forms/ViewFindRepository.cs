@@ -13,7 +13,7 @@ namespace MetricHunter.Desktop.Forms
 
         public void Run()
         {
-            ShowDialog();
+            Show();
         }
 
         public IViewFindRepositoryPresenter Presenter { get; set; }
