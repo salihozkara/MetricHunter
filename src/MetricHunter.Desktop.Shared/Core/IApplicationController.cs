@@ -18,6 +18,8 @@ public interface IApplicationController
     void StartApplication();
     void ShowExploreRepositories();
     void ShowFindRepository();
+    
     void ShowRepositories(IEnumerable<Repository> repositories);
+    
     void SetProgressBar(int i);
 }

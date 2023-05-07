@@ -3,7 +3,7 @@ using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Views;
 using Octokit;
 
-namespace MetricHunter.Desktop
+namespace MetricHunter.Desktop.Forms
 {
     public partial class ViewExploreRepositories : Form, IViewExploreRepositories
     {

@@ -6,6 +6,8 @@ namespace MetricHunter.Desktop.Presenters;
 
 public interface IViewMainPresenter : IPresenter<IViewMain>
 {
+    public IEnumerable<Repository> Repositories { get; set; }
+
     Task<string> CalculateMetricsAsync(CancellationToken cancellationToken = default);
     
     Task DownloadRepositoriesAsync(CancellationToken cancellationToken = default);

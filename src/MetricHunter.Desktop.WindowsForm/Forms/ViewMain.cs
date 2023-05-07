@@ -14,7 +14,7 @@ using Serilog.Events;
 using Volo.Abp.DependencyInjection;
 using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
-namespace MetricHunter.Desktop;
+namespace MetricHunter.Desktop.Forms;
 
 public partial class ViewMain : Form, ISingletonDependency, IViewMain
 {

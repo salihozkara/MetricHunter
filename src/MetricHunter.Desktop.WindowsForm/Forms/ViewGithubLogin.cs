@@ -3,7 +3,7 @@ using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
 
-namespace MetricHunter.Desktop;
+namespace MetricHunter.Desktop.Forms;
 
 public partial class ViewGithubLogin : Form, IViewGithubLogin
 {

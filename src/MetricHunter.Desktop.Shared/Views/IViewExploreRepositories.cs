@@ -6,7 +6,6 @@ namespace MetricHunter.Desktop.Views;
 
 public interface IViewExploreRepositories : IView<IViewExploreRepositoriesPresenter>
 {
-    
     Language? SelectedLanguage { get; }
 
     SortDirection SortDirection { get; }
@@ -18,4 +17,6 @@ public interface IViewExploreRepositories : IView<IViewExploreRepositoriesPresen
     IEnumerable<Language>? LanguageSelectList { set; }
 
     IEnumerable<SortDirection> SortDirectionSelectList { set; }
+    
+    void Close();
 }

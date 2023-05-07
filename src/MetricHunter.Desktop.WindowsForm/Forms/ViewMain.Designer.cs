@@ -1,4 +1,4 @@
-﻿namespace MetricHunter.Desktop;
+﻿namespace MetricHunter.Desktop.Forms;
 
 partial class ViewMain
 {
@@ -31,14 +31,16 @@ partial class ViewMain
     {
             this.components = new System.ComponentModel.Container();
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
             this.SearchButton = new System.Windows.Forms.ImageList(this.components);
             this.IconList = new System.Windows.Forms.ImageList(this.components);
             this._repositoryDataGridView = new System.Windows.Forms.DataGridView();
             this.menu = new System.Windows.Forms.MenuStrip();
             this.savedRepositoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.exploreRepositoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.findRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loginGithubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -50,6 +52,7 @@ partial class ViewMain
             this.basePanel = new System.Windows.Forms.Panel();
             this.layoutPanel = new System.Windows.Forms.TableLayoutPanel();
             this.searchRepositoryPanel = new System.Windows.Forms.Panel();
+            this.label1 = new System.Windows.Forms.Label();
             this.operationGroupBox = new System.Windows.Forms.GroupBox();
             this._huntButton = new System.Windows.Forms.Button();
             this._downloadButton = new System.Windows.Forms.Button();
@@ -60,8 +63,6 @@ partial class ViewMain
             this.panel1 = new System.Windows.Forms.Panel();
             this._cancelButton = new System.Windows.Forms.Button();
             this._progressBar = new System.Windows.Forms.ProgressBar();
-            this.exploreRepositoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.findRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).BeginInit();
             this.menu.SuspendLayout();
             this.basePanel.SuspendLayout();
@@ -102,41 +103,42 @@ partial class ViewMain
             this._repositoryDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(211)))), ((int)(((byte)(193)))));
             this._repositoryDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
             this._repositoryDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
-            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle7.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
-            dataGridViewCellStyle7.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle7.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle7.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle7.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle7.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle7;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
             this._repositoryDataGridView.ColumnHeadersHeight = 70;
             this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle8.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
-            dataGridViewCellStyle8.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle8.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle8.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle8.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle8.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle8;
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
+            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
             this._repositoryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
             this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this._repositoryDataGridView.Location = new System.Drawing.Point(3, 203);
+            this._repositoryDataGridView.Location = new System.Drawing.Point(7, 250);
+            this._repositoryDataGridView.Margin = new System.Windows.Forms.Padding(7, 0, 7, 30);
             this._repositoryDataGridView.Name = "_repositoryDataGridView";
             this._repositoryDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle9.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
-            dataGridViewCellStyle9.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle9.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle9.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle9.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle9;
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
+            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
+            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
+            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
+            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
+            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
+            this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
             this._repositoryDataGridView.RowHeadersWidth = 45;
             this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._repositoryDataGridView.RowTemplate.Height = 50;
-            this._repositoryDataGridView.Size = new System.Drawing.Size(1098, 544);
+            this._repositoryDataGridView.Size = new System.Drawing.Size(1090, 466);
             this._repositoryDataGridView.TabIndex = 4;
             this._repositoryDataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
             // 
@@ -166,6 +168,20 @@ partial class ViewMain
             this.savedRepositoriesToolStripMenuItem.Name = "savedRepositoriesToolStripMenuItem";
             this.savedRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(118, 38);
             this.savedRepositoriesToolStripMenuItem.Text = "Repository";
+            // 
+            // exploreRepositoriesToolStripMenuItem
+            // 
+            this.exploreRepositoriesToolStripMenuItem.Name = "exploreRepositoriesToolStripMenuItem";
+            this.exploreRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
+            this.exploreRepositoriesToolStripMenuItem.Text = "Explore Repositories";
+            this.exploreRepositoriesToolStripMenuItem.Click += new System.EventHandler(this.exploreRepositoriesToolStripMenuItem_Click);
+            // 
+            // findRepositoryToolStripMenuItem
+            // 
+            this.findRepositoryToolStripMenuItem.Name = "findRepositoryToolStripMenuItem";
+            this.findRepositoryToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
+            this.findRepositoryToolStripMenuItem.Text = "Find Repository";
+            this.findRepositoryToolStripMenuItem.Click += new System.EventHandler(this.findRepositoryToolStripMenuItem_Click);
             // 
             // showToolStripMenuItem
             // 
@@ -251,20 +267,32 @@ partial class ViewMain
             this.layoutPanel.Location = new System.Drawing.Point(30, 30);
             this.layoutPanel.Name = "layoutPanel";
             this.layoutPanel.RowCount = 3;
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 200F));
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 60F));
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 40F));
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 250F));
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.14286F));
+            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 42.85714F));
             this.layoutPanel.Size = new System.Drawing.Size(1104, 1118);
             this.layoutPanel.TabIndex = 5;
+            this.layoutPanel.Tag = "";
             // 
             // searchRepositoryPanel
             // 
+            this.searchRepositoryPanel.Controls.Add(this.label1);
             this.searchRepositoryPanel.Controls.Add(this.operationGroupBox);
             this.searchRepositoryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.searchRepositoryPanel.Location = new System.Drawing.Point(3, 3);
             this.searchRepositoryPanel.Name = "searchRepositoryPanel";
-            this.searchRepositoryPanel.Size = new System.Drawing.Size(1098, 194);
+            this.searchRepositoryPanel.Size = new System.Drawing.Size(1098, 244);
             this.searchRepositoryPanel.TabIndex = 5;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.label1.Location = new System.Drawing.Point(4, 194);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(91, 40);
+            this.label1.TabIndex = 18;
+            this.label1.Text = "Results";
             // 
             // operationGroupBox
             // 
@@ -275,7 +303,7 @@ partial class ViewMain
             this.operationGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.operationGroupBox.Location = new System.Drawing.Point(209, 23);
             this.operationGroupBox.Name = "operationGroupBox";
-            this.operationGroupBox.Size = new System.Drawing.Size(701, 144);
+            this.operationGroupBox.Size = new System.Drawing.Size(701, 150);
             this.operationGroupBox.TabIndex = 17;
             this.operationGroupBox.TabStop = false;
             this.operationGroupBox.Text = "Operations";
@@ -325,10 +353,10 @@ partial class ViewMain
             // bottomPanel
             // 
             this.bottomPanel.Controls.Add(this.bottomLayoutPanel);
-            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomPanel.Location = new System.Drawing.Point(3, 753);
+            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.bottomPanel.Location = new System.Drawing.Point(3, 749);
             this.bottomPanel.Name = "bottomPanel";
-            this.bottomPanel.Size = new System.Drawing.Size(1098, 362);
+            this.bottomPanel.Size = new System.Drawing.Size(1098, 366);
             this.bottomPanel.TabIndex = 6;
             // 
             // bottomLayoutPanel
@@ -343,8 +371,7 @@ partial class ViewMain
             this.bottomLayoutPanel.RowCount = 2;
             this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.bottomLayoutPanel.Size = new System.Drawing.Size(1098, 362);
+            this.bottomLayoutPanel.Size = new System.Drawing.Size(1098, 366);
             this.bottomLayoutPanel.TabIndex = 0;
             // 
             // logTextBox
@@ -354,7 +381,7 @@ partial class ViewMain
             this.logTextBox.Location = new System.Drawing.Point(3, 3);
             this.logTextBox.Name = "logTextBox";
             this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(1092, 331);
+            this.logTextBox.Size = new System.Drawing.Size(1092, 335);
             this.logTextBox.TabIndex = 19;
             this.logTextBox.Text = "";
             // 
@@ -363,7 +390,7 @@ partial class ViewMain
             this.panel1.Controls.Add(this._cancelButton);
             this.panel1.Controls.Add(this._progressBar);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 340);
+            this.panel1.Location = new System.Drawing.Point(3, 344);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1092, 19);
             this.panel1.TabIndex = 20;
@@ -388,20 +415,6 @@ partial class ViewMain
             this._progressBar.Size = new System.Drawing.Size(1057, 34);
             this._progressBar.TabIndex = 18;
             // 
-            // exploreRepositoriesToolStripMenuItem
-            // 
-            this.exploreRepositoriesToolStripMenuItem.Name = "exploreRepositoriesToolStripMenuItem";
-            this.exploreRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
-            this.exploreRepositoriesToolStripMenuItem.Text = "Explore Repositories";
-            this.exploreRepositoriesToolStripMenuItem.Click += new System.EventHandler(this.exploreRepositoriesToolStripMenuItem_Click);
-            // 
-            // findRepositoryToolStripMenuItem
-            // 
-            this.findRepositoryToolStripMenuItem.Name = "findRepositoryToolStripMenuItem";
-            this.findRepositoryToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
-            this.findRepositoryToolStripMenuItem.Text = "Find Repository";
-            this.findRepositoryToolStripMenuItem.Click += new System.EventHandler(this.findRepositoryToolStripMenuItem_Click);
-            // 
             // ViewMain
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -423,6 +436,7 @@ partial class ViewMain
             this.basePanel.ResumeLayout(false);
             this.layoutPanel.ResumeLayout(false);
             this.searchRepositoryPanel.ResumeLayout(false);
+            this.searchRepositoryPanel.PerformLayout();
             this.operationGroupBox.ResumeLayout(false);
             this.bottomPanel.ResumeLayout(false);
             this.bottomLayoutPanel.ResumeLayout(false);
@@ -461,4 +475,5 @@ partial class ViewMain
     private ProgressBar _progressBar;
     private ToolStripMenuItem exploreRepositoriesToolStripMenuItem;
     private ToolStripMenuItem findRepositoryToolStripMenuItem;
+    private Label label1;
 }

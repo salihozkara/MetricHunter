@@ -102,8 +102,8 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task DownloadRepositoriesAsync(CancellationToken cancellationToken = default)
     {
-        if (!CheckSelectRepositories())
-            return;
+        // if (!CheckSelectRepositories())
+        //     return;
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();

@@ -80,6 +80,8 @@ public class ViewExploreRepositoriesPresenter : IViewExploreRepositoriesPresente
         var progressBarValue = (int)Math.Round((double)_repositories.Count / View.RepositoryCount * 100);
         _controller.SetProgressBar(progressBarValue);
         _controller.ShowRepositories(Repositories);
+        _controller.ViewMain.Presenter.Repositories = _repositories;
+        View.Close();
     }
 
     public void Run()

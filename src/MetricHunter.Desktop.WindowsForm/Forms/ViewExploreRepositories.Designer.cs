@@ -1,4 +1,4 @@
-﻿namespace MetricHunter.Desktop
+﻿namespace MetricHunter.Desktop.Forms
 {
     partial class ViewExploreRepositories
     {
