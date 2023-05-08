@@ -46,21 +46,6 @@ namespace MetricHunter.Desktop.Forms
             CenterToScreen();
         }
 
-        private void _downloadButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void _calculateButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void _huntButton_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void _commitsButton_Click(object sender, EventArgs e)
         {
             Presenter.GetCommits();

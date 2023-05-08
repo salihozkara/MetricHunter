@@ -29,5 +29,6 @@ public interface IViewMain : IView<IViewMainPresenter>
     void SetProgressBar(int value);
     
     void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits);
+    
     void ShowReleases(IEnumerable<Release> releases);
 }

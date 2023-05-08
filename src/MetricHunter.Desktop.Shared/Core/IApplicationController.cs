@@ -22,6 +22,8 @@ public interface IApplicationController
     void ShowRepositories(IEnumerable<Repository> repositories);
     
     void SetProgressBar(int i);
+    
     void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits);
+    
     void ShowReleases(IEnumerable<Release> releases);
 }

@@ -46,9 +46,6 @@
             this._repositoryOwner = new System.Windows.Forms.Label();
             this._releasesButton = new System.Windows.Forms.Button();
             this._commitsButton = new System.Windows.Forms.Button();
-            this._downloadButton = new System.Windows.Forms.Button();
-            this._huntButton = new System.Windows.Forms.Button();
-            this._calculateButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryImage)).BeginInit();
             this._repositoryPanel.SuspendLayout();
             this.SuspendLayout();
@@ -224,7 +221,7 @@
             // _releasesButton
             // 
             this._releasesButton.ImageKey = "search.png";
-            this._releasesButton.Location = new System.Drawing.Point(719, 608);
+            this._releasesButton.Location = new System.Drawing.Point(717, 626);
             this._releasesButton.Name = "_releasesButton";
             this._releasesButton.Size = new System.Drawing.Size(120, 41);
             this._releasesButton.TabIndex = 45;
@@ -235,7 +232,7 @@
             // _commitsButton
             // 
             this._commitsButton.ImageKey = "search.png";
-            this._commitsButton.Location = new System.Drawing.Point(584, 608);
+            this._commitsButton.Location = new System.Drawing.Point(577, 626);
             this._commitsButton.Name = "_commitsButton";
             this._commitsButton.Size = new System.Drawing.Size(129, 41);
             this._commitsButton.TabIndex = 46;
@@ -243,47 +240,11 @@
             this._commitsButton.UseVisualStyleBackColor = true;
             this._commitsButton.Click += new System.EventHandler(this._commitsButton_Click);
             // 
-            // _downloadButton
-            // 
-            this._downloadButton.ImageKey = "search.png";
-            this._downloadButton.Location = new System.Drawing.Point(39, 608);
-            this._downloadButton.Name = "_downloadButton";
-            this._downloadButton.Size = new System.Drawing.Size(140, 41);
-            this._downloadButton.TabIndex = 47;
-            this._downloadButton.Text = "Download";
-            this._downloadButton.UseVisualStyleBackColor = true;
-            this._downloadButton.Click += new System.EventHandler(this._downloadButton_Click);
-            // 
-            // _huntButton
-            // 
-            this._huntButton.ImageKey = "search.png";
-            this._huntButton.Location = new System.Drawing.Point(379, 608);
-            this._huntButton.Name = "_huntButton";
-            this._huntButton.Size = new System.Drawing.Size(95, 41);
-            this._huntButton.TabIndex = 48;
-            this._huntButton.Text = "Hunt";
-            this._huntButton.UseVisualStyleBackColor = true;
-            this._huntButton.Click += new System.EventHandler(this._huntButton_Click);
-            // 
-            // _calculateButton
-            // 
-            this._calculateButton.ImageKey = "search.png";
-            this._calculateButton.Location = new System.Drawing.Point(185, 608);
-            this._calculateButton.Name = "_calculateButton";
-            this._calculateButton.Size = new System.Drawing.Size(188, 41);
-            this._calculateButton.TabIndex = 49;
-            this._calculateButton.Text = "Calculate Metrics";
-            this._calculateButton.UseVisualStyleBackColor = true;
-            this._calculateButton.Click += new System.EventHandler(this._calculateButton_Click);
-            // 
             // ViewFindRepository
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(865, 229);
-            this.Controls.Add(this._calculateButton);
-            this.Controls.Add(this._huntButton);
-            this.Controls.Add(this._downloadButton);
+            this.ClientSize = new System.Drawing.Size(865, 693);
             this.Controls.Add(this._commitsButton);
             this.Controls.Add(this._releasesButton);
             this.Controls.Add(this._repositoryPanel);
@@ -325,8 +286,5 @@
         private Label label7;
         private Button _releasesButton;
         private Button _commitsButton;
-        private Button _downloadButton;
-        private Button _huntButton;
-        private Button _calculateButton;
     }
 }

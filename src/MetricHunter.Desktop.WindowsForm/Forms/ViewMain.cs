@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Text;
 using MetricHunter.Application.Git;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
@@ -47,10 +48,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     public void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits)
     {
         var index = 0;
+
         var commitModelList = gitHubCommits.Select(x => new CommitModel()
         {
             Index = ++index,
-            Author = x.Author.Login,
+            Author = x.Commit.Author.Email,
             CommitedAt = x.Commit.Author.Date.UtcDateTime,
             Name = x.Commit.Message,
             Url = x.HtmlUrl
