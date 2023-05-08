@@ -90,13 +90,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             }
         }
     }
+    
+    private int _checkBoxColumnIndex = 0;
 
     public IEnumerable<long> SelectedRepositories
     {
         get
         {
-            return _repositoryDataGridView.SelectedRows.Cast<DataGridViewRow>()
-                .Select(r => r.Cells[0].Value)
+            return _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
+                .Where(r => r.Cells[_checkBoxColumnIndex].Value != null && (bool) r.Cells[_checkBoxColumnIndex].Value)
+                .Select(r => r.Cells["Id"].Value)
                 .Cast<long>()
                 .ToList();
         }
@@ -114,20 +117,39 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
+        _repositoryDataGridView.Columns.Clear();
+        
+        _checkBoxColumnIndex = _repositoryDataGridView.Columns.Add(new DataGridViewCheckBoxColumn()
+        {
+            Name = "IsSelected",
+            HeaderText = "Select All",
+            DataPropertyName = "IsSelected",
+            ValueType = typeof(bool),
+            ReadOnly = true,
+            Width = 50,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells,
+        });
+        
         var index = 0;
         var repositoryModelList = repositories.Select(x => new RepositoryModel
         {
             Id = x.Id,
             Index = ++index,
-            Name = x.Name,
-            Description = x.Description,
             Stars = x.StargazersCount,
+            Name = x.Name,
             Url = x.HtmlUrl,
+            Description = x.Description,
             License = x.License?.Name ?? "No License",
             Owner = x.Owner.Login,
             Size = ToSizeString(x.Size)
         }).ToList();
+
         _repositoryDataGridView.DataSource = repositoryModelList.ToList();
+        _repositoryDataGridView.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+        _repositoryDataGridView.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
+        _repositoryDataGridView.Columns[7].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+        _repositoryDataGridView.Columns[8].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
+        _repositoryDataGridView.Columns[9].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
         if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
 
@@ -248,13 +270,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             return;
         _logger.LogInformation("Calculate metrics operation finished");
         await SaveCsv(result);
+        _progressBar.Value = 0;
     }
 
     private static async Task SaveCsv(string result)
     {
+        var fileName = $"result_{DateTime.Now:yyyy-MM-dd_HH-mm-ss}.csv";
+
         using var fileDialog = new SaveFileDialog
         {
-            Filter = "Csv files | *.csv"
+            Filter = "Csv files | *.csv",
+            FileName = fileName
         };
 
         if (fileDialog.ShowDialog() == DialogResult.OK) await File.WriteAllTextAsync(fileDialog.FileName, result);
@@ -263,6 +289,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void _downloadButton_Click(object sender, EventArgs e)
     {
         _logger.LogInformation("Download operation started");
+        _logger.LogInformation("Please wait...");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
 
@@ -318,6 +345,48 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         }
     }
 
+    private void _repositoryDataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+    {
+        switch (e)
+        {
+            case { RowIndex: -1 } when IsAllSelected && e.ColumnIndex == _checkBoxColumnIndex:
+                UnSelectAllRepositories();
+                _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = "Select All";
+                return;
+            case { RowIndex: -1 } when !IsAllSelected && e.ColumnIndex == _checkBoxColumnIndex:
+                SelectAllRepositories();
+                _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = "Unselect All";
+                return;
+            case { ColumnIndex: >= 0, RowIndex: >= 0 }:
+            {
+                if (_repositoryDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex] is not DataGridViewCheckBoxCell cell)
+                {
+                    UnSelectAllRepositories(false);
+                    return;
+                }
+                cell.Value = (bool?)cell.Value != true;
+                break;
+            }
+        }
+        _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = IsAllSelected ? "Unselect All" : "Select All";
+    }
+
+    private void SelectAllRepositories()
+    {
+        _repositoryDataGridView.Rows.Cast<DataGridViewRow>().ToList()
+            .ForEach(row => row.Cells[_checkBoxColumnIndex].Value = true);
+    }
+
+    private void UnSelectAllRepositories(bool includeDataGridSelectedRows = true)
+    {
+        _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
+            .Where(row => includeDataGridSelectedRows || row.Selected == false).ToList()
+            .ToList()
+            .ForEach(row => row.Cells[_checkBoxColumnIndex].Value = false);
+    }
+
+    private bool IsAllSelected => _repositoryDataGridView.Rows.Cast<DataGridViewRow>().All(row => (bool?) row.Cells[_checkBoxColumnIndex].Value == true);
+
     private void loginGithubToolStripMenuItem_Click(object sender, EventArgs e)
     {
         Presenter.ShowGithubLogin();
@@ -365,6 +434,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private async void huntButton_Click(object sender, EventArgs e)
     {
         _logger.LogInformation("Hunt operation started");
+        _logger.LogInformation("This process may take some time. Please wait...");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
         var result = await Presenter.HuntRepositoriesAsync(CancellationTokenSource.Token)
@@ -374,6 +444,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             return;
         _logger.LogInformation("Hunt operation finished");
         await SaveCsv(result);
+        _progressBar.Value = 0;
     }
 
     private void openLogsStripMenuItem_Click(object sender, EventArgs e)
@@ -392,6 +463,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         CancellationTokenSource.Cancel();
         _processManager.KillAllProcesses(true);
         _logger.LogInformation("Operation canceled by user");
+        _progressBar.Value = 0;
         ButtonEnable();
     }
 
@@ -408,5 +480,22 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void _repositoryDataGridView_DataContextChanged(object sender, EventArgs e)
     {
         SetHyperLink();
+
+    }
+
+    private void _repositoryDataGridView_SelectionChanged(object sender, EventArgs e)
+    {
+        var selectedRows = _repositoryDataGridView.SelectedRows;
+        if(selectedRows.Count == 0) return;
+        
+        UnSelectAllRepositories();
+
+        foreach (DataGridViewRow selectedRow in selectedRows)
+        {
+            if (selectedRow.Cells[_checkBoxColumnIndex] is not DataGridViewCheckBoxCell cell) return;
+            cell.Value = true;
+        }
+        
+        _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = IsAllSelected ? "Unselect All" : "Select All";
     }
 }

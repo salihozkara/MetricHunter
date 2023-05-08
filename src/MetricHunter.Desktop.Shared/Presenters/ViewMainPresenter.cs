@@ -67,6 +67,12 @@ public class ViewMainPresenter : IViewMainPresenter
     {
         View.Run();
     }
+
+    public void ShowGithubLogin()
+    {
+        _controller.ShowGithubLogin();
+        Authenticate();
+    }
     
     public async Task<string> CalculateMetricsAsync(CancellationToken cancellationToken = default)
     {
@@ -102,24 +108,32 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task DownloadRepositoriesAsync(CancellationToken cancellationToken = default)
     {
-        // if (!CheckSelectRepositories())
-        //     return;
+        if (!CheckSelectRepositories())
+            return;
+        
+        var currentProgressValue = 0;
+        View.SetProgressBar(0);
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        View.SetProgressBar(0);
-        var count = Repositories.Count();
-        var i = 0;
+        
+        var amount = 100 / Repositories.Count();
+        
         foreach (var item in Repositories)
         {
             await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, item.DefaultBranch,
                 cancellationToken);
-            View.SetProgressBar((int)((double)++i / count * 100));
+
+            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, cancellationToken: cancellationToken);
+
+            currentProgressValue += amount;
+
+            View.SetProgressBar(currentProgressValue);
         }
 
-        View.SetProgressBar(100);
         stopwatch.Stop();
         _logger.LogInformation($"Repositories downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+        View.SetProgressBar(0);
     }
 
     public async Task ShowRepositoriesAsync(CancellationToken cancellationToken = default)
@@ -135,8 +149,6 @@ public class ViewMainPresenter : IViewMainPresenter
         if (!repositories.Any()) return;
 
         Repositories = repositories;
-
-        View.ShowRepositories(Repositories);
     }
 
     public async Task SaveRepositoriesAsync(CancellationToken cancellationToken = default)
@@ -152,12 +164,15 @@ public class ViewMainPresenter : IViewMainPresenter
 
     public async Task<string> HuntRepositoriesAsync(CancellationToken cancellationToken = default)
     {
+        var currentProgressValue = 0;
+        var amount = 100 / Repositories.Count();
+        View.SetProgressBar(0);
+        
         if (!CheckSelectRepositories())
             return string.Empty;
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        View.SetProgressBar(0);
         var metrics = new List<Dictionary<string, string>>();
         foreach (var item in Repositories)
             if (await _gitProvider.CloneRepositoryAsync(item, cancellationToken: cancellationToken))
@@ -168,10 +183,12 @@ public class ViewMainPresenter : IViewMainPresenter
                 var dictList = metric.ToDictionaryListByTopics();
                 metrics.AddRange(dictList);
                 await _gitProvider.DeleteLocalRepositoryAsync(item, token: cancellationToken);
-                View.SetProgressBar((int)((double)_repositories.IndexOf(item) / _repositories.Count * 100));
+
+                currentProgressValue += amount;
+                
+                View.SetProgressBar(currentProgressValue);
             }
 
-        View.SetProgressBar(100);
         stopwatch.Stop();
         _logger.LogInformation($"Repositories hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
@@ -194,12 +211,6 @@ public class ViewMainPresenter : IViewMainPresenter
             Console.WriteLine($"Loaded {repositories.Count} repositories");
             Repositories = repositories;
         }
-    }
-    
-    public void ShowGithubLogin()
-    {
-        _controller.ShowGithubLogin();
-        Authenticate();
     }
 
     public void ShowExploreRepositories()

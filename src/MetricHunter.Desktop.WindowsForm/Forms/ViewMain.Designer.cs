@@ -135,10 +135,10 @@ partial class ViewMain
             dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
             dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
             this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this._repositoryDataGridView.RowHeadersWidth = 45;
+            this._repositoryDataGridView.RowHeadersWidth = 30;
             this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
             this._repositoryDataGridView.RowTemplate.Height = 50;
-            this._repositoryDataGridView.Size = new System.Drawing.Size(1090, 466);
+            this._repositoryDataGridView.Size = new System.Drawing.Size(1112, 589);
             this._repositoryDataGridView.TabIndex = 4;
             this._repositoryDataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
             this._repositoryDataGridView.DataContextChanged += new System.EventHandler(this._repositoryDataGridView_DataContextChanged);
@@ -154,7 +154,7 @@ partial class ViewMain
             this.helpMenu});
             this.menu.Location = new System.Drawing.Point(0, 0);
             this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(1164, 42);
+            this.menu.Size = new System.Drawing.Size(1178, 42);
             this.menu.TabIndex = 15;
             this.menu.Text = "menuStrip1";
             // 
@@ -254,7 +254,7 @@ partial class ViewMain
             this.basePanel.Location = new System.Drawing.Point(0, 42);
             this.basePanel.Name = "basePanel";
             this.basePanel.Padding = new System.Windows.Forms.Padding(30);
-            this.basePanel.Size = new System.Drawing.Size(1164, 1178);
+            this.basePanel.Size = new System.Drawing.Size(1178, 1202);
             this.basePanel.TabIndex = 16;
             // 
             // layoutPanel
@@ -282,11 +282,67 @@ partial class ViewMain
             this.searchRepositoryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
             this.searchRepositoryPanel.Location = new System.Drawing.Point(3, 3);
             this.searchRepositoryPanel.Name = "searchRepositoryPanel";
-            this.searchRepositoryPanel.Size = new System.Drawing.Size(1098, 244);
+            this.searchRepositoryPanel.Size = new System.Drawing.Size(1112, 144);
             this.searchRepositoryPanel.TabIndex = 5;
             // 
-            // label1
+            // searchGroupBox
             // 
+            this.searchGroupBox.Anchor = System.Windows.Forms.AnchorStyles.None;
+            this.searchGroupBox.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
+            this.searchGroupBox.Controls.Add(this._repositoryCountTextBox);
+            this.searchGroupBox.Controls.Add(this._sortDirectionLabel);
+            this.searchGroupBox.Controls.Add(this._searchButton);
+            this.searchGroupBox.Controls.Add(this._languageLabel);
+            this.searchGroupBox.Controls.Add(this._sortDirectionComboBox);
+            this.searchGroupBox.Controls.Add(this._countRepositoryLabel);
+            this.searchGroupBox.Controls.Add(this._languageComboBox);
+            this.searchGroupBox.Controls.Add(this._topicsTextBox);
+            this.searchGroupBox.Controls.Add(this._topicsLabel);
+            this.searchGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.searchGroupBox.Location = new System.Drawing.Point(153, 13);
+            this.searchGroupBox.Name = "searchGroupBox";
+            this.searchGroupBox.Padding = new System.Windows.Forms.Padding(10);
+            this.searchGroupBox.Size = new System.Drawing.Size(788, 128);
+            this.searchGroupBox.TabIndex = 12;
+            this.searchGroupBox.TabStop = false;
+            this.searchGroupBox.Text = "Search Repositories";
+            // 
+            // bottomPanel
+            // 
+            this.bottomPanel.Controls.Add(this.bottomLayoutPanel);
+            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bottomPanel.Location = new System.Drawing.Point(3, 748);
+            this.bottomPanel.Name = "bottomPanel";
+            this.bottomPanel.Size = new System.Drawing.Size(1112, 391);
+            this.bottomPanel.TabIndex = 6;
+            // 
+            // bottomLayoutPanel
+            // 
+            this.bottomLayoutPanel.ColumnCount = 1;
+            this.bottomLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.bottomLayoutPanel.Controls.Add(this.logTextBox, 0, 1);
+            this.bottomLayoutPanel.Controls.Add(this.operationGroupBox, 0, 0);
+            this.bottomLayoutPanel.Controls.Add(this.panel1, 2, 2);
+            this.bottomLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.bottomLayoutPanel.Location = new System.Drawing.Point(0, 0);
+            this.bottomLayoutPanel.Name = "bottomLayoutPanel";
+            this.bottomLayoutPanel.RowCount = 3;
+            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 150F));
+            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
+            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
+            this.bottomLayoutPanel.Size = new System.Drawing.Size(1112, 391);
+            this.bottomLayoutPanel.TabIndex = 0;
+            // 
+            // logTextBox
+            // 
+            this.logTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.logTextBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
+            this.logTextBox.Location = new System.Drawing.Point(3, 153);
+            this.logTextBox.Name = "logTextBox";
+            this.logTextBox.ReadOnly = true;
+            this.logTextBox.Size = new System.Drawing.Size(1106, 210);
+            this.logTextBox.TabIndex = 19;
+            this.logTextBox.Text = "";
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
             this.label1.Location = new System.Drawing.Point(4, 194);
@@ -302,7 +358,7 @@ partial class ViewMain
             this.operationGroupBox.Controls.Add(this._downloadButton);
             this.operationGroupBox.Controls.Add(this._calculateMetricsButton);
             this.operationGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.operationGroupBox.Location = new System.Drawing.Point(209, 23);
+            this.operationGroupBox.Location = new System.Drawing.Point(205, 3);
             this.operationGroupBox.Name = "operationGroupBox";
             this.operationGroupBox.Size = new System.Drawing.Size(701, 150);
             this.operationGroupBox.TabIndex = 17;
@@ -351,49 +407,14 @@ partial class ViewMain
             this._calculateMetricsButton.UseVisualStyleBackColor = true;
             this._calculateMetricsButton.Click += new System.EventHandler(this._calculateMetricsButton_Click);
             // 
-            // bottomPanel
-            // 
-            this.bottomPanel.Controls.Add(this.bottomLayoutPanel);
-            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomPanel.Location = new System.Drawing.Point(3, 749);
-            this.bottomPanel.Name = "bottomPanel";
-            this.bottomPanel.Size = new System.Drawing.Size(1098, 366);
-            this.bottomPanel.TabIndex = 6;
-            // 
-            // bottomLayoutPanel
-            // 
-            this.bottomLayoutPanel.ColumnCount = 1;
-            this.bottomLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.bottomLayoutPanel.Controls.Add(this.logTextBox, 0, 0);
-            this.bottomLayoutPanel.Controls.Add(this.panel1, 2, 1);
-            this.bottomLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            this.bottomLayoutPanel.Name = "bottomLayoutPanel";
-            this.bottomLayoutPanel.RowCount = 2;
-            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.bottomLayoutPanel.Size = new System.Drawing.Size(1098, 366);
-            this.bottomLayoutPanel.TabIndex = 0;
-            // 
-            // logTextBox
-            // 
-            this.logTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.logTextBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.logTextBox.Location = new System.Drawing.Point(3, 3);
-            this.logTextBox.Name = "logTextBox";
-            this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(1092, 335);
-            this.logTextBox.TabIndex = 19;
-            this.logTextBox.Text = "";
-            // 
             // panel1
             // 
             this.panel1.Controls.Add(this._cancelButton);
             this.panel1.Controls.Add(this._progressBar);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 344);
+            this.panel1.Location = new System.Drawing.Point(3, 369);
             this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1092, 19);
+            this.panel1.Size = new System.Drawing.Size(1106, 19);
             this.panel1.TabIndex = 20;
             // 
             // _cancelButton
@@ -401,7 +422,7 @@ partial class ViewMain
             this._cancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
             this._cancelButton.ImageKey = "close.png";
             this._cancelButton.ImageList = this.IconList;
-            this._cancelButton.Location = new System.Drawing.Point(1052, -8);
+            this._cancelButton.Location = new System.Drawing.Point(1066, -8);
             this._cancelButton.Name = "_cancelButton";
             this._cancelButton.Size = new System.Drawing.Size(40, 35);
             this._cancelButton.TabIndex = 19;
@@ -413,7 +434,7 @@ partial class ViewMain
             this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
             this._progressBar.Location = new System.Drawing.Point(0, -8);
             this._progressBar.Name = "_progressBar";
-            this._progressBar.Size = new System.Drawing.Size(1057, 34);
+            this._progressBar.Size = new System.Drawing.Size(1071, 34);
             this._progressBar.TabIndex = 18;
             // 
             // ViewMain
@@ -421,13 +442,13 @@ partial class ViewMain
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(115)))), ((int)(((byte)(186)))), ((int)(((byte)(155)))));
-            this.ClientSize = new System.Drawing.Size(1164, 1220);
+            this.ClientSize = new System.Drawing.Size(1178, 1244);
             this.Controls.Add(this.basePanel);
             this.Controls.Add(this.menu);
             this.ForeColor = System.Drawing.Color.Black;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MainMenuStrip = this.menu;
-            this.MinimumSize = new System.Drawing.Size(897, 806);
+            this.MinimumSize = new System.Drawing.Size(1200, 1300);
             this.Name = "ViewMain";
             this.Text = "MetricHunter";
             this.Load += new System.EventHandler(this._viewMain_Load);

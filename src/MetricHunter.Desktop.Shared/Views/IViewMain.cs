@@ -20,8 +20,8 @@ public interface IViewMain : IView<IViewMainPresenter>
     
     string CalculateMetricsByLocalResultsPath { get; set; }
     
-
     CancellationTokenSource CancellationTokenSource { get; set; }
+    
     void ShowMessage(string message);
 
     void ShowRepositories(IEnumerable<Repository> repositories);
