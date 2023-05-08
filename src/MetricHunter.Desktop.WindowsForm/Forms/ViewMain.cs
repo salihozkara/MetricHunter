@@ -126,8 +126,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             DataPropertyName = "IsSelected",
             ValueType = typeof(bool),
             ReadOnly = true,
-            Width = 50,
-            AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader,
+            MinimumWidth = 150
         });
         
         var index = 0;
@@ -359,12 +359,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
                 return;
             case { ColumnIndex: >= 0, RowIndex: >= 0 }:
             {
-                if (_repositoryDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex] is not DataGridViewCheckBoxCell cell)
+                if (_repositoryDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex] is DataGridViewCheckBoxCell cell)
                 {
-                    UnSelectAllRepositories(false);
+                    cell.Value = (bool?)cell.Value != true;
                     return;
                 }
-                cell.Value = (bool?)cell.Value != true;
                 break;
             }
         }
