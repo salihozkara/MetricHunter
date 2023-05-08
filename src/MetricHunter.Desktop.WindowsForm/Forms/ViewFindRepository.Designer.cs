@@ -44,11 +44,11 @@
             this.label2 = new System.Windows.Forms.Label();
             this._repositoryDescription = new System.Windows.Forms.Label();
             this._repositoryOwner = new System.Windows.Forms.Label();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
-            this.button3 = new System.Windows.Forms.Button();
-            this.button4 = new System.Windows.Forms.Button();
-            this.button5 = new System.Windows.Forms.Button();
+            this._releasesButton = new System.Windows.Forms.Button();
+            this._commitsButton = new System.Windows.Forms.Button();
+            this._downloadButton = new System.Windows.Forms.Button();
+            this._huntButton = new System.Windows.Forms.Button();
+            this._calculateButton = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this._repositoryImage)).BeginInit();
             this._repositoryPanel.SuspendLayout();
             this.SuspendLayout();
@@ -221,66 +221,71 @@
             this._repositoryOwner.TabIndex = 44;
             this._repositoryOwner.Text = "label1";
             // 
-            // button1
+            // _releasesButton
             // 
-            this.button1.ImageKey = "search.png";
-            this.button1.Location = new System.Drawing.Point(719, 608);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(120, 41);
-            this.button1.TabIndex = 45;
-            this.button1.Text = "Releases";
-            this.button1.UseVisualStyleBackColor = true;
+            this._releasesButton.ImageKey = "search.png";
+            this._releasesButton.Location = new System.Drawing.Point(719, 608);
+            this._releasesButton.Name = "_releasesButton";
+            this._releasesButton.Size = new System.Drawing.Size(120, 41);
+            this._releasesButton.TabIndex = 45;
+            this._releasesButton.Text = "Releases";
+            this._releasesButton.UseVisualStyleBackColor = true;
+            this._releasesButton.Click += new System.EventHandler(this._releasesButton_Click);
             // 
-            // button2
+            // _commitsButton
             // 
-            this.button2.ImageKey = "search.png";
-            this.button2.Location = new System.Drawing.Point(584, 608);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(129, 41);
-            this.button2.TabIndex = 46;
-            this.button2.Text = "Commits";
-            this.button2.UseVisualStyleBackColor = true;
+            this._commitsButton.ImageKey = "search.png";
+            this._commitsButton.Location = new System.Drawing.Point(584, 608);
+            this._commitsButton.Name = "_commitsButton";
+            this._commitsButton.Size = new System.Drawing.Size(129, 41);
+            this._commitsButton.TabIndex = 46;
+            this._commitsButton.Text = "Commits";
+            this._commitsButton.UseVisualStyleBackColor = true;
+            this._commitsButton.Click += new System.EventHandler(this._commitsButton_Click);
             // 
-            // button3
+            // _downloadButton
             // 
-            this.button3.ImageKey = "search.png";
-            this.button3.Location = new System.Drawing.Point(39, 608);
-            this.button3.Name = "button3";
-            this.button3.Size = new System.Drawing.Size(140, 41);
-            this.button3.TabIndex = 47;
-            this.button3.Text = "Download";
-            this.button3.UseVisualStyleBackColor = true;
+            this._downloadButton.ImageKey = "search.png";
+            this._downloadButton.Location = new System.Drawing.Point(39, 608);
+            this._downloadButton.Name = "_downloadButton";
+            this._downloadButton.Size = new System.Drawing.Size(140, 41);
+            this._downloadButton.TabIndex = 47;
+            this._downloadButton.Text = "Download";
+            this._downloadButton.UseVisualStyleBackColor = true;
+            this._downloadButton.Click += new System.EventHandler(this._downloadButton_Click);
             // 
-            // button4
+            // _huntButton
             // 
-            this.button4.ImageKey = "search.png";
-            this.button4.Location = new System.Drawing.Point(379, 608);
-            this.button4.Name = "button4";
-            this.button4.Size = new System.Drawing.Size(95, 41);
-            this.button4.TabIndex = 48;
-            this.button4.Text = "Hunt";
-            this.button4.UseVisualStyleBackColor = true;
+            this._huntButton.ImageKey = "search.png";
+            this._huntButton.Location = new System.Drawing.Point(379, 608);
+            this._huntButton.Name = "_huntButton";
+            this._huntButton.Size = new System.Drawing.Size(95, 41);
+            this._huntButton.TabIndex = 48;
+            this._huntButton.Text = "Hunt";
+            this._huntButton.UseVisualStyleBackColor = true;
+            this._huntButton.Click += new System.EventHandler(this._huntButton_Click);
             // 
-            // button5
+            // _calculateButton
             // 
-            this.button5.ImageKey = "search.png";
-            this.button5.Location = new System.Drawing.Point(185, 608);
-            this.button5.Name = "button5";
-            this.button5.Size = new System.Drawing.Size(188, 41);
-            this.button5.TabIndex = 49;
-            this.button5.Text = "Calculate Metrics";
-            this.button5.UseVisualStyleBackColor = true;
+            this._calculateButton.ImageKey = "search.png";
+            this._calculateButton.Location = new System.Drawing.Point(185, 608);
+            this._calculateButton.Name = "_calculateButton";
+            this._calculateButton.Size = new System.Drawing.Size(188, 41);
+            this._calculateButton.TabIndex = 49;
+            this._calculateButton.Text = "Calculate Metrics";
+            this._calculateButton.UseVisualStyleBackColor = true;
+            this._calculateButton.Click += new System.EventHandler(this._calculateButton_Click);
             // 
             // ViewFindRepository
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(865, 232);
-            this.Controls.Add(this.button5);
-            this.Controls.Add(this.button4);
-            this.Controls.Add(this.button3);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.ClientSize = new System.Drawing.Size(865, 229);
+            this.Controls.Add(this._calculateButton);
+            this.Controls.Add(this._huntButton);
+            this.Controls.Add(this._downloadButton);
+            this.Controls.Add(this._commitsButton);
+            this.Controls.Add(this._releasesButton);
             this.Controls.Add(this._repositoryPanel);
             this.Controls.Add(this._findButton);
             this.Controls.Add(this.label1);
@@ -318,10 +323,10 @@
         private Label label2;
         private Label label6;
         private Label label7;
-        private Button button1;
-        private Button button2;
-        private Button button3;
-        private Button button4;
-        private Button button5;
+        private Button _releasesButton;
+        private Button _commitsButton;
+        private Button _downloadButton;
+        private Button _huntButton;
+        private Button _calculateButton;
     }
 }

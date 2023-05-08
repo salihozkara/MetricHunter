@@ -26,16 +26,29 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
     
     public async Task FindRepository()
     {
-        _repository = await _gitManager.GetRepositoryAsync(View.RepositoryFullNameOrUrl);
-
-        if (_repository is null)
+        try
+        {
+            _repository = await _gitManager.GetRepositoryAsync(View.RepositoryFullNameOrUrl);
+            View.ShowRepository(_repository);
+        }
+        catch (Exception e)
         {
             _controller.ErrorMessage("Repository not found");
         }
-        else
-        {
-            View.ShowRepository(_repository);
-        }
+    }
+
+    public async Task GetCommits()
+    {
+        var commits = await _gitManager.GetCommitsAsync(_repository.FullName);
+
+        _controller.ShowCommits(commits);
+    }
+
+    public async Task GetReleases()
+    {
+        var releases = await _gitManager.GetReleasesAsync(_repository.FullName);
+
+        _controller.ShowReleases(releases);
     }
 
     public void Run()

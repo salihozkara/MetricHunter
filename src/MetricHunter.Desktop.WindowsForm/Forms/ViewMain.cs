@@ -44,6 +44,36 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _progressBar.Value = value;
     }
 
+    public void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits)
+    {
+        var index = 0;
+        var commitModelList = gitHubCommits.Select(x => new CommitModel()
+        {
+            Index = ++index,
+            Author = x.Author.Login,
+            CommitedAt = x.Commit.Author.Date.UtcDateTime,
+            Name = x.Commit.Message,
+            Url = x.HtmlUrl
+        }).ToList();
+        
+        _repositoryDataGridView.DataSource = commitModelList.ToList();
+    }
+
+    public void ShowReleases(IEnumerable<Release> releases)
+    {
+        var index = 0;
+        
+        var releaseModelList = releases.Select(x => new ReleaseModel()
+        {
+            Index = ++index,
+            Name = x.Name,
+            Url = x.HtmlUrl,
+            PublishedAt = x.PublishedAt?.UtcDateTime,
+        }).ToList();
+        
+        _repositoryDataGridView.DataSource = releaseModelList.ToList();
+    }
+
     public string GithubToken
     {
         get
@@ -371,5 +401,10 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
     private void exploreRepositoriesToolStripMenuItem_Click(object sender, EventArgs e)
     {
         Presenter.ShowExploreRepositories();
+    }
+
+    private void _repositoryDataGridView_DataContextChanged(object sender, EventArgs e)
+    {
+        SetHyperLink();
     }
 }

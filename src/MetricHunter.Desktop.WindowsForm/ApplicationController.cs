@@ -68,6 +68,16 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
         ViewMain.SetProgressBar(i);
     }
 
+    public void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits)
+    {
+        ViewMain.ShowCommits(gitHubCommits);
+    }
+
+    public void ShowReleases(IEnumerable<Release> releases)
+    {
+        ViewMain.ShowReleases(releases);
+    }
+
     public void ShowGithubLogin()
     {
         using var viewGithubLogin = new ViewGithubLogin();

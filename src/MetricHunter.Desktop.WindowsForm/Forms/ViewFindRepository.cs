@@ -13,7 +13,9 @@ namespace MetricHunter.Desktop.Forms
 
         public void Run()
         {
+            FormBorderStyle = FormBorderStyle.FixedSingle;
             Show();
+
         }
 
         public IViewFindRepositoryPresenter Presenter { get; set; }
@@ -33,9 +35,40 @@ namespace MetricHunter.Desktop.Forms
             _repositoryName.Text = repository.Name;
             _repositoryOwner.Text = repository.Owner.Login;
             _repositoryDescription.Text = repository.Description;
+
+            if (repository.Description.IsNullOrWhiteSpace())
+            {
+                _repositoryDescription.Text = "No description";
+            }
+            
             _repositoryUrl.Text = repository.HtmlUrl;
             
             CenterToScreen();
+        }
+
+        private void _downloadButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void _calculateButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void _huntButton_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void _commitsButton_Click(object sender, EventArgs e)
+        {
+            Presenter.GetCommits();
+        }
+
+        private void _releasesButton_Click(object sender, EventArgs e)
+        {
+            Presenter.GetReleases();
         }
     }
 }

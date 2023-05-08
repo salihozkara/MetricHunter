@@ -141,6 +141,7 @@ partial class ViewMain
             this._repositoryDataGridView.Size = new System.Drawing.Size(1090, 466);
             this._repositoryDataGridView.TabIndex = 4;
             this._repositoryDataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
+            this._repositoryDataGridView.DataContextChanged += new System.EventHandler(this._repositoryDataGridView_DataContextChanged);
             // 
             // menu
             // 
