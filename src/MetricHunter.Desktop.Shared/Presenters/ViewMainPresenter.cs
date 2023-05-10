@@ -21,8 +21,8 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly ILogger<ViewMainPresenter> _logger;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
+    
     private List<Repository> _repositories;
-    private List<Branch> _branches;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -31,7 +31,6 @@ public class ViewMainPresenter : IViewMainPresenter
         View.Presenter = this;
 
         _repositories = new List<Repository>();
-        _branches = new List<Branch>();
 
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
         _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
@@ -44,6 +43,8 @@ public class ViewMainPresenter : IViewMainPresenter
         
         LoadFromArgsAsync();
     }
+    
+    public Repository FoundRepository { get; set; }
 
     public IEnumerable<Repository> Repositories
     {
@@ -60,7 +61,7 @@ public class ViewMainPresenter : IViewMainPresenter
             View.ShowRepositories(_repositories);
         }
     }
-
+    
     public IViewMain View { get; }
 
     public void Run()
@@ -121,9 +122,6 @@ public class ViewMainPresenter : IViewMainPresenter
         
         foreach (var item in Repositories)
         {
-            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, item.DefaultBranch,
-                cancellationToken);
-
             await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, cancellationToken: cancellationToken);
 
             currentProgressValue += amount;
@@ -223,6 +221,62 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller.ShowFindRepository();
     }
 
+    public async Task DownloadCommitsAsync(CancellationToken cancellationToken = default)
+    {
+        if (!CheckSelectCommits())
+            return;
+        
+        var currentProgressValue = 0;
+        View.SetProgressBar(0);
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        var amount = 100 / View.SelectedCommits.Count();
+        
+        foreach (var item in View.SelectedCommits)
+        {
+            await _gitProvider.CloneRepositoryAsync(FoundRepository, View.DownloadRepositoryPath, item,
+                cancellationToken);
+            
+            currentProgressValue += amount;
+
+            View.SetProgressBar(currentProgressValue);
+        }
+
+        stopwatch.Stop();
+        _logger.LogInformation($"Commits downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+        View.SetProgressBar(0);
+    }
+
+    public async Task DownloadReleasesAsync(CancellationToken cancellationToken = default)
+    {
+        if (!CheckSelectReleases())
+            return;
+        
+        var currentProgressValue = 0;
+        View.SetProgressBar(0);
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        
+        var amount = 100 / View.SelectedReleases.Count();
+        
+        foreach (var item in View.SelectedReleases)
+        {
+            await _gitProvider.CloneRepositoryAsync(FoundRepository, View.DownloadRepositoryPath, item,
+                cancellationToken);
+            
+            currentProgressValue += amount;
+
+            View.SetProgressBar(currentProgressValue);
+        }
+
+        stopwatch.Stop();
+        _logger.LogInformation($"Releases downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+        View.SetProgressBar(0);
+    }
+
     private void Authenticate()
     {
         if (!string.IsNullOrWhiteSpace(View.GithubToken))
@@ -233,6 +287,22 @@ public class ViewMainPresenter : IViewMainPresenter
     {
         if (Repositories.Any()) return true;
         _controller.ErrorMessage("No repositories selected");
+        return false;
+
+    }
+    
+    private bool CheckSelectCommits()
+    {
+        if (View.SelectedCommits.Any()) return true;
+        _controller.ErrorMessage("No commits selected");
+        return false;
+
+    }
+    
+    private bool CheckSelectReleases()
+    {
+        if (View.SelectedReleases.Any()) return true;
+        _controller.ErrorMessage("No releases selected");
         return false;
 
     }

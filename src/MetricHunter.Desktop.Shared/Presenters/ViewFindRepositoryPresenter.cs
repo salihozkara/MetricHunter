@@ -41,14 +41,14 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
     {
         var commits = await _gitManager.GetCommitsAsync(_repository.FullName);
 
-        _controller.ShowCommits(commits);
+        _controller.ShowCommits(_repository, commits);
     }
 
     public async Task GetReleases()
     {
         var releases = await _gitManager.GetReleasesAsync(_repository.FullName);
 
-        _controller.ShowReleases(releases);
+        _controller.ShowReleases(_repository, releases);
     }
 
     public void Run()

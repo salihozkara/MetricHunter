@@ -23,7 +23,7 @@ public interface IApplicationController
     
     void SetProgressBar(int i);
     
-    void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits);
+    void ShowCommits(Repository repository, IEnumerable<GitHubCommit> gitHubCommits);
     
-    void ShowReleases(IEnumerable<Release> releases);
+    void ShowReleases(Repository repository, IEnumerable<Release> releases);
 }

@@ -10,6 +10,10 @@ public interface IViewMain : IView<IViewMainPresenter>
     
     IEnumerable<long> SelectedRepositories { get; }
     
+    IEnumerable<string> SelectedCommits { get; }
+
+    IEnumerable<string> SelectedReleases { get; }
+    
     string JsonLoadPath { get; set; }
 
     string JsonSavePath { get; set; }

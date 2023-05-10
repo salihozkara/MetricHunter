@@ -47,10 +47,13 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits)
     {
+        AddSelectColumn();
+
         var index = 0;
 
         var commitModelList = gitHubCommits.Select(x => new CommitModel()
         {
+            Id = x.Sha,
             Index = ++index,
             Author = x.Commit.Author.Email,
             CommitedAt = x.Commit.Author.Date.UtcDateTime,
@@ -59,14 +62,19 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         }).ToList();
         
         _repositoryDataGridView.DataSource = commitModelList.ToList();
+        
+        // if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
     }
 
     public void ShowReleases(IEnumerable<Release> releases)
     {
+        AddSelectColumn();
+        
         var index = 0;
         
         var releaseModelList = releases.Select(x => new ReleaseModel()
         {
+            Id = x.TagName,
             Index = ++index,
             Name = x.Name,
             Url = x.HtmlUrl,
@@ -74,6 +82,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         }).ToList();
         
         _repositoryDataGridView.DataSource = releaseModelList.ToList();
+        
+        if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
     }
 
     public string GithubToken
@@ -105,6 +115,30 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         }
     }
 
+    public IEnumerable<string> SelectedCommits
+    {
+        get
+        {
+            return _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
+                .Where(r => r.Cells[_checkBoxColumnIndex].Value != null && (bool) r.Cells[_checkBoxColumnIndex].Value)
+                .Select(r => r.Cells["Id"].Value)
+                .Cast<string>()
+                .ToList();
+        }
+    }
+    
+    public IEnumerable<string> SelectedReleases
+    {
+        get
+        {
+            return _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
+                .Where(r => r.Cells[_checkBoxColumnIndex].Value != null && (bool) r.Cells[_checkBoxColumnIndex].Value)
+                .Select(r => r.Cells["Id"].Value)
+                .Cast<string>()
+                .ToList();
+        }
+    }
+
     public string JsonLoadPath { get; set; }
 
     public string JsonSavePath { get; set; }
@@ -115,7 +149,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
     public string CalculateMetricsByLocalResultsPath { get; set; }
 
-    public void ShowRepositories(IEnumerable<Repository> repositories)
+    private void AddSelectColumn()
     {
         _repositoryDataGridView.Columns.Clear();
         
@@ -129,6 +163,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
             AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader,
             MinimumWidth = 150
         });
+    }
+    
+    public void ShowRepositories(IEnumerable<Repository> repositories)
+    {
+        AddSelectColumn();
         
         var index = 0;
         var repositoryModelList = repositories.Select(x => new RepositoryModel
@@ -297,8 +336,27 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
 
         if (folderDialog.ShowDialog() == DialogResult.OK) DownloadRepositoryPath = folderDialog.SelectedPath;
 
-        await Presenter.DownloadRepositoriesAsync(CancellationTokenSource.Token)
-            .MaybeCanceled(CancellationTokenSource.Token);
+        var dataSource = _repositoryDataGridView.DataSource;
+        
+        // get list generic type
+        var sourceType = dataSource.GetType().GenericTypeArguments[0];
+        
+        if (sourceType == typeof(RepositoryModel))
+        {
+            await Presenter.DownloadRepositoriesAsync(CancellationTokenSource.Token)
+                .MaybeCanceled(CancellationTokenSource.Token);
+        } else if (sourceType == typeof(CommitModel))
+        {
+            await Presenter.DownloadCommitsAsync(CancellationTokenSource.Token)
+                .MaybeCanceled(CancellationTokenSource.Token);
+        }
+        else if (sourceType == typeof(ReleaseModel))
+        {
+            await Presenter.DownloadReleasesAsync(CancellationTokenSource.Token)
+                .MaybeCanceled(CancellationTokenSource.Token);
+        }
+        
+        
         ButtonEnable();
     }
 
