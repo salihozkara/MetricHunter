@@ -1,6 +1,9 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using System.Reflection;
+using MetricHunter.Core.Languages;
+using Microsoft.Extensions.Logging;
 using Octokit;
 using Volo.Abp.DependencyInjection;
+using Language = Octokit.Language;
 using Range = Octokit.Range;
 
 namespace MetricHunter.Application.Git;
@@ -146,7 +149,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
         List<Repository> repositories = new();
         Range? stars = null;
 
-        while (repositories.Count < input.Count)
+        do
         {
             cancellationToken.ThrowIfCancellationRequested();
             var requests = GetPageNumbers(input.Count - repositories.Count).Select(p => CreateRequest(input, p, stars))
@@ -171,7 +174,7 @@ public class OctokitGitManager : IGitManager, ITransientDependency
                 stars = input.Order == SortDirection.Descending
                     ? Range.LessThanOrEquals(repositories.Min(x => x.StargazersCount))
                     : Range.GreaterThanOrEquals(repositories.Max(x => x.StargazersCount));
-        }
+        }while(repositories.Count < input.Count && repositories.Count != 0);
 
         return new GitOutput(repositories.Take(input.Count).ToList(), failedRequests);
     }
@@ -351,16 +354,25 @@ public class OctokitGitManager : IGitManager, ITransientDependency
 
     private SearchRepositoriesRequest CreateRequest(GitInput input, int page, Range? stars)
     {
-        var request = new SearchRepositoriesRequest
+        string? term = null;
+        
+        if (input.Language.HasValue)
         {
-            Language = input.Language,
-            Topic = input.Topic.IsNullOrWhiteSpace() ? null : input.Topic,
-            SortField = RepoSearchSort.Stars,
-            Stars = stars,
-            Page = page,
-            PerPage = PerPage,
-            Order = input.Order
-        };
+            var languageInfo = input.Language.Value.GetType().GetField(input.Language.Value.ToString())?.GetCustomAttribute<LanguageInfoAttribute>();
+            var lang = languageInfo?.ParameterName ?? input.Language.Value.ToString();
+            term = $"language:{lang}";
+        }
+
+        var request = !term.IsNullOrWhiteSpace() ? new SearchRepositoriesRequest(term) : new SearchRepositoriesRequest();
+
+        request.Topic = input.Topic.IsNullOrWhiteSpace() ? null : input.Topic;
+        request.SortField = RepoSearchSort.Stars;
+        request.Stars = stars;
+        request.Page = page;
+        request.PerPage = PerPage;
+        request.Order = input.Order;
+
+        
         return request;
     }
 }

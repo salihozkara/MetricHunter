@@ -3,18 +3,20 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using AdvancedPath;
 using MetricHunter.Application.Git;
-using MetricHunter.Application.Metrics.SourceMonitor.SourceMonitorMetrics;
 using MetricHunter.Application.Resources;
 using MetricHunter.Application.Results;
 using MetricHunter.Core.DependencyProcesses;
+using MetricHunter.Core.Languages;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using Microsoft.Extensions.Logging;
 using Octokit;
+using Octokit.Internal;
+using Language = MetricHunter.Core.Languages.Language;
 
 namespace MetricHunter.Application.Metrics.SourceMonitor;
 
-[Language(Language.CSharp, Language.CPlusPlus, Language.Java)]
+[Language(Language.C, Language.CPlusPlus, Language.CSharp, Language.Delphi, Language.Html, Language.Java, Language.VBNET)]
 [ProcessDependency<SourceMonitorProcessDependency>]
 public class SourceMonitorMetricCalculator : IMetricCalculator
 {
@@ -34,6 +36,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     private string? _projectsPath;
 
     private string? _reportsPath;
+    
+    
 
     public SourceMonitorMetricCalculator(IProcessManager processManager,
         ILogger<SourceMonitorMetricCalculator> logger)
@@ -114,35 +118,9 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             .Select(k => new Metric(k.InnerText, metricsDetails[k].InnerText)).ToList();
         if (matchesMetrics != null) metrics.AddRange(matchesMetrics);
 
-        return Metrics(metrics);
+        return metrics;
     }
-
-    private List<IMetric> Metrics(List<IMetric> metrics)
-    {
-        return new List<IMetric>
-        {
-            new LinesMetric(GetMetricListValue(metrics, LinesMetric.MatchedMetricNames)),
-            new StatementsMetric(GetMetricListValue(metrics, StatementsMetric.MatchedMetricNames)),
-            new PercentCommentLinesMetric(GetMetricListValue(metrics, PercentCommentLinesMetric.MatchedMetricNames)),
-            new PercentDocumentationLinesMetric(GetMetricListValue(metrics,
-                PercentDocumentationLinesMetric.MatchedMetricNames)),
-            new ClassesInterfacesStructsMetric(GetMetricListValue(metrics,
-                ClassesInterfacesStructsMetric.MatchedMetricNames)),
-            new MethodsPerClassMetric(GetMetricListValue(metrics, MethodsPerClassMetric.MatchedMetricNames)),
-            new StatementsPerMethodMetric(GetMetricListValue(metrics, StatementsPerMethodMetric.MatchedMetricNames)),
-            new MaximumComplexityMetric(GetMetricListValue(metrics, MaximumComplexityMetric.MatchedMetricNames)),
-            new AverageComplexityMetric(GetMetricListValue(metrics, AverageComplexityMetric.MatchedMetricNames)),
-            new MaximumBlockDepthMetric(GetMetricListValue(metrics, MaximumBlockDepthMetric.MatchedMetricNames)),
-            new AverageBlockDepthMetric(GetMetricListValue(metrics, AverageBlockDepthMetric.MatchedMetricNames))
-        };
-    }
-
-    private static string GetMetricListValue(IEnumerable<IMetric> metrics, string[] match)
-    {
-        var metric = metrics.FirstOrDefault(m => match.Contains(m.Name));
-        return metric?.Value ?? "0";
-    }
-
+    
     private static void FileNameChange(Repository repository, FilePathString reportsPath)
     {
         // file name change
@@ -221,7 +199,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
             .Replace(ProjectNameReplacement, projectName)
             .Replace(ProjectDirectoryReplacement, projectDirectory)
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)
-            .Replace(ProjectLanguageReplacement, repository.Language)
+            .Replace(ProjectLanguageReplacement, GitConsts.LanguagesMap[repository.Language].GetNormalizedLanguage())
             .Replace(ReportsPathReplacement, reportsPath);
 
         await File.WriteAllTextAsync(xmlPath, xml, cancellationToken);

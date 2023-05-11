@@ -2,6 +2,7 @@ using System.Diagnostics;
 using AdvancedPath;
 using MetricHunter.Application.Csv;
 using MetricHunter.Application.Git;
+using MetricHunter.Application.Languages;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
 using MetricHunter.Desktop.Core;

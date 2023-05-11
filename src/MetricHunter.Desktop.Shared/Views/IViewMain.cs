@@ -1,6 +1,7 @@
 ﻿using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Presenters;
 using Octokit;
+using Language = MetricHunter.Core.Languages.Language;
 
 namespace MetricHunter.Desktop.Views;
 
