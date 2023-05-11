@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using Octokit;
 using Serilog.Events;
 using Volo.Abp.DependencyInjection;
+using Language = MetricHunter.Core.Languages.Language;
 using ProcessStartInfo = System.Diagnostics.ProcessStartInfo;
 
 namespace MetricHunter.Desktop;
