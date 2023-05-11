@@ -2,6 +2,7 @@
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Views;
 using Octokit;
+using Language = MetricHunter.Core.Languages.Language;
 
 namespace MetricHunter.Desktop.Forms
 {
@@ -22,7 +23,7 @@ namespace MetricHunter.Desktop.Forms
 
         public IViewExploreRepositoriesPresenter Presenter { get; set; }
 
-        public Language? SelectedLanguage => _languageComboBox.SelectedValue as Language?;
+        public MetricHunter.Core.Languages.Language? SelectedLanguage => _languageComboBox.SelectedValue as MetricHunter.Core.Languages.Language?;
 
         public SortDirection SortDirection =>
             _sortDirectionComboBox.SelectedValue as SortDirection? ?? SortDirection.Descending;
