@@ -9,8 +9,8 @@ namespace MetricHunter.Desktop.Presenters;
 public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
 {
     private readonly IApplicationController _controller;
-    private readonly IGitManager _gitManager;
-    
+    public IGitManager GitManager { get; }
+
     private Repository _repository;
     
     public ViewFindRepositoryPresenter(IApplicationController controller, IViewFindRepository viewFindRepository)
@@ -18,8 +18,8 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
         _controller = controller;
         View = viewFindRepository;
         View.Presenter = this;
-        
-        _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
+
+        GitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
     }
     
     public IViewFindRepository View { get; }
@@ -28,7 +28,7 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
     {
         try
         {
-            _repository = await _gitManager.GetRepositoryAsync(View.RepositoryFullNameOrUrl);
+            _repository = await GitManager.GetRepositoryAsync(View.RepositoryFullNameOrUrl);
             View.ShowRepository(_repository);
         }
         catch (Exception e)
@@ -39,14 +39,14 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
 
     public async Task GetCommits()
     {
-        var commits = await _gitManager.GetCommitsAsync(_repository.FullName);
+        var commits = await GitManager.GetCommitsAsync(_repository.FullName);
 
         _controller.ShowCommits(_repository, commits);
     }
 
     public async Task GetReleases()
     {
-        var releases = await _gitManager.GetReleasesAsync(_repository.FullName);
+        var releases = await GitManager.GetReleasesAsync(_repository.FullName);
 
         _controller.ShowReleases(_repository, releases);
     }

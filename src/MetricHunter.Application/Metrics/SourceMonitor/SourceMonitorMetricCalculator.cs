@@ -184,6 +184,8 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         var reportsPath = PathHelper
             .BuildReportPath(_reportsPath!, repository.Language, repository.FullName, branchName.Replace('/', '-'),FileExtension).ParentDirectory;
+        
+        reportsPath.CreateIfNotExists();
 
         var projectDirectory =
             PathHelper.BuildRepositoryDirectoryPath(_projectsPath!, repository.Language, repository.FullName, branchName);

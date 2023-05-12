@@ -19,6 +19,10 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
     Task SaveRepositoriesAsync(CancellationToken cancellationToken = default);
     
     Task<string> HuntRepositoriesAsync(CancellationToken cancellationToken = default);
+
+    Task<string> HuntCommitsAsync(CancellationToken cancellationToken = default);
+    
+    Task<string> HuntReleasesAsync(CancellationToken cancellationToken = default);
     
     void ShowGithubLogin();
     

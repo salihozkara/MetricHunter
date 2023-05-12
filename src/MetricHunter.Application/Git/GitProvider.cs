@@ -316,7 +316,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
     private static async void AddRepositoryInfoFile(PathString repositoryPath, Repository repository, string branchName)
     {
-        var repositoryInfoFilePath = (repositoryPath + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
-        await JsonHelper.AppendJsonAsync(new {repository, branchName}, repositoryInfoFilePath, r => new {r.repository.Id,r.branchName});
+        var repositoryInfoFilePath = (repositoryPath + branchName + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
+        await JsonHelper.AppendJsonAsync(repository, repositoryInfoFilePath, r => r.Id);
     }
 }

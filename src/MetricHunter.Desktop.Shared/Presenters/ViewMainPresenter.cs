@@ -192,6 +192,72 @@ public class ViewMainPresenter : IViewMainPresenter
         _logger.LogInformation($"Repositories hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
     }
+    
+    public async Task<string> HuntCommitsAsync(CancellationToken cancellationToken = default)
+    {
+        var currentProgressValue = 0;
+        var amount = 100 / View.SelectedCommits.Count();
+        View.SetProgressBar(0);
+        
+        if (!CheckSelectCommits())
+            return string.Empty;
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        var language = GitConsts.LanguagesMap[FoundRepository.Language];
+        var manager = _metricCalculatorManager.FindMetricCalculator(language);
+        var metrics = new List<Dictionary<string, string>>();
+        foreach (var item in View.SelectedCommits)
+            if (await _gitProvider.CloneRepositoryAsync(FoundRepository, branchName: item, cancellationToken: cancellationToken))
+            {
+                
+                var metric = await manager.CalculateMetricsAsync(FoundRepository, branchName: item, token: cancellationToken);
+                var dictList = metric.ToDictionaryListByTopics();
+                metrics.AddRange(dictList);
+                await _gitProvider.DeleteLocalRepositoryAsync(FoundRepository, branchName: item, token: cancellationToken);
+
+                currentProgressValue += amount;
+                
+                View.SetProgressBar(currentProgressValue);
+            }
+
+        stopwatch.Stop();
+        _logger.LogInformation($"Commits hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+        return _csvHelper.MetricsToCsv(metrics);
+    }
+    
+    public async Task<string> HuntReleasesAsync(CancellationToken cancellationToken = default)
+    {
+        var currentProgressValue = 0;
+        var amount = 100 / View.SelectedReleases.Count();
+        View.SetProgressBar(0);
+        
+        if (!CheckSelectReleases())
+            return string.Empty;
+
+        var stopwatch = new Stopwatch();
+        stopwatch.Start();
+        var language = GitConsts.LanguagesMap[FoundRepository.Language];
+        var manager = _metricCalculatorManager.FindMetricCalculator(language);
+        var metrics = new List<Dictionary<string, string>>();
+        foreach (var item in View.SelectedReleases)
+            if (await _gitProvider.CloneRepositoryAsync(FoundRepository, item, cancellationToken: cancellationToken))
+            {
+                
+                var metric = await manager.CalculateMetricsAsync(FoundRepository, branchName: item, token: cancellationToken);
+                var dictList = metric.ToDictionaryListByTopics();
+                metrics.AddRange(dictList);
+                await _gitProvider.DeleteLocalRepositoryAsync(FoundRepository, item, token: cancellationToken);
+
+                currentProgressValue += amount;
+                
+                View.SetProgressBar(currentProgressValue);
+            }
+
+        stopwatch.Stop();
+        _logger.LogInformation($"Releases hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
+        return _csvHelper.MetricsToCsv(metrics);
+    }
 
     private async void LoadFromArgsAsync(CancellationToken cancellationToken = default)
     {

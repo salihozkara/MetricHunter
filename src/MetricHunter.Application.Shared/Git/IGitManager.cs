@@ -69,4 +69,6 @@ public interface IGitManager
     Task<IReadOnlyList<Release>> GetReleasesAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default);
     
     Task<IReadOnlyList<GitHubCommit>> GetCommitsAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default);
+    
+    public Task<IReadOnlyList<Repository>> GetRepositoriesByOwnerAsync(string owner, CancellationToken cancellationToken = default);
 }

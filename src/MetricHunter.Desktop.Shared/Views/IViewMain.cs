@@ -7,6 +7,7 @@ namespace MetricHunter.Desktop.Views;
 
 public interface IViewMain : IView<IViewMainPresenter>
 {
+    Mode Mode { get; set; }
     string GithubToken { get; }
     
     IEnumerable<long> SelectedRepositories { get; }

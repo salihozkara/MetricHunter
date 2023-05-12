@@ -1,7 +1,5 @@
-﻿namespace MetricHunter.Desktop.Forms
-{
-    partial class ViewFindRepository
-    {
+﻿namespace MetricHunter.Desktop.Forms {
+    partial class ViewFindRepository {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -11,10 +9,8 @@
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -26,244 +22,264 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
-            this.label1 = new System.Windows.Forms.Label();
-            this._repositoryNameTextBox = new System.Windows.Forms.TextBox();
-            this._repositoryNameLabel = new System.Windows.Forms.Label();
-            this._findButton = new System.Windows.Forms.Button();
-            this._repositoryUrl = new System.Windows.Forms.LinkLabel();
-            this._repositoryName = new System.Windows.Forms.Label();
-            this._repositoryImage = new System.Windows.Forms.PictureBox();
-            this._repositoryPanel = new System.Windows.Forms.Panel();
-            this.label6 = new System.Windows.Forms.Label();
-            this.label7 = new System.Windows.Forms.Label();
-            this.label5 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this._repositoryDescription = new System.Windows.Forms.Label();
-            this._repositoryOwner = new System.Windows.Forms.Label();
-            this._releasesButton = new System.Windows.Forms.Button();
-            this._commitsButton = new System.Windows.Forms.Button();
-            ((System.ComponentModel.ISupportInitialize)(this._repositoryImage)).BeginInit();
-            this._repositoryPanel.SuspendLayout();
-            this.SuspendLayout();
+        private void InitializeComponent() {
+            label1 = new Label();
+            _repositoryNameTextBox = new TextBox();
+            _repositoryNameLabel = new Label();
+            _findButton = new Button();
+            _repositoryUrl = new LinkLabel();
+            _repositoryName = new Label();
+            _repositoryImage = new PictureBox();
+            _repositoryPanel = new Panel();
+            label6 = new Label();
+            label7 = new Label();
+            label5 = new Label();
+            label4 = new Label();
+            label3 = new Label();
+            label2 = new Label();
+            _repositoryDescription = new Label();
+            _repositoryOwner = new Label();
+            _releasesButton = new Button();
+            _commitsButton = new Button();
+            ((System.ComponentModel.ISupportInitialize)_repositoryImage).BeginInit();
+            _repositoryPanel.SuspendLayout();
+            SuspendLayout();
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(26, 27);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(356, 65);
-            this.label1.TabIndex = 31;
-            this.label1.Text = "Find Repository";
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 24F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Location = new Point(18, 16);
+            label1.Margin = new Padding(2, 0, 2, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(241, 45);
+            label1.TabIndex = 31;
+            label1.Text = "Find Repository";
             // 
             // _repositoryNameTextBox
             // 
-            this._repositoryNameTextBox.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryNameTextBox.Location = new System.Drawing.Point(37, 162);
-            this._repositoryNameTextBox.Name = "_repositoryNameTextBox";
-            this._repositoryNameTextBox.Size = new System.Drawing.Size(685, 41);
-            this._repositoryNameTextBox.TabIndex = 23;
+            _repositoryNameTextBox.AutoCompleteMode = AutoCompleteMode.Suggest;
+            _repositoryNameTextBox.AutoCompleteSource = AutoCompleteSource.CustomSource;
+            _repositoryNameTextBox.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            _repositoryNameTextBox.Location = new Point(26, 97);
+            _repositoryNameTextBox.Margin = new Padding(2);
+            _repositoryNameTextBox.Name = "_repositoryNameTextBox";
+            _repositoryNameTextBox.Size = new Size(481, 30);
+            _repositoryNameTextBox.TabIndex = 23;
+            _repositoryNameTextBox.KeyDown += _repositoryNameTextBox_KeyDown;
             // 
             // _repositoryNameLabel
             // 
-            this._repositoryNameLabel.AutoSize = true;
-            this._repositoryNameLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryNameLabel.Location = new System.Drawing.Point(35, 124);
-            this._repositoryNameLabel.Name = "_repositoryNameLabel";
-            this._repositoryNameLabel.Size = new System.Drawing.Size(216, 34);
-            this._repositoryNameLabel.TabIndex = 27;
-            this._repositoryNameLabel.Text = "Repository Name or URL";
+            _repositoryNameLabel.AutoSize = true;
+            _repositoryNameLabel.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            _repositoryNameLabel.Location = new Point(24, 74);
+            _repositoryNameLabel.Margin = new Padding(2, 0, 2, 0);
+            _repositoryNameLabel.Name = "_repositoryNameLabel";
+            _repositoryNameLabel.Size = new Size(149, 24);
+            _repositoryNameLabel.TabIndex = 27;
+            _repositoryNameLabel.Text = "Repository Name or URL";
             // 
             // _findButton
             // 
-            this._findButton.ImageKey = "search.png";
-            this._findButton.Location = new System.Drawing.Point(738, 162);
-            this._findButton.Name = "_findButton";
-            this._findButton.Size = new System.Drawing.Size(99, 41);
-            this._findButton.TabIndex = 36;
-            this._findButton.Text = "Find";
-            this._findButton.UseVisualStyleBackColor = true;
-            this._findButton.Click += new System.EventHandler(this._findButton_Click);
+            _findButton.ImageKey = "search.png";
+            _findButton.Location = new Point(517, 97);
+            _findButton.Margin = new Padding(2);
+            _findButton.Name = "_findButton";
+            _findButton.Size = new Size(69, 25);
+            _findButton.TabIndex = 36;
+            _findButton.Text = "Find";
+            _findButton.UseVisualStyleBackColor = true;
+            _findButton.Click += _findButton_Click;
             // 
             // _repositoryUrl
             // 
-            this._repositoryUrl.AutoSize = true;
-            this._repositoryUrl.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryUrl.Location = new System.Drawing.Point(399, 93);
-            this._repositoryUrl.Name = "_repositoryUrl";
-            this._repositoryUrl.Size = new System.Drawing.Size(100, 28);
-            this._repositoryUrl.TabIndex = 43;
-            this._repositoryUrl.TabStop = true;
-            this._repositoryUrl.Text = "linkLabel1";
+            _repositoryUrl.AutoSize = true;
+            _repositoryUrl.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            _repositoryUrl.Location = new Point(279, 56);
+            _repositoryUrl.Margin = new Padding(2, 0, 2, 0);
+            _repositoryUrl.Name = "_repositoryUrl";
+            _repositoryUrl.Size = new Size(70, 19);
+            _repositoryUrl.TabIndex = 43;
+            _repositoryUrl.TabStop = true;
+            _repositoryUrl.Text = "linkLabel1";
             // 
             // _repositoryName
             // 
-            this._repositoryName.AutoSize = true;
-            this._repositoryName.Font = new System.Drawing.Font("Segoe UI", 16F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryName.Location = new System.Drawing.Point(109, 80);
-            this._repositoryName.Name = "_repositoryName";
-            this._repositoryName.Size = new System.Drawing.Size(105, 45);
-            this._repositoryName.TabIndex = 41;
-            this._repositoryName.Text = "label1";
+            _repositoryName.AutoSize = true;
+            _repositoryName.Font = new Font("Segoe UI", 16F, FontStyle.Regular, GraphicsUnit.Point);
+            _repositoryName.Location = new Point(76, 48);
+            _repositoryName.Margin = new Padding(2, 0, 2, 0);
+            _repositoryName.Name = "_repositoryName";
+            _repositoryName.Size = new Size(71, 30);
+            _repositoryName.TabIndex = 41;
+            _repositoryName.Text = "label1";
             // 
             // _repositoryImage
             // 
-            this._repositoryImage.BackColor = System.Drawing.Color.Transparent;
-            this._repositoryImage.Location = new System.Drawing.Point(0, 23);
-            this._repositoryImage.Name = "_repositoryImage";
-            this._repositoryImage.Size = new System.Drawing.Size(100, 100);
-            this._repositoryImage.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this._repositoryImage.TabIndex = 40;
-            this._repositoryImage.TabStop = false;
+            _repositoryImage.BackColor = Color.Transparent;
+            _repositoryImage.Location = new Point(0, 14);
+            _repositoryImage.Margin = new Padding(2);
+            _repositoryImage.Name = "_repositoryImage";
+            _repositoryImage.Size = new Size(70, 60);
+            _repositoryImage.SizeMode = PictureBoxSizeMode.StretchImage;
+            _repositoryImage.TabIndex = 40;
+            _repositoryImage.TabStop = false;
             // 
             // _repositoryPanel
             // 
-            this._repositoryPanel.Controls.Add(this.label6);
-            this._repositoryPanel.Controls.Add(this.label7);
-            this._repositoryPanel.Controls.Add(this.label5);
-            this._repositoryPanel.Controls.Add(this.label4);
-            this._repositoryPanel.Controls.Add(this.label3);
-            this._repositoryPanel.Controls.Add(this.label2);
-            this._repositoryPanel.Controls.Add(this._repositoryDescription);
-            this._repositoryPanel.Controls.Add(this._repositoryOwner);
-            this._repositoryPanel.Controls.Add(this._repositoryImage);
-            this._repositoryPanel.Controls.Add(this._repositoryUrl);
-            this._repositoryPanel.Controls.Add(this._repositoryName);
-            this._repositoryPanel.Location = new System.Drawing.Point(37, 235);
-            this._repositoryPanel.Name = "_repositoryPanel";
-            this._repositoryPanel.Size = new System.Drawing.Size(800, 352);
-            this._repositoryPanel.TabIndex = 44;
-            this._repositoryPanel.Visible = false;
+            _repositoryPanel.Controls.Add(label6);
+            _repositoryPanel.Controls.Add(label7);
+            _repositoryPanel.Controls.Add(label5);
+            _repositoryPanel.Controls.Add(label4);
+            _repositoryPanel.Controls.Add(label3);
+            _repositoryPanel.Controls.Add(label2);
+            _repositoryPanel.Controls.Add(_repositoryDescription);
+            _repositoryPanel.Controls.Add(_repositoryOwner);
+            _repositoryPanel.Controls.Add(_repositoryImage);
+            _repositoryPanel.Controls.Add(_repositoryUrl);
+            _repositoryPanel.Controls.Add(_repositoryName);
+            _repositoryPanel.Location = new Point(26, 141);
+            _repositoryPanel.Margin = new Padding(2);
+            _repositoryPanel.Name = "_repositoryPanel";
+            _repositoryPanel.Size = new Size(560, 211);
+            _repositoryPanel.TabIndex = 44;
+            _repositoryPanel.Visible = false;
             // 
             // label6
             // 
-            this.label6.AutoSize = true;
-            this.label6.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label6.Location = new System.Drawing.Point(488, 12);
-            this.label6.Name = "label6";
-            this.label6.Size = new System.Drawing.Size(62, 25);
-            this.label6.TabIndex = 51;
-            this.label6.Text = "29739";
+            label6.AutoSize = true;
+            label6.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label6.Location = new Point(342, 7);
+            label6.Margin = new Padding(2, 0, 2, 0);
+            label6.Name = "label6";
+            label6.Size = new Size(42, 15);
+            label6.TabIndex = 51;
+            label6.Text = "29739";
             // 
             // label7
             // 
-            this.label7.AutoSize = true;
-            this.label7.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label7.Location = new System.Drawing.Point(399, 12);
-            this.label7.Name = "label7";
-            this.label7.Size = new System.Drawing.Size(91, 25);
-            this.label7.TabIndex = 50;
-            this.label7.Text = "Commits:";
+            label7.AutoSize = true;
+            label7.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label7.Location = new Point(279, 7);
+            label7.Margin = new Padding(2, 0, 2, 0);
+            label7.Name = "label7";
+            label7.Size = new Size(59, 15);
+            label7.TabIndex = 50;
+            label7.Text = "Commits:";
             // 
             // label5
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label5.Location = new System.Drawing.Point(637, 12);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(32, 25);
-            this.label5.TabIndex = 49;
-            this.label5.Text = "3k";
+            label5.AutoSize = true;
+            label5.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label5.Location = new Point(446, 7);
+            label5.Margin = new Padding(2, 0, 2, 0);
+            label5.Name = "label5";
+            label5.Size = new Size(21, 15);
+            label5.TabIndex = 49;
+            label5.Text = "3k";
             // 
             // label4
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label4.Location = new System.Drawing.Point(590, 12);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(55, 25);
-            this.label4.TabIndex = 48;
-            this.label4.Text = "Fork:";
+            label4.AutoSize = true;
+            label4.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label4.Location = new Point(413, 7);
+            label4.Margin = new Padding(2, 0, 2, 0);
+            label4.Name = "label4";
+            label4.Size = new Size(35, 15);
+            label4.TabIndex = 48;
+            label4.Text = "Fork:";
             // 
             // label3
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label3.Location = new System.Drawing.Point(736, 12);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(47, 25);
-            this.label3.TabIndex = 47;
-            this.label3.Text = "9.9k";
+            label3.AutoSize = true;
+            label3.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label3.Location = new Point(515, 7);
+            label3.Margin = new Padding(2, 0, 2, 0);
+            label3.Name = "label3";
+            label3.Size = new Size(31, 15);
+            label3.TabIndex = 47;
+            label3.Text = "9.9k";
             // 
             // label2
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label2.Location = new System.Drawing.Point(689, 12);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(52, 25);
-            this.label2.TabIndex = 46;
-            this.label2.Text = "Star:";
+            label2.AutoSize = true;
+            label2.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point);
+            label2.Location = new Point(482, 7);
+            label2.Margin = new Padding(2, 0, 2, 0);
+            label2.Name = "label2";
+            label2.Size = new Size(33, 15);
+            label2.TabIndex = 46;
+            label2.Text = "Star:";
             // 
             // _repositoryDescription
             // 
-            this._repositoryDescription.Font = new System.Drawing.Font("Segoe UI", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryDescription.Location = new System.Drawing.Point(0, 156);
-            this._repositoryDescription.Name = "_repositoryDescription";
-            this._repositoryDescription.Size = new System.Drawing.Size(773, 196);
-            this._repositoryDescription.TabIndex = 45;
-            this._repositoryDescription.Text = "_repositoryDescription";
+            _repositoryDescription.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point);
+            _repositoryDescription.Location = new Point(0, 94);
+            _repositoryDescription.Margin = new Padding(2, 0, 2, 0);
+            _repositoryDescription.Name = "_repositoryDescription";
+            _repositoryDescription.Size = new Size(541, 118);
+            _repositoryDescription.TabIndex = 45;
+            _repositoryDescription.Text = "_repositoryDescription";
             // 
             // _repositoryOwner
             // 
-            this._repositoryOwner.AutoSize = true;
-            this._repositoryOwner.Font = new System.Drawing.Font("Segoe UI", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._repositoryOwner.Location = new System.Drawing.Point(114, 50);
-            this._repositoryOwner.Name = "_repositoryOwner";
-            this._repositoryOwner.Size = new System.Drawing.Size(71, 30);
-            this._repositoryOwner.TabIndex = 44;
-            this._repositoryOwner.Text = "label1";
+            _repositoryOwner.AutoSize = true;
+            _repositoryOwner.Font = new Font("Segoe UI", 11F, FontStyle.Regular, GraphicsUnit.Point);
+            _repositoryOwner.Location = new Point(80, 30);
+            _repositoryOwner.Margin = new Padding(2, 0, 2, 0);
+            _repositoryOwner.Name = "_repositoryOwner";
+            _repositoryOwner.Size = new Size(50, 20);
+            _repositoryOwner.TabIndex = 44;
+            _repositoryOwner.Text = "label1";
             // 
             // _releasesButton
             // 
-            this._releasesButton.ImageKey = "search.png";
-            this._releasesButton.Location = new System.Drawing.Point(717, 626);
-            this._releasesButton.Name = "_releasesButton";
-            this._releasesButton.Size = new System.Drawing.Size(120, 41);
-            this._releasesButton.TabIndex = 45;
-            this._releasesButton.Text = "Releases";
-            this._releasesButton.UseVisualStyleBackColor = true;
-            this._releasesButton.Click += new System.EventHandler(this._releasesButton_Click);
+            _releasesButton.ImageKey = "search.png";
+            _releasesButton.Location = new Point(502, 376);
+            _releasesButton.Margin = new Padding(2);
+            _releasesButton.Name = "_releasesButton";
+            _releasesButton.Size = new Size(84, 25);
+            _releasesButton.TabIndex = 45;
+            _releasesButton.Text = "Releases";
+            _releasesButton.UseVisualStyleBackColor = true;
+            _releasesButton.Click += _releasesButton_Click;
             // 
             // _commitsButton
             // 
-            this._commitsButton.ImageKey = "search.png";
-            this._commitsButton.Location = new System.Drawing.Point(577, 626);
-            this._commitsButton.Name = "_commitsButton";
-            this._commitsButton.Size = new System.Drawing.Size(129, 41);
-            this._commitsButton.TabIndex = 46;
-            this._commitsButton.Text = "Commits";
-            this._commitsButton.UseVisualStyleBackColor = true;
-            this._commitsButton.Click += new System.EventHandler(this._commitsButton_Click);
+            _commitsButton.ImageKey = "search.png";
+            _commitsButton.Location = new Point(404, 376);
+            _commitsButton.Margin = new Padding(2);
+            _commitsButton.Name = "_commitsButton";
+            _commitsButton.Size = new Size(90, 25);
+            _commitsButton.TabIndex = 46;
+            _commitsButton.Text = "Commits";
+            _commitsButton.UseVisualStyleBackColor = true;
+            _commitsButton.Click += _commitsButton_Click;
             // 
             // ViewFindRepository
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(865, 693);
-            this.Controls.Add(this._commitsButton);
-            this.Controls.Add(this._releasesButton);
-            this.Controls.Add(this._repositoryPanel);
-            this.Controls.Add(this._findButton);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this._repositoryNameTextBox);
-            this.Controls.Add(this._repositoryNameLabel);
-            this.MaximizeBox = false;
-            this.MinimizeBox = false;
-            this.Name = "ViewFindRepository";
-            this.ShowIcon = false;
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Find Repository";
-            ((System.ComponentModel.ISupportInitialize)(this._repositoryImage)).EndInit();
-            this._repositoryPanel.ResumeLayout(false);
-            this._repositoryPanel.PerformLayout();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(606, 416);
+            Controls.Add(_commitsButton);
+            Controls.Add(_releasesButton);
+            Controls.Add(_repositoryPanel);
+            Controls.Add(_findButton);
+            Controls.Add(label1);
+            Controls.Add(_repositoryNameTextBox);
+            Controls.Add(_repositoryNameLabel);
+            Margin = new Padding(2);
+            MaximizeBox = false;
+            MinimizeBox = false;
+            Name = "ViewFindRepository";
+            ShowIcon = false;
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "Find Repository";
+            ((System.ComponentModel.ISupportInitialize)_repositoryImage).EndInit();
+            _repositoryPanel.ResumeLayout(false);
+            _repositoryPanel.PerformLayout();
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion

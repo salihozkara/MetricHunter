@@ -61,6 +61,7 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
     public void ShowRepositories(IEnumerable<Repository> repositories)
     {
         ViewMain.ShowRepositories(repositories);
+        ViewMain.Mode = Mode.Repositories;
     }
 
     public void SetProgressBar(int i)
@@ -72,12 +73,14 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
     {
         ViewMain.Presenter.FoundRepository = repository;
         ViewMain.ShowCommits(gitHubCommits);
+        ViewMain.Mode = Mode.Commits;
     }
 
     public void ShowReleases(Repository repository, IEnumerable<Release> releases)
     {
         ViewMain.Presenter.FoundRepository = repository;
         ViewMain.ShowReleases(releases);
+        ViewMain.Mode = Mode.Releases;
     }
 
     public void ShowGithubLogin()

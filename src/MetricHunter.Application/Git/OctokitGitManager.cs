@@ -95,6 +95,15 @@ public class OctokitGitManager : IGitManager, ITransientDependency
             PageSize = 100
         });
     }
+    
+    public Task<IReadOnlyList<Repository>> GetRepositoriesByOwnerAsync(string owner, CancellationToken cancellationToken = default)
+    {
+        return Client.Repository.GetAllForUser(owner, new ApiOptions()
+        {
+            PageCount = 1,
+            PageSize = 100
+        });
+    }
 
     /// <summary>
     ///     User login

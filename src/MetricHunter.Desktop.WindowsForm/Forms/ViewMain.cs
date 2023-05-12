@@ -4,6 +4,7 @@ using MetricHunter.Application.Git;
 using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using MetricHunter.Core.Tasks;
+using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.DesktopLogs;
 using MetricHunter.Desktop.Models;
 using MetricHunter.Desktop.Presenters;
@@ -86,6 +87,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         
         if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
     }
+
+    public Mode Mode { get; set; }
 
     public string GithubToken
     {
@@ -495,7 +498,16 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain
         _logger.LogInformation("This process may take some time. Please wait...");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
-        var result = await Presenter.HuntRepositoriesAsync(CancellationTokenSource.Token)
+
+        Func<CancellationToken,Task<string>> huntFunc = Mode switch
+        {
+            Mode.Commits => Presenter.HuntCommitsAsync,
+            Mode.Releases => Presenter.HuntReleasesAsync,
+            Mode.Repositories => Presenter.HuntRepositoriesAsync,
+            _ => throw new ArgumentOutOfRangeException()
+        };
+
+        var result = await huntFunc(CancellationTokenSource.Token)
             .MaybeCanceled(CancellationTokenSource.Token);
         ButtonEnable();
         if (string.IsNullOrEmpty(result))
