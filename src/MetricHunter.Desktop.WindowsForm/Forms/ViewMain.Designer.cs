@@ -1,7 +1,6 @@
 ﻿namespace MetricHunter.Desktop.Forms;
 
-partial class ViewMain
-{
+partial class ViewMain {
     /// <summary>
     ///  Required designer variable.
     /// </summary>
@@ -11,10 +10,8 @@ partial class ViewMain
     ///  Clean up any resources being used.
     /// </summary>
     /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-    protected override void Dispose(bool disposing)
-    {
-        if (disposing && (components != null))
-        {
+    protected override void Dispose(bool disposing) {
+        if (disposing && (components != null)) {
             components.Dispose();
         }
 
@@ -27,428 +24,431 @@ partial class ViewMain
     ///  Required method for Designer support - do not modify
     ///  the contents of this method with the code editor.
     /// </summary>
-    private void InitializeComponent()
-    {
-            this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
-            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
-            this.SearchButton = new System.Windows.Forms.ImageList(this.components);
-            this.IconList = new System.Windows.Forms.ImageList(this.components);
-            this._repositoryDataGridView = new System.Windows.Forms.DataGridView();
-            this.menu = new System.Windows.Forms.MenuStrip();
-            this.savedRepositoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.exploreRepositoriesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.findRepositoryToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.showToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.saveToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loginGithubToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpMenu = new System.Windows.Forms.ToolStripMenuItem();
-            this.contributorsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.helpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.reportToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.openLogsStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.basePanel = new System.Windows.Forms.Panel();
-            this.layoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.searchRepositoryPanel = new System.Windows.Forms.Panel();
-            this.label1 = new System.Windows.Forms.Label();
-            this.operationGroupBox = new System.Windows.Forms.GroupBox();
-            this._huntButton = new System.Windows.Forms.Button();
-            this._downloadButton = new System.Windows.Forms.Button();
-            this._calculateMetricsButton = new System.Windows.Forms.Button();
-            this.bottomPanel = new System.Windows.Forms.Panel();
-            this.bottomLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
-            this.logTextBox = new System.Windows.Forms.RichTextBox();
-            this.panel1 = new System.Windows.Forms.Panel();
-            this._cancelButton = new System.Windows.Forms.Button();
-            this._progressBar = new System.Windows.Forms.ProgressBar();
-            ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).BeginInit();
-            this.menu.SuspendLayout();
-            this.basePanel.SuspendLayout();
-            this.layoutPanel.SuspendLayout();
-            this.searchRepositoryPanel.SuspendLayout();
-            this.operationGroupBox.SuspendLayout();
-            this.bottomPanel.SuspendLayout();
-            this.bottomLayoutPanel.SuspendLayout();
-            this.panel1.SuspendLayout();
-            this.SuspendLayout();
-            // 
-            // SearchButton
-            // 
-            this.SearchButton.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.SearchButton.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("SearchButton.ImageStream")));
-            this.SearchButton.TransparentColor = System.Drawing.Color.Transparent;
-            this.SearchButton.Images.SetKeyName(0, "search.png");
-            // 
-            // IconList
-            // 
-            this.IconList.ColorDepth = System.Windows.Forms.ColorDepth.Depth8Bit;
-            this.IconList.ImageStream = ((System.Windows.Forms.ImageListStreamer)(resources.GetObject("IconList.ImageStream")));
-            this.IconList.TransparentColor = System.Drawing.Color.Transparent;
-            this.IconList.Images.SetKeyName(0, "search.png");
-            this.IconList.Images.SetKeyName(1, "knife.png");
-            this.IconList.Images.SetKeyName(2, "calculation.png");
-            this.IconList.Images.SetKeyName(3, "download.png");
-            this.IconList.Images.SetKeyName(4, "close.png");
-            // 
-            // _repositoryDataGridView
-            // 
-            this._repositoryDataGridView.AllowUserToAddRows = false;
-            this._repositoryDataGridView.AllowUserToDeleteRows = false;
-            this._repositoryDataGridView.AllowUserToResizeColumns = false;
-            this._repositoryDataGridView.AllowUserToResizeRows = false;
-            this._repositoryDataGridView.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
-            this._repositoryDataGridView.AutoSizeRowsMode = System.Windows.Forms.DataGridViewAutoSizeRowsMode.DisplayedCells;
-            this._repositoryDataGridView.BackgroundColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(211)))), ((int)(((byte)(193)))));
-            this._repositoryDataGridView.BorderStyle = System.Windows.Forms.BorderStyle.Fixed3D;
-            this._repositoryDataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.Raised;
-            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
-            dataGridViewCellStyle1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle1.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle1.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle1.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle1.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
-            this._repositoryDataGridView.ColumnHeadersHeight = 70;
-            this._repositoryDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
-            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle2.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
-            dataGridViewCellStyle2.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle2.ForeColor = System.Drawing.Color.Black;
-            dataGridViewCellStyle2.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle2.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle2.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
-            this._repositoryDataGridView.Dock = System.Windows.Forms.DockStyle.Fill;
-            this._repositoryDataGridView.EditMode = System.Windows.Forms.DataGridViewEditMode.EditProgrammatically;
-            this._repositoryDataGridView.Location = new System.Drawing.Point(7, 250);
-            this._repositoryDataGridView.Margin = new System.Windows.Forms.Padding(7, 0, 7, 30);
-            this._repositoryDataGridView.Name = "_repositoryDataGridView";
-            this._repositoryDataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
-            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleLeft;
-            dataGridViewCellStyle3.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(138)))), ((int)(((byte)(129)))), ((int)(((byte)(124)))));
-            dataGridViewCellStyle3.Font = new System.Drawing.Font("Segoe UI", 9F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            dataGridViewCellStyle3.ForeColor = System.Drawing.SystemColors.WindowText;
-            dataGridViewCellStyle3.SelectionBackColor = System.Drawing.SystemColors.Highlight;
-            dataGridViewCellStyle3.SelectionForeColor = System.Drawing.SystemColors.HighlightText;
-            dataGridViewCellStyle3.WrapMode = System.Windows.Forms.DataGridViewTriState.True;
-            this._repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
-            this._repositoryDataGridView.RowHeadersVisible = false;
-            this._repositoryDataGridView.RowHeadersWidth = 30;
-            this._repositoryDataGridView.RowHeadersWidthSizeMode = System.Windows.Forms.DataGridViewRowHeadersWidthSizeMode.DisableResizing;
-            this._repositoryDataGridView.RowTemplate.Height = 50;
-            this._repositoryDataGridView.Size = new System.Drawing.Size(1104, 479);
-            this._repositoryDataGridView.TabIndex = 4;
-            this._repositoryDataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellClick);
-            this._repositoryDataGridView.CellContentDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this._repositoryDataGridView_CellContentClick);
-            this._repositoryDataGridView.SelectionChanged += new System.EventHandler(this._repositoryDataGridView_SelectionChanged);
-            this._repositoryDataGridView.DataContextChanged += new System.EventHandler(this._repositoryDataGridView_DataContextChanged);
-            // 
-            // menu
-            // 
-            this.menu.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(215)))), ((int)(((byte)(211)))), ((int)(((byte)(193)))));
-            this.menu.Font = new System.Drawing.Font("Segoe UI", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.menu.ImageScalingSize = new System.Drawing.Size(24, 24);
-            this.menu.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.savedRepositoriesToolStripMenuItem,
-            this.loginGithubToolStripMenuItem,
-            this.helpMenu});
-            this.menu.Location = new System.Drawing.Point(0, 0);
-            this.menu.Name = "menu";
-            this.menu.Size = new System.Drawing.Size(1178, 42);
-            this.menu.TabIndex = 15;
-            this.menu.Text = "menuStrip1";
-            // 
-            // savedRepositoriesToolStripMenuItem
-            // 
-            this.savedRepositoriesToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.exploreRepositoriesToolStripMenuItem,
-            this.findRepositoryToolStripMenuItem,
-            this.showToolStripMenuItem,
-            this.saveToolStripMenuItem});
-            this.savedRepositoriesToolStripMenuItem.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.savedRepositoriesToolStripMenuItem.Name = "savedRepositoriesToolStripMenuItem";
-            this.savedRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(118, 38);
-            this.savedRepositoriesToolStripMenuItem.Text = "Repository";
-            // 
-            // exploreRepositoriesToolStripMenuItem
-            // 
-            this.exploreRepositoriesToolStripMenuItem.Name = "exploreRepositoriesToolStripMenuItem";
-            this.exploreRepositoriesToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
-            this.exploreRepositoriesToolStripMenuItem.Text = "Explore Repositories";
-            this.exploreRepositoriesToolStripMenuItem.Click += new System.EventHandler(this.exploreRepositoriesToolStripMenuItem_Click);
-            // 
-            // findRepositoryToolStripMenuItem
-            // 
-            this.findRepositoryToolStripMenuItem.Name = "findRepositoryToolStripMenuItem";
-            this.findRepositoryToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
-            this.findRepositoryToolStripMenuItem.Text = "Find Repository";
-            this.findRepositoryToolStripMenuItem.Click += new System.EventHandler(this.findRepositoryToolStripMenuItem_Click);
-            // 
-            // showToolStripMenuItem
-            // 
-            this.showToolStripMenuItem.Name = "showToolStripMenuItem";
-            this.showToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
-            this.showToolStripMenuItem.Text = "Load";
-            this.showToolStripMenuItem.Click += new System.EventHandler(this.showToolStripMenuItem_Click);
-            // 
-            // saveToolStripMenuItem
-            // 
-            this.saveToolStripMenuItem.Name = "saveToolStripMenuItem";
-            this.saveToolStripMenuItem.Size = new System.Drawing.Size(286, 42);
-            this.saveToolStripMenuItem.Text = "Save";
-            this.saveToolStripMenuItem.Click += new System.EventHandler(this.saveToolStripMenuItem_Click);
-            // 
-            // loginGithubToolStripMenuItem
-            // 
-            this.loginGithubToolStripMenuItem.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.loginGithubToolStripMenuItem.Name = "loginGithubToolStripMenuItem";
-            this.loginGithubToolStripMenuItem.Size = new System.Drawing.Size(140, 38);
-            this.loginGithubToolStripMenuItem.Text = "Login GitHub";
-            this.loginGithubToolStripMenuItem.Click += new System.EventHandler(this.loginGithubToolStripMenuItem_Click);
-            // 
-            // helpMenu
-            // 
-            this.helpMenu.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.contributorsToolStripMenuItem,
-            this.helpToolStripMenuItem,
-            this.reportToolStripMenuItem,
-            this.openLogsStripMenuItem});
-            this.helpMenu.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.helpMenu.Name = "helpMenu";
-            this.helpMenu.Size = new System.Drawing.Size(69, 38);
-            this.helpMenu.Text = "Help";
-            // 
-            // contributorsToolStripMenuItem
-            // 
-            this.contributorsToolStripMenuItem.Name = "contributorsToolStripMenuItem";
-            this.contributorsToolStripMenuItem.Size = new System.Drawing.Size(244, 42);
-            this.contributorsToolStripMenuItem.Text = "Contributors";
-            this.contributorsToolStripMenuItem.Click += new System.EventHandler(this.contributorsToolStripMenuItem_Click);
-            // 
-            // helpToolStripMenuItem
-            // 
-            this.helpToolStripMenuItem.Name = "helpToolStripMenuItem";
-            this.helpToolStripMenuItem.Size = new System.Drawing.Size(244, 42);
-            this.helpToolStripMenuItem.Text = "Help";
-            this.helpToolStripMenuItem.Click += new System.EventHandler(this.helpToolStripMenuItem_Click);
-            // 
-            // reportToolStripMenuItem
-            // 
-            this.reportToolStripMenuItem.Name = "reportToolStripMenuItem";
-            this.reportToolStripMenuItem.Size = new System.Drawing.Size(244, 42);
-            this.reportToolStripMenuItem.Text = "Report an Issue";
-            this.reportToolStripMenuItem.Click += new System.EventHandler(this.reportToolStripMenuItem_Click);
-            // 
-            // openLogsStripMenuItem
-            // 
-            this.openLogsStripMenuItem.Name = "openLogsStripMenuItem";
-            this.openLogsStripMenuItem.Size = new System.Drawing.Size(244, 42);
-            this.openLogsStripMenuItem.Text = "Open Logs";
-            this.openLogsStripMenuItem.Click += new System.EventHandler(this.openLogsStripMenuItem_Click);
-            // 
-            // basePanel
-            // 
-            this.basePanel.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(239)))), ((int)(((byte)(237)))), ((int)(((byte)(230)))));
-            this.basePanel.Controls.Add(this.layoutPanel);
-            this.basePanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.basePanel.Location = new System.Drawing.Point(0, 42);
-            this.basePanel.Name = "basePanel";
-            this.basePanel.Padding = new System.Windows.Forms.Padding(30);
-            this.basePanel.Size = new System.Drawing.Size(1178, 1202);
-            this.basePanel.TabIndex = 16;
-            // 
-            // layoutPanel
-            // 
-            this.layoutPanel.ColumnCount = 1;
-            this.layoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.layoutPanel.Controls.Add(this._repositoryDataGridView, 0, 1);
-            this.layoutPanel.Controls.Add(this.searchRepositoryPanel, 0, 0);
-            this.layoutPanel.Controls.Add(this.bottomPanel, 0, 2);
-            this.layoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.layoutPanel.Location = new System.Drawing.Point(30, 30);
-            this.layoutPanel.Name = "layoutPanel";
-            this.layoutPanel.RowCount = 3;
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 250F));
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 57.14286F));
-            this.layoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 42.85714F));
-            this.layoutPanel.Size = new System.Drawing.Size(1118, 1142);
-            this.layoutPanel.TabIndex = 5;
-            this.layoutPanel.Tag = "";
-            // 
-            // searchRepositoryPanel
-            // 
-            this.searchRepositoryPanel.Controls.Add(this.label1);
-            this.searchRepositoryPanel.Controls.Add(this.operationGroupBox);
-            this.searchRepositoryPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.searchRepositoryPanel.Location = new System.Drawing.Point(3, 3);
-            this.searchRepositoryPanel.Name = "searchRepositoryPanel";
-            this.searchRepositoryPanel.Size = new System.Drawing.Size(1112, 244);
-            this.searchRepositoryPanel.TabIndex = 5;
-            // 
-            // label1
-            // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(4, 194);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(91, 40);
-            this.label1.TabIndex = 18;
-            this.label1.Text = "Results";
-            // 
-            // operationGroupBox
-            // 
-            this.operationGroupBox.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)));
-            this.operationGroupBox.Controls.Add(this._huntButton);
-            this.operationGroupBox.Controls.Add(this._downloadButton);
-            this.operationGroupBox.Controls.Add(this._calculateMetricsButton);
-            this.operationGroupBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.operationGroupBox.Location = new System.Drawing.Point(207, 31);
-            this.operationGroupBox.Name = "operationGroupBox";
-            this.operationGroupBox.Size = new System.Drawing.Size(720, 169);
-            this.operationGroupBox.TabIndex = 17;
-            this.operationGroupBox.TabStop = false;
-            this.operationGroupBox.Text = "Operations";
-            // 
-            // _huntButton
-            // 
-            this._huntButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._huntButton.ImageKey = "knife.png";
-            this._huntButton.ImageList = this.IconList;
-            this._huntButton.Location = new System.Drawing.Point(552, 61);
-            this._huntButton.Name = "_huntButton";
-            this._huntButton.Size = new System.Drawing.Size(121, 41);
-            this._huntButton.TabIndex = 8;
-            this._huntButton.Text = "Hunt";
-            this._huntButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._huntButton.UseVisualStyleBackColor = true;
-            this._huntButton.Click += new System.EventHandler(this.huntButton_Click);
-            // 
-            // _downloadButton
-            // 
-            this._downloadButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._downloadButton.ImageKey = "download.png";
-            this._downloadButton.ImageList = this.IconList;
-            this._downloadButton.Location = new System.Drawing.Point(22, 61);
-            this._downloadButton.Name = "_downloadButton";
-            this._downloadButton.Size = new System.Drawing.Size(141, 41);
-            this._downloadButton.TabIndex = 6;
-            this._downloadButton.Text = "Download";
-            this._downloadButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._downloadButton.UseVisualStyleBackColor = true;
-            this._downloadButton.Click += new System.EventHandler(this._downloadButton_Click);
-            // 
-            // _calculateMetricsButton
-            // 
-            this._calculateMetricsButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._calculateMetricsButton.ImageKey = "calculation.png";
-            this._calculateMetricsButton.ImageList = this.IconList;
-            this._calculateMetricsButton.Location = new System.Drawing.Point(247, 61);
-            this._calculateMetricsButton.Name = "_calculateMetricsButton";
-            this._calculateMetricsButton.Size = new System.Drawing.Size(213, 41);
-            this._calculateMetricsButton.TabIndex = 7;
-            this._calculateMetricsButton.Text = "Calculate Metrics";
-            this._calculateMetricsButton.TextImageRelation = System.Windows.Forms.TextImageRelation.ImageBeforeText;
-            this._calculateMetricsButton.UseVisualStyleBackColor = true;
-            this._calculateMetricsButton.Click += new System.EventHandler(this._calculateMetricsButton_Click);
-            // 
-            // bottomPanel
-            // 
-            this.bottomPanel.Controls.Add(this.bottomLayoutPanel);
-            this.bottomPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomPanel.Location = new System.Drawing.Point(3, 762);
-            this.bottomPanel.Name = "bottomPanel";
-            this.bottomPanel.Size = new System.Drawing.Size(1112, 377);
-            this.bottomPanel.TabIndex = 6;
-            // 
-            // bottomLayoutPanel
-            // 
-            this.bottomLayoutPanel.ColumnCount = 1;
-            this.bottomLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.bottomLayoutPanel.Controls.Add(this.logTextBox, 0, 0);
-            this.bottomLayoutPanel.Controls.Add(this.panel1, 2, 1);
-            this.bottomLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.bottomLayoutPanel.Location = new System.Drawing.Point(0, 0);
-            this.bottomLayoutPanel.Name = "bottomLayoutPanel";
-            this.bottomLayoutPanel.RowCount = 2;
-            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
-            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 25F));
-            this.bottomLayoutPanel.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
-            this.bottomLayoutPanel.Size = new System.Drawing.Size(1112, 377);
-            this.bottomLayoutPanel.TabIndex = 0;
-            // 
-            // logTextBox
-            // 
-            this.logTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.logTextBox.Font = new System.Drawing.Font("Dubai", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point);
-            this.logTextBox.Location = new System.Drawing.Point(3, 3);
-            this.logTextBox.Name = "logTextBox";
-            this.logTextBox.ReadOnly = true;
-            this.logTextBox.Size = new System.Drawing.Size(1106, 346);
-            this.logTextBox.TabIndex = 19;
-            this.logTextBox.Text = "";
-            // 
-            // panel1
-            // 
-            this.panel1.Controls.Add(this._cancelButton);
-            this.panel1.Controls.Add(this._progressBar);
-            this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.panel1.Location = new System.Drawing.Point(3, 355);
-            this.panel1.Name = "panel1";
-            this.panel1.Size = new System.Drawing.Size(1106, 19);
-            this.panel1.TabIndex = 20;
-            // 
-            // _cancelButton
-            // 
-            this._cancelButton.Anchor = System.Windows.Forms.AnchorStyles.Right;
-            this._cancelButton.ImageKey = "close.png";
-            this._cancelButton.ImageList = this.IconList;
-            this._cancelButton.Location = new System.Drawing.Point(1066, -8);
-            this._cancelButton.Name = "_cancelButton";
-            this._cancelButton.Size = new System.Drawing.Size(40, 35);
-            this._cancelButton.TabIndex = 19;
-            this._cancelButton.UseVisualStyleBackColor = true;
-            this._cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
-            // 
-            // _progressBar
-            // 
-            this._progressBar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Left | System.Windows.Forms.AnchorStyles.Right)));
-            this._progressBar.Location = new System.Drawing.Point(0, -8);
-            this._progressBar.Name = "_progressBar";
-            this._progressBar.Size = new System.Drawing.Size(1071, 34);
-            this._progressBar.TabIndex = 18;
-            // 
-            // ViewMain
-            // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(115)))), ((int)(((byte)(186)))), ((int)(((byte)(155)))));
-            this.ClientSize = new System.Drawing.Size(1178, 1244);
-            this.Controls.Add(this.basePanel);
-            this.Controls.Add(this.menu);
-            this.ForeColor = System.Drawing.Color.Black;
-            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MainMenuStrip = this.menu;
-            this.MinimumSize = new System.Drawing.Size(1200, 1300);
-            this.Name = "ViewMain";
-            this.Text = "MetricHunter";
-            this.Load += new System.EventHandler(this._viewMain_Load);
-            ((System.ComponentModel.ISupportInitialize)(this._repositoryDataGridView)).EndInit();
-            this.menu.ResumeLayout(false);
-            this.menu.PerformLayout();
-            this.basePanel.ResumeLayout(false);
-            this.layoutPanel.ResumeLayout(false);
-            this.searchRepositoryPanel.ResumeLayout(false);
-            this.searchRepositoryPanel.PerformLayout();
-            this.operationGroupBox.ResumeLayout(false);
-            this.bottomPanel.ResumeLayout(false);
-            this.bottomLayoutPanel.ResumeLayout(false);
-            this.panel1.ResumeLayout(false);
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+    private void InitializeComponent() {
+        components = new System.ComponentModel.Container();
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
+        DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
+        DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
+        DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
+        SearchButton = new ImageList(components);
+        IconList = new ImageList(components);
+        _repositoryDataGridView = new DataGridView();
+        menu = new MenuStrip();
+        savedRepositoriesToolStripMenuItem = new ToolStripMenuItem();
+        exploreRepositoriesToolStripMenuItem = new ToolStripMenuItem();
+        findRepositoryToolStripMenuItem = new ToolStripMenuItem();
+        showToolStripMenuItem = new ToolStripMenuItem();
+        saveToolStripMenuItem = new ToolStripMenuItem();
+        loginGithubToolStripMenuItem = new ToolStripMenuItem();
+        helpMenu = new ToolStripMenuItem();
+        contributorsToolStripMenuItem = new ToolStripMenuItem();
+        helpToolStripMenuItem = new ToolStripMenuItem();
+        reportToolStripMenuItem = new ToolStripMenuItem();
+        openLogsStripMenuItem = new ToolStripMenuItem();
+        basePanel = new Panel();
+        layoutPanel = new TableLayoutPanel();
+        searchRepositoryPanel = new Panel();
+        label1 = new Label();
+        operationGroupBox = new GroupBox();
+        _huntButton = new Button();
+        _downloadButton = new Button();
+        _calculateMetricsButton = new Button();
+        bottomPanel = new Panel();
+        bottomLayoutPanel = new TableLayoutPanel();
+        logTextBox = new RichTextBox();
+        panel1 = new Panel();
+        _cancelButton = new Button();
+        _progressBar = new ProgressBar();
+        ((System.ComponentModel.ISupportInitialize)_repositoryDataGridView).BeginInit();
+        menu.SuspendLayout();
+        basePanel.SuspendLayout();
+        layoutPanel.SuspendLayout();
+        searchRepositoryPanel.SuspendLayout();
+        operationGroupBox.SuspendLayout();
+        bottomPanel.SuspendLayout();
+        bottomLayoutPanel.SuspendLayout();
+        panel1.SuspendLayout();
+        SuspendLayout();
+        // 
+        // SearchButton
+        // 
+        SearchButton.ColorDepth = ColorDepth.Depth8Bit;
+        SearchButton.ImageStream = (ImageListStreamer)resources.GetObject("SearchButton.ImageStream");
+        SearchButton.TransparentColor = Color.Transparent;
+        SearchButton.Images.SetKeyName(0, "search.png");
+        // 
+        // IconList
+        // 
+        IconList.ColorDepth = ColorDepth.Depth8Bit;
+        IconList.ImageStream = (ImageListStreamer)resources.GetObject("IconList.ImageStream");
+        IconList.TransparentColor = Color.Transparent;
+        IconList.Images.SetKeyName(0, "search.png");
+        IconList.Images.SetKeyName(1, "knife.png");
+        IconList.Images.SetKeyName(2, "calculation.png");
+        IconList.Images.SetKeyName(3, "download.png");
+        IconList.Images.SetKeyName(4, "close.png");
+        // 
+        // _repositoryDataGridView
+        // 
+        _repositoryDataGridView.AllowUserToAddRows = false;
+        _repositoryDataGridView.AllowUserToDeleteRows = false;
+        _repositoryDataGridView.AllowUserToOrderColumns = true;
+        _repositoryDataGridView.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill;
+        _repositoryDataGridView.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.DisplayedCells;
+        _repositoryDataGridView.BackgroundColor = Color.FromArgb(215, 211, 193);
+        _repositoryDataGridView.BorderStyle = BorderStyle.Fixed3D;
+        _repositoryDataGridView.CellBorderStyle = DataGridViewCellBorderStyle.Raised;
+        dataGridViewCellStyle1.Alignment = DataGridViewContentAlignment.MiddleLeft;
+        dataGridViewCellStyle1.BackColor = Color.FromArgb(138, 129, 124);
+        dataGridViewCellStyle1.Font = new Font("Dubai", 12F, FontStyle.Bold, GraphicsUnit.Point);
+        dataGridViewCellStyle1.ForeColor = SystemColors.WindowText;
+        dataGridViewCellStyle1.SelectionBackColor = SystemColors.Highlight;
+        dataGridViewCellStyle1.SelectionForeColor = SystemColors.HighlightText;
+        dataGridViewCellStyle1.WrapMode = DataGridViewTriState.True;
+        _repositoryDataGridView.ColumnHeadersDefaultCellStyle = dataGridViewCellStyle1;
+        _repositoryDataGridView.ColumnHeadersHeight = 70;
+        _repositoryDataGridView.ColumnHeadersHeightSizeMode = DataGridViewColumnHeadersHeightSizeMode.DisableResizing;
+        dataGridViewCellStyle2.Alignment = DataGridViewContentAlignment.MiddleLeft;
+        dataGridViewCellStyle2.BackColor = Color.FromArgb(239, 237, 230);
+        dataGridViewCellStyle2.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        dataGridViewCellStyle2.ForeColor = Color.Black;
+        dataGridViewCellStyle2.SelectionBackColor = SystemColors.Highlight;
+        dataGridViewCellStyle2.SelectionForeColor = SystemColors.HighlightText;
+        dataGridViewCellStyle2.WrapMode = DataGridViewTriState.True;
+        _repositoryDataGridView.DefaultCellStyle = dataGridViewCellStyle2;
+        _repositoryDataGridView.Dock = DockStyle.Fill;
+        _repositoryDataGridView.EditMode = DataGridViewEditMode.EditProgrammatically;
+        _repositoryDataGridView.Location = new Point(5, 150);
+        _repositoryDataGridView.Margin = new Padding(5, 0, 5, 18);
+        _repositoryDataGridView.Name = "_repositoryDataGridView";
+        _repositoryDataGridView.RowHeadersBorderStyle = DataGridViewHeaderBorderStyle.Single;
+        dataGridViewCellStyle3.Alignment = DataGridViewContentAlignment.MiddleLeft;
+        dataGridViewCellStyle3.BackColor = Color.FromArgb(138, 129, 124);
+        dataGridViewCellStyle3.Font = new Font("Segoe UI", 9F, FontStyle.Regular, GraphicsUnit.Point);
+        dataGridViewCellStyle3.ForeColor = SystemColors.WindowText;
+        dataGridViewCellStyle3.SelectionBackColor = SystemColors.Highlight;
+        dataGridViewCellStyle3.SelectionForeColor = SystemColors.HighlightText;
+        dataGridViewCellStyle3.WrapMode = DataGridViewTriState.True;
+        _repositoryDataGridView.RowHeadersDefaultCellStyle = dataGridViewCellStyle3;
+        _repositoryDataGridView.RowHeadersVisible = false;
+        _repositoryDataGridView.RowHeadersWidth = 30;
+        _repositoryDataGridView.RowHeadersWidthSizeMode = DataGridViewRowHeadersWidthSizeMode.DisableResizing;
+        _repositoryDataGridView.RowTemplate.Height = 50;
+        _repositoryDataGridView.Size = new Size(777, 291);
+        _repositoryDataGridView.TabIndex = 4;
+        _repositoryDataGridView.CellClick += _repositoryDataGridView_CellClick;
+        _repositoryDataGridView.CellContentDoubleClick += _repositoryDataGridView_CellContentClick;
+        _repositoryDataGridView.SelectionChanged += _repositoryDataGridView_SelectionChanged;
+        _repositoryDataGridView.DataContextChanged += _repositoryDataGridView_DataContextChanged;
+        // 
+        // menu
+        // 
+        menu.BackColor = Color.FromArgb(215, 211, 193);
+        menu.Font = new Font("Segoe UI", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        menu.ImageScalingSize = new Size(24, 24);
+        menu.Items.AddRange(new ToolStripItem[] { savedRepositoriesToolStripMenuItem, loginGithubToolStripMenuItem, helpMenu });
+        menu.Location = new Point(0, 0);
+        menu.Name = "menu";
+        menu.Padding = new Padding(4, 1, 0, 1);
+        menu.Size = new Size(829, 30);
+        menu.TabIndex = 15;
+        menu.Text = "menuStrip1";
+        // 
+        // savedRepositoriesToolStripMenuItem
+        // 
+        savedRepositoriesToolStripMenuItem.DropDownItems.AddRange(new ToolStripItem[] { exploreRepositoriesToolStripMenuItem, findRepositoryToolStripMenuItem, showToolStripMenuItem, saveToolStripMenuItem });
+        savedRepositoriesToolStripMenuItem.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        savedRepositoriesToolStripMenuItem.Name = "savedRepositoriesToolStripMenuItem";
+        savedRepositoriesToolStripMenuItem.Size = new Size(82, 28);
+        savedRepositoriesToolStripMenuItem.Text = "Repository";
+        // 
+        // exploreRepositoriesToolStripMenuItem
+        // 
+        exploreRepositoriesToolStripMenuItem.Name = "exploreRepositoriesToolStripMenuItem";
+        exploreRepositoriesToolStripMenuItem.Size = new Size(194, 28);
+        exploreRepositoriesToolStripMenuItem.Text = "Explore Repositories";
+        exploreRepositoriesToolStripMenuItem.Click += exploreRepositoriesToolStripMenuItem_Click;
+        // 
+        // findRepositoryToolStripMenuItem
+        // 
+        findRepositoryToolStripMenuItem.Name = "findRepositoryToolStripMenuItem";
+        findRepositoryToolStripMenuItem.Size = new Size(194, 28);
+        findRepositoryToolStripMenuItem.Text = "Find Repository";
+        findRepositoryToolStripMenuItem.Click += findRepositoryToolStripMenuItem_Click;
+        // 
+        // showToolStripMenuItem
+        // 
+        showToolStripMenuItem.Name = "showToolStripMenuItem";
+        showToolStripMenuItem.Size = new Size(194, 28);
+        showToolStripMenuItem.Text = "Load";
+        showToolStripMenuItem.Click += showToolStripMenuItem_Click;
+        // 
+        // saveToolStripMenuItem
+        // 
+        saveToolStripMenuItem.Name = "saveToolStripMenuItem";
+        saveToolStripMenuItem.Size = new Size(194, 28);
+        saveToolStripMenuItem.Text = "Save";
+        saveToolStripMenuItem.Click += saveToolStripMenuItem_Click;
+        // 
+        // loginGithubToolStripMenuItem
+        // 
+        loginGithubToolStripMenuItem.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        loginGithubToolStripMenuItem.Name = "loginGithubToolStripMenuItem";
+        loginGithubToolStripMenuItem.Size = new Size(97, 28);
+        loginGithubToolStripMenuItem.Text = "Login GitHub";
+        loginGithubToolStripMenuItem.Click += loginGithubToolStripMenuItem_Click;
+        // 
+        // helpMenu
+        // 
+        helpMenu.DropDownItems.AddRange(new ToolStripItem[] { contributorsToolStripMenuItem, helpToolStripMenuItem, reportToolStripMenuItem, openLogsStripMenuItem });
+        helpMenu.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        helpMenu.Name = "helpMenu";
+        helpMenu.Size = new Size(48, 28);
+        helpMenu.Text = "Help";
+        // 
+        // contributorsToolStripMenuItem
+        // 
+        contributorsToolStripMenuItem.Name = "contributorsToolStripMenuItem";
+        contributorsToolStripMenuItem.Size = new Size(167, 28);
+        contributorsToolStripMenuItem.Text = "Contributors";
+        contributorsToolStripMenuItem.Click += contributorsToolStripMenuItem_Click;
+        // 
+        // helpToolStripMenuItem
+        // 
+        helpToolStripMenuItem.Name = "helpToolStripMenuItem";
+        helpToolStripMenuItem.Size = new Size(167, 28);
+        helpToolStripMenuItem.Text = "Help";
+        helpToolStripMenuItem.Click += helpToolStripMenuItem_Click;
+        // 
+        // reportToolStripMenuItem
+        // 
+        reportToolStripMenuItem.Name = "reportToolStripMenuItem";
+        reportToolStripMenuItem.Size = new Size(167, 28);
+        reportToolStripMenuItem.Text = "Report an Issue";
+        reportToolStripMenuItem.Click += reportToolStripMenuItem_Click;
+        // 
+        // openLogsStripMenuItem
+        // 
+        openLogsStripMenuItem.Name = "openLogsStripMenuItem";
+        openLogsStripMenuItem.Size = new Size(167, 28);
+        openLogsStripMenuItem.Text = "Open Logs";
+        openLogsStripMenuItem.Click += openLogsStripMenuItem_Click;
+        // 
+        // basePanel
+        // 
+        basePanel.BackColor = Color.FromArgb(239, 237, 230);
+        basePanel.Controls.Add(layoutPanel);
+        basePanel.Dock = DockStyle.Fill;
+        basePanel.Location = new Point(0, 30);
+        basePanel.Margin = new Padding(2, 2, 2, 2);
+        basePanel.Name = "basePanel";
+        basePanel.Padding = new Padding(21, 18, 21, 18);
+        basePanel.Size = new Size(829, 727);
+        basePanel.TabIndex = 16;
+        // 
+        // layoutPanel
+        // 
+        layoutPanel.ColumnCount = 1;
+        layoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        layoutPanel.Controls.Add(_repositoryDataGridView, 0, 1);
+        layoutPanel.Controls.Add(searchRepositoryPanel, 0, 0);
+        layoutPanel.Controls.Add(bottomPanel, 0, 2);
+        layoutPanel.Dock = DockStyle.Fill;
+        layoutPanel.Location = new Point(21, 18);
+        layoutPanel.Margin = new Padding(2, 2, 2, 2);
+        layoutPanel.Name = "layoutPanel";
+        layoutPanel.RowCount = 3;
+        layoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 150F));
+        layoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 57.14286F));
+        layoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 42.85714F));
+        layoutPanel.Size = new Size(787, 691);
+        layoutPanel.TabIndex = 5;
+        layoutPanel.Tag = "";
+        // 
+        // searchRepositoryPanel
+        // 
+        searchRepositoryPanel.Controls.Add(label1);
+        searchRepositoryPanel.Controls.Add(operationGroupBox);
+        searchRepositoryPanel.Dock = DockStyle.Fill;
+        searchRepositoryPanel.Location = new Point(2, 2);
+        searchRepositoryPanel.Margin = new Padding(2, 2, 2, 2);
+        searchRepositoryPanel.Name = "searchRepositoryPanel";
+        searchRepositoryPanel.Size = new Size(783, 146);
+        searchRepositoryPanel.TabIndex = 5;
+        // 
+        // label1
+        // 
+        label1.AutoSize = true;
+        label1.Font = new Font("Dubai", 12F, FontStyle.Bold, GraphicsUnit.Point);
+        label1.Location = new Point(3, 116);
+        label1.Margin = new Padding(2, 0, 2, 0);
+        label1.Name = "label1";
+        label1.Size = new Size(63, 27);
+        label1.TabIndex = 18;
+        label1.Text = "Results";
+        // 
+        // operationGroupBox
+        // 
+        operationGroupBox.Anchor = AnchorStyles.Top | AnchorStyles.Bottom;
+        operationGroupBox.Controls.Add(_huntButton);
+        operationGroupBox.Controls.Add(_downloadButton);
+        operationGroupBox.Controls.Add(_calculateMetricsButton);
+        operationGroupBox.Font = new Font("Dubai", 12F, FontStyle.Bold, GraphicsUnit.Point);
+        operationGroupBox.Location = new Point(147, 19);
+        operationGroupBox.Margin = new Padding(2, 2, 2, 2);
+        operationGroupBox.Name = "operationGroupBox";
+        operationGroupBox.Padding = new Padding(2, 2, 2, 2);
+        operationGroupBox.Size = new Size(504, 101);
+        operationGroupBox.TabIndex = 17;
+        operationGroupBox.TabStop = false;
+        operationGroupBox.Text = "Operations";
+        // 
+        // _huntButton
+        // 
+        _huntButton.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        _huntButton.ImageKey = "knife.png";
+        _huntButton.ImageList = IconList;
+        _huntButton.Location = new Point(386, 37);
+        _huntButton.Margin = new Padding(2, 2, 2, 2);
+        _huntButton.Name = "_huntButton";
+        _huntButton.Size = new Size(85, 25);
+        _huntButton.TabIndex = 8;
+        _huntButton.Text = "Hunt";
+        _huntButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+        _huntButton.UseVisualStyleBackColor = true;
+        _huntButton.Click += huntButton_Click;
+        // 
+        // _downloadButton
+        // 
+        _downloadButton.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        _downloadButton.ImageKey = "download.png";
+        _downloadButton.ImageList = IconList;
+        _downloadButton.Location = new Point(15, 37);
+        _downloadButton.Margin = new Padding(2, 2, 2, 2);
+        _downloadButton.Name = "_downloadButton";
+        _downloadButton.Size = new Size(99, 25);
+        _downloadButton.TabIndex = 6;
+        _downloadButton.Text = "Download";
+        _downloadButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+        _downloadButton.UseVisualStyleBackColor = true;
+        _downloadButton.Click += _downloadButton_Click;
+        // 
+        // _calculateMetricsButton
+        // 
+        _calculateMetricsButton.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+        _calculateMetricsButton.ImageKey = "calculation.png";
+        _calculateMetricsButton.ImageList = IconList;
+        _calculateMetricsButton.Location = new Point(173, 37);
+        _calculateMetricsButton.Margin = new Padding(2, 2, 2, 2);
+        _calculateMetricsButton.Name = "_calculateMetricsButton";
+        _calculateMetricsButton.Size = new Size(149, 25);
+        _calculateMetricsButton.TabIndex = 7;
+        _calculateMetricsButton.Text = "Calculate Metrics";
+        _calculateMetricsButton.TextImageRelation = TextImageRelation.ImageBeforeText;
+        _calculateMetricsButton.UseVisualStyleBackColor = true;
+        _calculateMetricsButton.Click += _calculateMetricsButton_Click;
+        // 
+        // bottomPanel
+        // 
+        bottomPanel.Controls.Add(bottomLayoutPanel);
+        bottomPanel.Dock = DockStyle.Fill;
+        bottomPanel.Location = new Point(2, 461);
+        bottomPanel.Margin = new Padding(2, 2, 2, 2);
+        bottomPanel.Name = "bottomPanel";
+        bottomPanel.Size = new Size(783, 228);
+        bottomPanel.TabIndex = 6;
+        // 
+        // bottomLayoutPanel
+        // 
+        bottomLayoutPanel.ColumnCount = 1;
+        bottomLayoutPanel.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100F));
+        bottomLayoutPanel.Controls.Add(logTextBox, 0, 0);
+        bottomLayoutPanel.Controls.Add(panel1, 2, 1);
+        bottomLayoutPanel.Dock = DockStyle.Fill;
+        bottomLayoutPanel.Location = new Point(0, 0);
+        bottomLayoutPanel.Margin = new Padding(2, 2, 2, 2);
+        bottomLayoutPanel.Name = "bottomLayoutPanel";
+        bottomLayoutPanel.RowCount = 2;
+        bottomLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
+        bottomLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 15F));
+        bottomLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 12F));
+        bottomLayoutPanel.Size = new Size(783, 228);
+        bottomLayoutPanel.TabIndex = 0;
+        // 
+        // logTextBox
+        // 
+        logTextBox.Dock = DockStyle.Fill;
+        logTextBox.Font = new Font("Dubai", 12F, FontStyle.Bold, GraphicsUnit.Point);
+        logTextBox.Location = new Point(2, 2);
+        logTextBox.Margin = new Padding(2, 2, 2, 2);
+        logTextBox.Name = "logTextBox";
+        logTextBox.ReadOnly = true;
+        logTextBox.Size = new Size(779, 209);
+        logTextBox.TabIndex = 19;
+        logTextBox.Text = "";
+        // 
+        // panel1
+        // 
+        panel1.Controls.Add(_cancelButton);
+        panel1.Controls.Add(_progressBar);
+        panel1.Dock = DockStyle.Fill;
+        panel1.Location = new Point(2, 215);
+        panel1.Margin = new Padding(2, 2, 2, 2);
+        panel1.Name = "panel1";
+        panel1.Size = new Size(779, 11);
+        panel1.TabIndex = 20;
+        // 
+        // _cancelButton
+        // 
+        _cancelButton.Anchor = AnchorStyles.Right;
+        _cancelButton.ImageKey = "close.png";
+        _cancelButton.ImageList = IconList;
+        _cancelButton.Location = new Point(751, -5);
+        _cancelButton.Margin = new Padding(2, 2, 2, 2);
+        _cancelButton.Name = "_cancelButton";
+        _cancelButton.Size = new Size(28, 21);
+        _cancelButton.TabIndex = 19;
+        _cancelButton.UseVisualStyleBackColor = true;
+        _cancelButton.Click += cancelButton_Click;
+        // 
+        // _progressBar
+        // 
+        _progressBar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
+        _progressBar.Location = new Point(0, -5);
+        _progressBar.Margin = new Padding(2, 2, 2, 2);
+        _progressBar.Name = "_progressBar";
+        _progressBar.Size = new Size(755, 20);
+        _progressBar.TabIndex = 18;
+        // 
+        // ViewMain
+        // 
+        AutoScaleDimensions = new SizeF(7F, 15F);
+        AutoScaleMode = AutoScaleMode.Font;
+        BackColor = Color.FromArgb(115, 186, 155);
+        ClientSize = new Size(829, 757);
+        Controls.Add(basePanel);
+        Controls.Add(menu);
+        ForeColor = Color.Black;
+        Icon = (Icon)resources.GetObject("$this.Icon");
+        MainMenuStrip = menu;
+        Margin = new Padding(2, 2, 2, 2);
+        MinimumSize = new Size(845, 796);
+        Name = "ViewMain";
+        Text = "MetricHunter";
+        Load += _viewMain_Load;
+        ((System.ComponentModel.ISupportInitialize)_repositoryDataGridView).EndInit();
+        menu.ResumeLayout(false);
+        menu.PerformLayout();
+        basePanel.ResumeLayout(false);
+        layoutPanel.ResumeLayout(false);
+        searchRepositoryPanel.ResumeLayout(false);
+        searchRepositoryPanel.PerformLayout();
+        operationGroupBox.ResumeLayout(false);
+        bottomPanel.ResumeLayout(false);
+        bottomLayoutPanel.ResumeLayout(false);
+        panel1.ResumeLayout(false);
+        ResumeLayout(false);
+        PerformLayout();
     }
 
     #endregion

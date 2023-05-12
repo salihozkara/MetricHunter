@@ -3,6 +3,7 @@ using System.Text.RegularExpressions;
 using System.Xml;
 using AdvancedPath;
 using MetricHunter.Application.Git;
+using MetricHunter.Application.Repositories;
 using MetricHunter.Application.Resources;
 using MetricHunter.Application.Results;
 using MetricHunter.Core.DependencyProcesses;
@@ -48,10 +49,12 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     }
 
 
-    public async Task<IResult> CalculateMetricsAsync(Repository repository, string branchName = "", string baseRepositoriesDirectoryPath = "",
+    public async Task<IResult> CalculateMetricsAsync(RepositoryWithBranchNameDto repositoryWithBranchNameDto, string baseRepositoriesDirectoryPath = "",
         string baseReportsDirectoryPath = "", CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
+        var repository = repositoryWithBranchNameDto.Repository;
+        var branchName = repositoryWithBranchNameDto.BranchName;
         if (string.IsNullOrWhiteSpace(branchName)) branchName = repository.DefaultBranch;
         _reportsPath = string.IsNullOrEmpty(baseReportsDirectoryPath) ? PathHelper.TempPath : baseReportsDirectoryPath;
         _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath)
@@ -74,36 +77,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
 
         FileNameChange(repository, reportsPath);
 
-        return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
-    }
-
-    public Task<IResult[]> CalculateMetricsByLocalResultsAsync(List<Repository> repositories,
-        string baseDirectoryPath = "",
-        CancellationToken cancellationToken = default)
-    {
-        cancellationToken.ThrowIfCancellationRequested();
-        if (string.IsNullOrEmpty(baseDirectoryPath))
-            baseDirectoryPath = PathHelper.TempPath;
-        DirectoryPathString path = baseDirectoryPath;
-
-        var files = path.FileSystemInfo.GetFiles($"*.{FileExtension}", SearchOption.AllDirectories);
-        var tasks = repositories.Select(repository => Task.Run<IResult>(() =>
-        {
-            var fileName = $"id_{repository.Id}_{repository.Name}.xml";
-            FilePathString filePath = files.FirstOrDefault(file => file.Name == fileName)!;
-            if (filePath.Exists)
-            {
-                _logger.LogError($"SourceMonitor reports file not found for {repository.FullName}");
-                return new NullResult();
-            }
-
-            var xmlDocument = new XmlDocument();
-            xmlDocument.Load(filePath);
-
-            return new SourceMonitorResult(repository, GetMetrics(xmlDocument));
-        }, cancellationToken));
-
-        return Task.WhenAll(tasks).WaitAsync(cancellationToken);
+        return new SourceMonitorResult(repository, GetMetrics(xmlDocument).Append(new Metric("BranchName", branchName)).ToList());
     }
 
     private List<IMetric> GetMetrics(XmlNode xmlNode)

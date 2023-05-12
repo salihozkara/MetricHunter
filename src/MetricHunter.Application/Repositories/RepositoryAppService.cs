@@ -6,13 +6,13 @@ namespace MetricHunter.Application.Repositories;
 
 public class RepositoryAppService : IRepositoryAppService, ISingletonDependency
 {
-    public async Task<Repository[]> ReadRepositoriesAsync(string path, CancellationToken cancellationToken = default)
+    public async Task<RepositoryWithBranchNameDto[]> ReadRepositoriesAsync(string path, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        return await JsonHelper.ReadJsonAsync<Repository[]>(path, cancellationToken) ?? Array.Empty<Repository>();
+        return await JsonHelper.ReadJsonAsync<RepositoryWithBranchNameDto[]>(path, cancellationToken) ?? Array.Empty<RepositoryWithBranchNameDto>();
     }
 
-    public Task WriteRepositoriesAsync(IEnumerable<Repository> repositories, string path,
+    public Task WriteRepositoriesAsync(IEnumerable<RepositoryWithBranchNameDto> repositories, string path,
         CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();

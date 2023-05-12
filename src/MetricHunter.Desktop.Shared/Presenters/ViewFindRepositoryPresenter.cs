@@ -1,4 +1,5 @@
 ﻿using MetricHunter.Application.Git;
+using MetricHunter.Application.Repositories;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,14 +42,16 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
     {
         var commits = await GitManager.GetCommitsAsync(_repository.FullName);
 
-        _controller.ShowCommits(_repository, commits);
+        _controller.ShowRepositories(commits.Select(x => new RepositoryWithBranchNameDto(_repository, x.Sha, x))
+            .ToList());
     }
 
     public async Task GetReleases()
     {
         var releases = await GitManager.GetReleasesAsync(_repository.FullName);
 
-        _controller.ShowReleases(_repository, releases);
+        _controller.ShowRepositories(releases.Select(x => new RepositoryWithBranchNameDto(_repository, x.TagName, x))
+            .ToList());
     }
 
     public void Run()

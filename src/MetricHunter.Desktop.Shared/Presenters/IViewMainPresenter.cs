@@ -1,4 +1,5 @@
-﻿using MetricHunter.Desktop.Core;
+﻿using MetricHunter.Application.Repositories;
+using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Octokit;
 
@@ -8,7 +9,7 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
 {
     public Repository FoundRepository { get; set; }
     
-    public IEnumerable<Repository> Repositories { get; set; }
+    public IEnumerable<RepositoryWithBranchNameDto> Repositories { get; set; }
     
     Task<string> CalculateMetricsAsync(CancellationToken cancellationToken = default);
     
@@ -19,18 +20,10 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
     Task SaveRepositoriesAsync(CancellationToken cancellationToken = default);
     
     Task<string> HuntRepositoriesAsync(CancellationToken cancellationToken = default);
-
-    Task<string> HuntCommitsAsync(CancellationToken cancellationToken = default);
-    
-    Task<string> HuntReleasesAsync(CancellationToken cancellationToken = default);
     
     void ShowGithubLogin();
     
     void ShowExploreRepositories();
     
     void ShowFindRepository();
-
-    Task DownloadCommitsAsync(CancellationToken token = default);
-    
-    Task DownloadReleasesAsync(CancellationToken token = default);
 }

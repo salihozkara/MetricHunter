@@ -23,7 +23,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
     
-    private List<Repository> _repositories;
+    private List<RepositoryWithBranchNameDto> _repositories;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
     {
@@ -31,7 +31,7 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller = controller;
         View.Presenter = this;
 
-        _repositories = new List<Repository>();
+        _repositories = new List<RepositoryWithBranchNameDto>();
 
         _gitManager = _controller.ServiceProvider.GetRequiredService<IGitManager>();
         _gitProvider = _controller.ServiceProvider.GetRequiredService<IGitProvider>();
@@ -47,12 +47,12 @@ public class ViewMainPresenter : IViewMainPresenter
     
     public Repository FoundRepository { get; set; }
 
-    public IEnumerable<Repository> Repositories
+    public IEnumerable<RepositoryWithBranchNameDto> Repositories
     {
         get
         {
             return View.SelectedRepositories.Any()
-                ? _repositories.Where(x => View.SelectedRepositories.Contains(x.Id)).ToList()
+                ? _repositories.Where(x => View.SelectedRepositories.Contains(x.Key)).ToList()
                 : _repositories;
         }
 
@@ -81,7 +81,7 @@ public class ViewMainPresenter : IViewMainPresenter
         var repositoryList =
             await _repositoryAppService.ReadRepositoriesAsync(View.CalculateMetricsRepositoryPath, cancellationToken);
         if (_repositories.Any())
-            repositoryList = repositoryList.Where(x => Repositories.Any(x2 => x2.Id == x.Id)).ToArray();
+            repositoryList = repositoryList.Where(x => Repositories.Any(x2 => x2.Equals(x))).ToArray();
 
         var metrics = new List<Dictionary<string, string>>();
         var stopwatch = new Stopwatch();
@@ -89,9 +89,9 @@ public class ViewMainPresenter : IViewMainPresenter
         View.SetProgressBar(0);
         foreach (var item in repositoryList)
         {
-            var language = GitConsts.LanguagesMap[item.Language];
+            var language = GitConsts.LanguagesMap[item.Repository.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var metric = await manager.CalculateMetricsAsync(item, item.DefaultBranch,
+            var metric = await manager.CalculateMetricsAsync(item,
                 View.CalculateMetricsRepositoryPath.ToFilePathString().ParentDirectory,
                 View.CalculateMetricsByLocalResultsPath,
                 cancellationToken);
@@ -176,7 +176,7 @@ public class ViewMainPresenter : IViewMainPresenter
         foreach (var item in Repositories)
             if (await _gitProvider.CloneRepositoryAsync(item, cancellationToken: cancellationToken))
             {
-                var language = GitConsts.LanguagesMap[item.Language];
+                var language = GitConsts.LanguagesMap[item.Repository.Language];
                 var manager = _metricCalculatorManager.FindMetricCalculator(language);
                 var metric = await manager.CalculateMetricsAsync(item, token: cancellationToken);
                 var dictList = metric.ToDictionaryListByTopics();
@@ -192,72 +192,6 @@ public class ViewMainPresenter : IViewMainPresenter
         _logger.LogInformation($"Repositories hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
         return _csvHelper.MetricsToCsv(metrics);
     }
-    
-    public async Task<string> HuntCommitsAsync(CancellationToken cancellationToken = default)
-    {
-        var currentProgressValue = 0;
-        var amount = 100 / View.SelectedCommits.Count();
-        View.SetProgressBar(0);
-        
-        if (!CheckSelectCommits())
-            return string.Empty;
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        var language = GitConsts.LanguagesMap[FoundRepository.Language];
-        var manager = _metricCalculatorManager.FindMetricCalculator(language);
-        var metrics = new List<Dictionary<string, string>>();
-        foreach (var item in View.SelectedCommits)
-            if (await _gitProvider.CloneRepositoryAsync(FoundRepository, branchName: item, cancellationToken: cancellationToken))
-            {
-                
-                var metric = await manager.CalculateMetricsAsync(FoundRepository, branchName: item, token: cancellationToken);
-                var dictList = metric.ToDictionaryListByTopics();
-                metrics.AddRange(dictList);
-                await _gitProvider.DeleteLocalRepositoryAsync(FoundRepository, branchName: item, token: cancellationToken);
-
-                currentProgressValue += amount;
-                
-                View.SetProgressBar(currentProgressValue);
-            }
-
-        stopwatch.Stop();
-        _logger.LogInformation($"Commits hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
-        return _csvHelper.MetricsToCsv(metrics);
-    }
-    
-    public async Task<string> HuntReleasesAsync(CancellationToken cancellationToken = default)
-    {
-        var currentProgressValue = 0;
-        var amount = 100 / View.SelectedReleases.Count();
-        View.SetProgressBar(0);
-        
-        if (!CheckSelectReleases())
-            return string.Empty;
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        var language = GitConsts.LanguagesMap[FoundRepository.Language];
-        var manager = _metricCalculatorManager.FindMetricCalculator(language);
-        var metrics = new List<Dictionary<string, string>>();
-        foreach (var item in View.SelectedReleases)
-            if (await _gitProvider.CloneRepositoryAsync(FoundRepository, item, cancellationToken: cancellationToken))
-            {
-                
-                var metric = await manager.CalculateMetricsAsync(FoundRepository, branchName: item, token: cancellationToken);
-                var dictList = metric.ToDictionaryListByTopics();
-                metrics.AddRange(dictList);
-                await _gitProvider.DeleteLocalRepositoryAsync(FoundRepository, item, token: cancellationToken);
-
-                currentProgressValue += amount;
-                
-                View.SetProgressBar(currentProgressValue);
-            }
-
-        stopwatch.Stop();
-        _logger.LogInformation($"Releases hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");
-        return _csvHelper.MetricsToCsv(metrics);
-    }
 
     private async void LoadFromArgsAsync(CancellationToken cancellationToken = default)
     {
@@ -266,7 +200,7 @@ public class ViewMainPresenter : IViewMainPresenter
         {
             var files = args.Skip(1).Where(x => x.EndsWith(GitConsts.RepositoryInfoFileExtension)).ToArray();
             Console.WriteLine($"Loading {files.Length} files");
-            var repositories = new List<Repository>();
+            var repositories = new List<RepositoryWithBranchNameDto>();
             foreach (var file in files)
             {
                 var repository = await _repositoryAppService.ReadRepositoriesAsync(file, cancellationToken);
@@ -288,62 +222,6 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller.ShowFindRepository();
     }
 
-    public async Task DownloadCommitsAsync(CancellationToken cancellationToken = default)
-    {
-        if (!CheckSelectCommits())
-            return;
-        
-        var currentProgressValue = 0;
-        View.SetProgressBar(0);
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
-        var amount = 100 / View.SelectedCommits.Count();
-        
-        foreach (var item in View.SelectedCommits)
-        {
-            await _gitProvider.CloneRepositoryAsync(FoundRepository, View.DownloadRepositoryPath, item,
-                cancellationToken);
-            
-            currentProgressValue += amount;
-
-            View.SetProgressBar(currentProgressValue);
-        }
-
-        stopwatch.Stop();
-        _logger.LogInformation($"Commits downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
-        View.SetProgressBar(0);
-    }
-
-    public async Task DownloadReleasesAsync(CancellationToken cancellationToken = default)
-    {
-        if (!CheckSelectReleases())
-            return;
-        
-        var currentProgressValue = 0;
-        View.SetProgressBar(0);
-
-        var stopwatch = new Stopwatch();
-        stopwatch.Start();
-        
-        var amount = 100 / View.SelectedReleases.Count();
-        
-        foreach (var item in View.SelectedReleases)
-        {
-            await _gitProvider.CloneRepositoryAsync(FoundRepository, View.DownloadRepositoryPath, item,
-                cancellationToken);
-            
-            currentProgressValue += amount;
-
-            View.SetProgressBar(currentProgressValue);
-        }
-
-        stopwatch.Stop();
-        _logger.LogInformation($"Releases downloaded in {stopwatch.Elapsed:hh\\:mm\\:ss}");
-        View.SetProgressBar(0);
-    }
-
     private void Authenticate()
     {
         if (!string.IsNullOrWhiteSpace(View.GithubToken))
@@ -354,22 +232,6 @@ public class ViewMainPresenter : IViewMainPresenter
     {
         if (Repositories.Any()) return true;
         _controller.ErrorMessage("No repositories selected");
-        return false;
-
-    }
-    
-    private bool CheckSelectCommits()
-    {
-        if (View.SelectedCommits.Any()) return true;
-        _controller.ErrorMessage("No commits selected");
-        return false;
-
-    }
-    
-    private bool CheckSelectReleases()
-    {
-        if (View.SelectedReleases.Any()) return true;
-        _controller.ErrorMessage("No releases selected");
         return false;
 
     }

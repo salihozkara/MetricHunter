@@ -1,5 +1,6 @@
 ﻿using System.Text;
 using AdvancedPath;
+using MetricHunter.Application.Repositories;
 using MetricHunter.Core.DependencyProcesses;
 using MetricHunter.Core.Jsons;
 using MetricHunter.Core.Paths;
@@ -23,13 +24,14 @@ public class GitProvider : IGitProvider, ISingletonDependency
         _logger = logger;
     }
     
-    public async Task<bool> CloneRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",string branchName = "", CancellationToken cancellationToken = default)
+    public async Task<bool> CloneRepositoryAsync(RepositoryWithBranchNameDto repositoryWithBranchNameDto, string cloneBaseDirectoryPath = "", CancellationToken cancellationToken = default)
     {
         var @return = false;
+        var repository = repositoryWithBranchNameDto.Repository;
+        var branchName = repositoryWithBranchNameDto.BranchName;
         Exception? exception = null;
         DirectoryPathString repositoryPath = string.Empty;
         if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
-        if(string.IsNullOrWhiteSpace(branchName)) branchName = repository.DefaultBranch;
         try
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -43,14 +45,18 @@ public class GitProvider : IGitProvider, ISingletonDependency
             var path = repositoryPath.ParentDirectory;
             if (repositoryPath.Exists)
             {
-                if (await LocalRepositoryCheck(repository, branchName, repositoryPath, cancellationToken)) return true;
+                if (await LocalRepositoryCheck(repository, branchName, repositoryPath, cancellationToken))
+                {
+                    @return = true;
+                    return true;
+                }
                 await DeleteLocalRepositoryAsync(repositoryPath, cancellationToken);
             }
             if (defaultBranchPath.Exists)
             {
                 if (await LocalRepositoryCheck(repository, repository.DefaultBranch, defaultBranchPath, cancellationToken))
                 {
-                    @return = await CreateNewLocalRepositoryWithBranchName(repository, branchName, path, defaultBranchPath, repositoryPath);
+                    @return = await CreateNewLocalRepositoryWithBranchName(repositoryWithBranchNameDto, path, defaultBranchPath, repositoryPath, cloneBaseDirectoryPath);
                     return @return;
                 }
 
@@ -88,8 +94,8 @@ public class GitProvider : IGitProvider, ISingletonDependency
 
                 if (result.ExitCode == 0)
                 {
-                    AddRepositoryInfoFile(defaultBranchPath, repository, repository.DefaultBranch);
-                    @return = await CreateNewLocalRepositoryWithBranchName(repository, branchName, path, defaultBranchPath, repositoryPath);
+                    AddRepositoryInfoFile(defaultBranchPath.ParentDirectory, new RepositoryWithBranchNameDto(repository), cloneBaseDirectoryPath);
+                    @return = await CreateNewLocalRepositoryWithBranchName(repositoryWithBranchNameDto, path, defaultBranchPath, repositoryPath, cloneBaseDirectoryPath);
                     return @return;
                 }
 
@@ -124,14 +130,16 @@ public class GitProvider : IGitProvider, ISingletonDependency
         }
     }
 
-    private async Task<bool> CreateNewLocalRepositoryWithBranchName(Repository repository, string branchName, DirectoryPathString path,
-        DirectoryPathString defaultBranchPath, DirectoryPathString repositoryPath)
+    private async Task<bool> CreateNewLocalRepositoryWithBranchName(RepositoryWithBranchNameDto repositoryWithBranchNameDto, DirectoryPathString path,
+        DirectoryPathString defaultBranchPath, DirectoryPathString repositoryPath, string cloneBaseDirectoryPath)
     {
+        var repository = repositoryWithBranchNameDto.Repository;
+        var branchName = repositoryWithBranchNameDto.BranchName;
         if (branchName != repository.DefaultBranch)
         {
             await CloneRepositoryOtherBranchAsync(defaultBranchPath, repositoryPath);
             if(!await ChangeBranchAsync(repositoryPath, branchName)) return false;
-            AddRepositoryInfoFile(path, repository, branchName);
+            AddRepositoryInfoFile(path, repositoryWithBranchNameDto, cloneBaseDirectoryPath);
         }
 
         OnCloneRepositorySuccess(new CloneRepositorySuccessEventArgs(repository, repositoryPath));
@@ -261,11 +269,11 @@ public class GitProvider : IGitProvider, ISingletonDependency
     }
 
 
-    public Task<bool> DeleteLocalRepositoryAsync(Repository repository, string cloneBaseDirectoryPath = "",string branchName = "", CancellationToken token = default)
+    public Task<bool> DeleteLocalRepositoryAsync(RepositoryWithBranchNameDto repositoryWithBranchNameDto, string cloneBaseDirectoryPath = "", CancellationToken token = default)
     {
         if (string.IsNullOrWhiteSpace(cloneBaseDirectoryPath)) cloneBaseDirectoryPath = PathHelper.TempPath;
         var repositoryPath =
-            PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repository.Language, repository.FullName, branchName);
+            PathHelper.BuildRepositoryDirectoryPath(cloneBaseDirectoryPath, repositoryWithBranchNameDto.Repository.Language, repositoryWithBranchNameDto.Repository.FullName, repositoryWithBranchNameDto.BranchName);
 
         return DeleteLocalRepositoryAsync(repositoryPath, token);
     }
@@ -314,9 +322,13 @@ public class GitProvider : IGitProvider, ISingletonDependency
         CloneRepositorySuccess?.Invoke(this, e);
     }
 
-    private static async void AddRepositoryInfoFile(PathString repositoryPath, Repository repository, string branchName)
+    private static async void AddRepositoryInfoFile(PathString repositoryPath, RepositoryWithBranchNameDto repositoryWithBranchNameDto, string cloneBaseDirectoryPath)
     {
-        var repositoryInfoFilePath = (repositoryPath + branchName + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
-        await JsonHelper.AppendJsonAsync(repository, repositoryInfoFilePath, r => r.Id);
+        var repositoryInfoFilePath = (repositoryPath + repositoryWithBranchNameDto.BranchName + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
+        while (repositoryInfoFilePath >= cloneBaseDirectoryPath)
+        {
+            await JsonHelper.AppendJsonAsync(repositoryWithBranchNameDto, repositoryInfoFilePath, x => new {x.Repository, x.BranchName});
+            repositoryInfoFilePath = repositoryInfoFilePath.ParentDirectory.ParentDirectory + GitConsts.RepositoryInfoFileExtension.ToFilePathString();
+        }
     }
 }

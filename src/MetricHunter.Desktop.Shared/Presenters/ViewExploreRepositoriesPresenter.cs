@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using MetricHunter.Application.Git;
 using MetricHunter.Application.Metrics;
+using MetricHunter.Application.Repositories;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +14,7 @@ public class ViewExploreRepositoriesPresenter : IViewExploreRepositoriesPresente
 {
     private readonly IApplicationController _controller;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
-    private List<Repository> _repositories;
+    private List<RepositoryWithBranchNameDto> _repositories;
     private readonly IGitManager _gitManager;
     private readonly ILogger<ViewMainPresenter> _logger;
 
@@ -23,7 +24,7 @@ public class ViewExploreRepositoriesPresenter : IViewExploreRepositoriesPresente
         View = viewExploreRepositories;
         View.Presenter = this;
         
-        _repositories = new List<Repository>();
+        _repositories = new List<RepositoryWithBranchNameDto>();
 
         _metricCalculatorManager = _controller.ServiceProvider.GetRequiredService<IMetricCalculatorManager>();
         
@@ -35,12 +36,12 @@ public class ViewExploreRepositoriesPresenter : IViewExploreRepositoriesPresente
     
     public IViewExploreRepositories View { get; }
     
-    public IEnumerable<Repository> Repositories
+    public IEnumerable<RepositoryWithBranchNameDto> Repositories
     {
         get
         {
             return _controller.ViewMain.SelectedRepositories.Any()
-                ? _repositories.Where(x => _controller.ViewMain.SelectedRepositories.Contains(x.Id)).ToList()
+                ? _repositories.Where(x => _controller.ViewMain.SelectedRepositories.Contains(x.Repository.Id.ToString())).ToList()
                 : _repositories;
         }
 
@@ -75,8 +76,8 @@ public class ViewExploreRepositoriesPresenter : IViewExploreRepositoriesPresente
     
     private void GitManager_SearchRepositoriesRequestSuccess(object? sender, RequestSuccessEventArgs e)
     {
-        _repositories.AddRange(e.Result.Items);
-        _repositories = _repositories.DistinctBy(x => x.Id).Take(View.RepositoryCount).ToList();
+        _repositories.AddRange(e.Result.Items.Select(x=> new RepositoryWithBranchNameDto(x)));
+        _repositories = _repositories.DistinctBy(x => x.Repository.Id).Take(View.RepositoryCount).ToList();
         var progressBarValue = (int)Math.Round((double)_repositories.Count / View.RepositoryCount * 100);
         _controller.SetProgressBar(progressBarValue);
         _controller.ShowRepositories(Repositories);

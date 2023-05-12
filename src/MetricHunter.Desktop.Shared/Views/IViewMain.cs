@@ -1,21 +1,16 @@
-﻿using MetricHunter.Desktop.Core;
+﻿using MetricHunter.Application.Repositories;
+using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Presenters;
 using Octokit;
-using Language = MetricHunter.Core.Languages.Language;
 
 namespace MetricHunter.Desktop.Views;
 
 public interface IViewMain : IView<IViewMainPresenter>
 {
-    Mode Mode { get; set; }
     string GithubToken { get; }
     
-    IEnumerable<long> SelectedRepositories { get; }
-    
-    IEnumerable<string> SelectedCommits { get; }
+    IEnumerable<string> SelectedRepositories { get; }
 
-    IEnumerable<string> SelectedReleases { get; }
-    
     string JsonLoadPath { get; set; }
 
     string JsonSavePath { get; set; }
@@ -30,7 +25,7 @@ public interface IViewMain : IView<IViewMainPresenter>
     
     void ShowMessage(string message);
 
-    void ShowRepositories(IEnumerable<Repository> repositories);
+    void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories);
 
     void SetProgressBar(int value);
     

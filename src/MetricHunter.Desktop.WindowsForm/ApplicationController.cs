@@ -1,4 +1,5 @@
-﻿using MetricHunter.Desktop.Core;
+﻿using MetricHunter.Application.Repositories;
+using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Forms;
 using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Views;
@@ -58,29 +59,14 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
         presenter.Run();
     }
 
-    public void ShowRepositories(IEnumerable<Repository> repositories)
+    public void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories)
     {
         ViewMain.ShowRepositories(repositories);
-        ViewMain.Mode = Mode.Repositories;
     }
 
     public void SetProgressBar(int i)
     {
         ViewMain.SetProgressBar(i);
-    }
-
-    public void ShowCommits(Repository repository, IEnumerable<GitHubCommit> gitHubCommits)
-    {
-        ViewMain.Presenter.FoundRepository = repository;
-        ViewMain.ShowCommits(gitHubCommits);
-        ViewMain.Mode = Mode.Commits;
-    }
-
-    public void ShowReleases(Repository repository, IEnumerable<Release> releases)
-    {
-        ViewMain.Presenter.FoundRepository = repository;
-        ViewMain.ShowReleases(releases);
-        ViewMain.Mode = Mode.Releases;
     }
 
     public void ShowGithubLogin()

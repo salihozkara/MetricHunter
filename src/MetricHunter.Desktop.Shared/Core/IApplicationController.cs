@@ -1,4 +1,5 @@
-﻿using MetricHunter.Desktop.Views;
+﻿using MetricHunter.Application.Repositories;
+using MetricHunter.Desktop.Views;
 using Octokit;
 
 namespace MetricHunter.Desktop.Core;
@@ -19,11 +20,7 @@ public interface IApplicationController
     void ShowExploreRepositories();
     void ShowFindRepository();
     
-    void ShowRepositories(IEnumerable<Repository> repositories);
+    void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories);
     
     void SetProgressBar(int i);
-    
-    void ShowCommits(Repository repository, IEnumerable<GitHubCommit> gitHubCommits);
-    
-    void ShowReleases(Repository repository, IEnumerable<Release> releases);
 }
