@@ -3,7 +3,7 @@ using MetricHunter.Desktop.Presenters;
 using MetricHunter.Desktop.Properties;
 using MetricHunter.Desktop.Views;
 
-namespace MetricHunter.Desktop;
+namespace MetricHunter.Desktop.Forms;
 
 public partial class ViewGithubLogin : Form, IViewGithubLogin
 {
@@ -16,6 +16,7 @@ public partial class ViewGithubLogin : Form, IViewGithubLogin
 
     public void Run()
     {
+        _githubToken.Text = Settings.Default.GithubToken;
         ShowDialog();
     }
 

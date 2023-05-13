@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Globalization;
 using AdvancedPath;
 using JsonNet.ContractResolvers;
@@ -10,7 +11,8 @@ namespace MetricHunter.Core.Jsons;
 
 public static class JsonHelper
 {
-    private static readonly JsonSerializerSettings ReadingJsonSerializerSettings = new()
+    private static ConcurrentDictionary<string,object> _lockers = new();
+    private static readonly JsonSerializerSettings JsonSerializerSettings = new()
     {
         Formatting = Formatting.Indented,
         NullValueHandling = NullValueHandling.Ignore,
@@ -35,52 +37,100 @@ public static class JsonHelper
         ContractResolver = new PrivateSetterContractResolver()
     };
 
-    public static Task WriteJsonAsync<T>(T obj, FilePathString path, CancellationToken cancellationToken = default)
+    private static Task WriteJsonAsync<T>(T obj, FilePathString path, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var json = JsonConvert.SerializeObject(obj);
+        var json = obj is IEnumerable ? JsonConvert.SerializeObject(obj, JsonSerializerSettings) : JsonConvert.SerializeObject(new [] { obj }, JsonSerializerSettings);
         path.ParentDirectory.CreateIfNotExists();
-        return File.WriteAllTextAsync(path, json, cancellationToken);
+        
+        // lock
+        var locker = _lockers.GetOrAdd(path, new object());
+        lock (locker)
+        {
+            File.WriteAllText(path, json);
+        }
+        
+        return Task.CompletedTask;
     }
 
     public static async Task<T?> ReadJsonAsync<T>(FilePathString path, CancellationToken cancellationToken = default)
         where T : class
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T));
-        if (!path.Exists) return default;
-        var json = await File.ReadAllTextAsync(path, cancellationToken);
-        var jToken = JToken.Parse(json);
-        if (isEnumerable)
+        try
         {
-            if (jToken is JArray jArray)
-                return jArray.ToObject<T>(JsonSerializer.Create(ReadingJsonSerializerSettings));
-
-            var type = typeof(T);
-            var itemType =
-                (type.HasElementType ? type.GetElementType() :
-                    type.IsGenericType ? type.GetGenericArguments()[0] : typeof(object)) ?? typeof(object);
-            var value = jToken.ToObject(itemType, JsonSerializer.Create(ReadingJsonSerializerSettings));
-            var array = Array.CreateInstance(itemType, 1);
-            array.SetValue(value, 0);
-            if (array is T result) return result;
-            if (type.IsClass)
-                result = (T)Activator.CreateInstance(type, array)!;
-            else if (type.IsInterface)
-                result = (T)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType), array)!;
-            else
-                throw new NotSupportedException($"Type {type} is not supported");
-            return result;
-        }
-        else
-        {
-            if (jToken is JArray jArray)
+            if (!path.Exists)
             {
-                var array = jArray.ToObject<List<T>>(JsonSerializer.Create(ReadingJsonSerializerSettings));
-                return array is not null && array.Count > 0 ? array[0] : default;
+                return default;
             }
 
-            return jToken.ToObject<T>(JsonSerializer.Create(ReadingJsonSerializerSettings));
+            var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T)) && typeof(T) != typeof(string);
+            
+            // lock
+            var locker = _lockers.GetOrAdd(path, new object());
+            string json;
+            lock (locker)
+            {
+                json = File.ReadAllText(path);
+            }
+            
+            var jToken = JToken.Parse(json);
+            if (isEnumerable)
+            {
+                if (jToken is JArray jArray)
+                {
+                    return jArray.ToObject<T>(JsonSerializer.Create(JsonSerializerSettings));
+                }
+
+                var type = typeof(T);
+                var itemType =
+                    (type.HasElementType ? type.GetElementType() :
+                        type.IsGenericType ? type.GetGenericArguments()[0] : typeof(object)) ?? typeof(object);
+                var value = jToken.ToObject(itemType, JsonSerializer.Create(JsonSerializerSettings));
+                try
+                {
+                    var array = Array.CreateInstance(itemType, 1);
+                    array.SetValue(value, 0);
+                    if (array is T result)
+                    {
+                        return result;
+                    }
+
+                    if (type.IsClass)
+                    {
+                        result = (T)Activator.CreateInstance(type, array)!;
+                    }
+                    else if (type.IsInterface)
+                    {
+                        result = (T)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType), array)!;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"Type {type} is not supported");
+                    }
+
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    return default;
+                }
+            }
+            else
+            {
+                if (jToken is not JArray jArray)
+                {
+                    return jToken.ToObject<T>(JsonSerializer.Create(JsonSerializerSettings));
+                }
+
+                var array = jArray.ToObject<T[]>(JsonSerializer.Create(JsonSerializerSettings));
+                return array is not null && array.Length > 0 ? array[0] : default;
+
+            }
+        }
+        catch
+        {
+            return default;
         }
     }
 
@@ -123,5 +173,22 @@ public static class JsonHelper
         }
 
         await WriteJsonAsync(obj, path, cancellationToken);
+    }
+
+    public static async Task RemoveJsonAsync<T>(FilePathString path, Func<T, bool> func)
+    {
+        if (!path.Exists)
+        {
+            return;
+        }
+
+        var result = await ReadJsonAsync<List<T>>(path);
+        if (result == null)
+        {
+            return;
+        }
+
+        var newResult = result.Where(x=>!func(x)).ToList();
+        await WriteJsonAsync(newResult, path);
     }
 }

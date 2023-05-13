@@ -61,4 +61,14 @@ public interface IGitManager
     ///     This event is triggered when there is an unknown error in a request.
     /// </summary>
     event EventHandler<ExceptionEventArgs>? OnException;
+    
+    Task<Repository> GetRepositoryAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default);
+    
+    Task<IReadOnlyList<Branch>> GetBranchesAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default);
+    
+    Task<IReadOnlyList<Release>> GetReleasesAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default);
+    
+    Task<IReadOnlyList<GitHubCommit>> GetCommitsAsync(string repositoryFullNameOrUrl, CancellationToken cancellationToken = default);
+    
+    public Task<IReadOnlyList<Repository>> GetRepositoriesByOwnerAsync(string owner, CancellationToken cancellationToken = default);
 }

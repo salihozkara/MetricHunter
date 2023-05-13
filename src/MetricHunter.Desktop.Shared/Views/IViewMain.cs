@@ -1,7 +1,7 @@
-﻿using MetricHunter.Desktop.Core;
+﻿using MetricHunter.Application.Repositories;
+using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Presenters;
 using Octokit;
-using Language = MetricHunter.Core.Languages.Language;
 
 namespace MetricHunter.Desktop.Views;
 
@@ -9,19 +9,7 @@ public interface IViewMain : IView<IViewMainPresenter>
 {
     string GithubToken { get; }
     
-    IEnumerable<Language>? LanguageSelectList { set; }
-
-    IEnumerable<SortDirection> SortDirectionSelectList { set; }
-
-    IEnumerable<long> SelectedRepositories { get; }
-
-    Language? SelectedLanguage { get; }
-
-    SortDirection SortDirection { get; }
-
-    int RepositoryCount { get; }
-
-    string Topics { get; }
+    IEnumerable<string> SelectedRepositories { get; }
 
     string JsonLoadPath { get; set; }
 
@@ -37,7 +25,13 @@ public interface IViewMain : IView<IViewMainPresenter>
     
     void ShowMessage(string message);
 
-    void ShowRepositories(IEnumerable<Repository> repositories);
+    void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories);
 
     void SetProgressBar(int value);
+    
+    void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits);
+    
+    void ShowReleases(IEnumerable<Release> releases);
+    
+    void CompleteRepository(string id);
 }

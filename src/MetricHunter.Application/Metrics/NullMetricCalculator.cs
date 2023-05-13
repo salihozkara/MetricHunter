@@ -1,6 +1,6 @@
-﻿using MetricHunter.Application.Results;
+﻿using MetricHunter.Application.Repositories;
+using MetricHunter.Application.Results;
 using Microsoft.Extensions.Logging;
-using Octokit;
 
 namespace MetricHunter.Application.Metrics;
 
@@ -12,20 +12,13 @@ public class NullMetricCalculator : IMetricCalculator
     {
         _logger = logger;
     }
-
-    public Task<IResult> CalculateMetricsAsync(Repository repository, string baseRepositoriesDirectoryPath = "",
-        string baseReportsDirectoryPath = "", CancellationToken token = default)
-    {
-        _logger.LogInformation("No language statistics available for {Repository}", repository.Name);
-        return Task.FromResult<IResult>(new NullResult());
-    }
-
-    public Task<IResult[]> CalculateMetricsByLocalResultsAsync(List<Repository> repositories,
-        string baseDirectoryPath = "",
+    
+    public Task<IResult> CalculateMetricsAsync(RepositoryWithBranchNameDto repositoryWithBranchNameDto,
+        string baseRepositoriesDirectoryPath = "", string baseReportsDirectoryPath = "",
         CancellationToken token = default)
     {
-        _logger.LogInformation("No language statistics available for {RepositoryCount} repositories",
-            repositories.Count);
-        return Task.FromResult(Array.Empty<IResult>());
+        _logger.LogInformation("No language statistics available for {Repository}",
+            repositoryWithBranchNameDto.Repository.Name);
+        return Task.FromResult<IResult>(new NullResult());
     }
 }

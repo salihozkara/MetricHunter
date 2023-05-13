@@ -1,11 +1,11 @@
-﻿using Octokit;
-
-namespace MetricHunter.Application.Repositories;
+﻿namespace MetricHunter.Application.Repositories;
 
 public interface IRepositoryAppService
 {
-    Task<Repository[]> ReadRepositoriesAsync(string path, CancellationToken cancellationToken = default);
+    Task<RepositoryWithBranchNameDto[]> ReadRepositoriesAsync(string path, CancellationToken cancellationToken = default);
+    
+    Task<RepositoryWithBranchNameDto?> ReadRepositoryAsync(string path, CancellationToken cancellationToken = default);
 
-    Task WriteRepositoriesAsync(IEnumerable<Repository> repositories, string path,
+    Task WriteRepositoriesAsync(IEnumerable<RepositoryWithBranchNameDto> repositories, string path,
         CancellationToken cancellationToken = default);
 }

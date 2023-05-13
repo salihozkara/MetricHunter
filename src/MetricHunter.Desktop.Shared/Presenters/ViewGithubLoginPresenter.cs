@@ -11,6 +11,7 @@ public class ViewGithubLoginPresenter : IViewGithubLoginPresenter
     {
         _controller = controller;
         View = viewGithubLogin;
+        View.Presenter = this;
     }
 
     public IViewGithubLogin View { get; }

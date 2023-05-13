@@ -75,6 +75,14 @@
         "PrivateKeyFile" = "8:"
         "TimeStampServer" = "8:"
         "InstallerBootstrapper" = "3:2"
+            "BootstrapperCfg:{63ACBE69-63AA-4F98-B2B6-99F9E24495F2}"
+            {
+            "Enabled" = "11:TRUE"
+            "PromptEnabled" = "11:TRUE"
+            "PrerequisitesLocation" = "2:1"
+            "Url" = "8:"
+            "ComponentsUrl" = "8:"
+            }
         }
     }
     "Deployable"
@@ -182,15 +190,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:MetricHunter"
-        "ProductCode" = "8:{BB4BBFA4-4DFD-4BA3-805F-CA4008A128FA}"
-        "PackageCode" = "8:{BFC2DA95-D5BA-417B-B611-6ECA1B054EFE}"
+        "ProductCode" = "8:{3D23B6EF-7A0C-487B-8659-A0818859F4E5}"
+        "PackageCode" = "8:{BF30F1A4-EDD5-404C-9300-089EB29884B3}"
         "UpgradeCode" = "8:{7590492E-42D2-4BD5-BD7F-04C68D9A6D15}"
         "AspNetVersion" = "8:2.0.50727.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:FALSE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.0"
+        "ProductVersion" = "8:1.0.1"
         "Manufacturer" = "8:MetricHunter"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
