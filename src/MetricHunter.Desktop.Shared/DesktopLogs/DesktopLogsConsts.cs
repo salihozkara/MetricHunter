@@ -5,5 +5,5 @@ namespace MetricHunter.Desktop.DesktopLogs;
 
 public class DesktopLogsConsts
 {
-    public static readonly FilePathString LogFilePath = PathHelper.TempPath + "Logs\\MetricHunter.log".ToFilePathString();
+    public static readonly FilePathString LogFilePath = PathHelper.AppDataPath + "Logs\\MetricHunter.log".ToFilePathString();
 }

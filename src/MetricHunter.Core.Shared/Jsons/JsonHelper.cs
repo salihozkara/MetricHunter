@@ -174,4 +174,21 @@ public static class JsonHelper
 
         await WriteJsonAsync(obj, path, cancellationToken);
     }
+
+    public static async Task RemoveJsonAsync<T>(FilePathString path, Func<T, bool> func)
+    {
+        if (!path.Exists)
+        {
+            return;
+        }
+
+        var result = await ReadJsonAsync<List<T>>(path);
+        if (result == null)
+        {
+            return;
+        }
+
+        var newResult = result.Where(x=>!func(x)).ToList();
+        await WriteJsonAsync(newResult, path);
+    }
 }

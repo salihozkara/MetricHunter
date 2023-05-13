@@ -1,3 +1,4 @@
+using MetricHunter.Core.Paths;
 using MetricHunter.Core.Processes;
 using MetricHunter.Desktop.DesktopLogs;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,12 +38,24 @@ public class Program
                 options.Services.AddLogging(c => c.AddSerilog());
             });
 
-        application.Initialize();
+        try
+        {
+            application.Initialize();
+        }
+        finally
+        {
+            var processManager = application.ServiceProvider
+                .GetRequiredService<IProcessManager>();
+            processManager.KillAllProcesses();
+        
 
-        var processManager = application.ServiceProvider
-            .GetRequiredService<IProcessManager>();
-        processManager.KillAllProcesses();
+            // Delete temp files
+            PathHelper.DeleteTempFiles();
+        
 
-        application.Shutdown();
+            application.Shutdown();
+            
+            Log.CloseAndFlush();
+        }
     }
 }

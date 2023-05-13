@@ -223,13 +223,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             }
         }
 
-        // _repositoryDataGridView.DataSource = repositoryModelList.ToList();
-        // _repositoryDataGridView.Columns[2].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-        // _repositoryDataGridView.Columns[3].AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader;
-        // _repositoryDataGridView.Columns[7].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-        // _repositoryDataGridView.Columns[8].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-        // _repositoryDataGridView.Columns[9].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
-
         if (new[] { commitModelCount, repositoryModelCount, releaseModelCount }.Count(x => x > 0) > 1) {
             _repositoryDataGridView.DataSource = repositoryModelList.Select(x => new CommandModel {
                 Id = x.Id.ToString(),
@@ -245,8 +238,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         if (exploreButtonEnabled) {
             AddExploreColumn();
         }
-
-        // if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
 
         SetHyperLink();
         AddCompleteColumn();
@@ -454,7 +445,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
                     }
                     break;
                 }
-            case { RowIndex: > -1 } when e.ColumnIndex == _exploreButtonColumnIndex: {
+            case { RowIndex: > -1 } when _repositoryDataGridView.Columns[e.ColumnIndex].Name == "Explore": {
                     var repository = _repositoryDataGridView.Rows[e.RowIndex].DataBoundItem as dynamic;
                     Presenter.ExploreRepository(repository.Id.ToString());
                     return;
