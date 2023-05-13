@@ -88,6 +88,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
     }
 
+    public void CompleteRepository(string id)
+    {
+        var row = _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
+            .FirstOrDefault(r => r.Cells["Id"].Value.ToString() == id);
+
+        if (row != null)
+        {
+            row.Cells[_completeCheckBoxColumnIndex].Value = true;
+        }
+    }
+
     public string GithubToken {
         get {
             try {
@@ -101,6 +112,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
 
     private int _checkBoxColumnIndex = 0;
     private int _exploreButtonColumnIndex = -1;
+    private int _completeCheckBoxColumnIndex = 0;
 
     public IEnumerable<string> SelectedRepositories {
         get {
@@ -146,6 +158,21 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader
         };
         _exploreButtonColumnIndex = _repositoryDataGridView.Columns.Add(exploreColumn);
+    }
+
+    private void AddCompleteColumn()
+    {
+        var completeColumn = new DataGridViewCheckBoxColumn()
+        {
+            Name = "Complete",
+            HeaderText = "Complete",
+            DataPropertyName = "Complete",
+            ValueType = typeof(bool),
+            ReadOnly = true,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader
+        };
+        
+        _completeCheckBoxColumnIndex = _repositoryDataGridView.Columns.Add(completeColumn);
     }
 
     public void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories) {
@@ -231,6 +258,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         // if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
 
         SetHyperLink();
+        AddCompleteColumn();
     }
 
     public void Run() {
@@ -256,8 +284,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
     private void _viewMain_Load(object sender, EventArgs e) {
         DesktopSink.LogAction += (s, logEvent) => {
             if (logEvent.Level != LogEventLevel.Information) return;
-            logTextBox.Text += s;
-            LogScrollToBottom();
+            logTextBox.BeginInvoke(() =>
+            {
+                logTextBox.Text += s;
+                LogScrollToBottom();
+            });
         };
 
         _logger.LogInformation("Application initialized");
@@ -275,6 +306,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         _calculateMetricsButton.Enabled = false;
         _huntButton.Enabled = false;
         _cancelButton.Enabled = true;
+        
+        // all not complete
+        foreach (DataGridViewRow row in _repositoryDataGridView.Rows)
+        {
+            var cell = row.Cells[_completeCheckBoxColumnIndex];
+            
+            if (cell is DataGridViewCheckBoxCell checkBoxCell)
+            {
+                checkBoxCell.Value = false;
+            }
+        }
     }
 
     private void ButtonEnable() {

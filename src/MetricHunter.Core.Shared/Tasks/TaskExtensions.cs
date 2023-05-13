@@ -1,4 +1,5 @@
-﻿namespace MetricHunter.Core.Tasks;
+﻿
+namespace MetricHunter.Core.Tasks;
 
 public static class TaskExtensions
 {
@@ -7,7 +8,7 @@ public static class TaskExtensions
     {
         try
         {
-            return await task.WaitAsync(cancellationToken);
+            return await task;
         }
         catch (TaskCanceledException) when (cancellationToken.IsCancellationRequested)
         {

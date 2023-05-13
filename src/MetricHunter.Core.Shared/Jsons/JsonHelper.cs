@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Concurrent;
 using System.Globalization;
 using AdvancedPath;
 using JsonNet.ContractResolvers;
@@ -10,6 +11,7 @@ namespace MetricHunter.Core.Jsons;
 
 public static class JsonHelper
 {
+    private static ConcurrentDictionary<string,object> _lockers = new();
     private static readonly JsonSerializerSettings JsonSerializerSettings = new()
     {
         Formatting = Formatting.Indented,
@@ -40,7 +42,15 @@ public static class JsonHelper
         cancellationToken.ThrowIfCancellationRequested();
         var json = obj is IEnumerable ? JsonConvert.SerializeObject(obj, JsonSerializerSettings) : JsonConvert.SerializeObject(new [] { obj }, JsonSerializerSettings);
         path.ParentDirectory.CreateIfNotExists();
-        return File.WriteAllTextAsync(path, json, cancellationToken);
+        
+        // lock
+        var locker = _lockers.GetOrAdd(path, new object());
+        lock (locker)
+        {
+            File.WriteAllText(path, json);
+        }
+        
+        return Task.CompletedTask;
     }
 
     public static async Task<T?> ReadJsonAsync<T>(FilePathString path, CancellationToken cancellationToken = default)
@@ -55,7 +65,15 @@ public static class JsonHelper
             }
 
             var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T)) && typeof(T) != typeof(string);
-            var json = await File.ReadAllTextAsync(path, cancellationToken);
+            
+            // lock
+            var locker = _lockers.GetOrAdd(path, new object());
+            string json;
+            lock (locker)
+            {
+                json = File.ReadAllText(path);
+            }
+            
             var jToken = JToken.Parse(json);
             if (isEnumerable)
             {

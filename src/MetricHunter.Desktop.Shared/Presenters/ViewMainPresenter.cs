@@ -5,6 +5,7 @@ using MetricHunter.Application.Git;
 using MetricHunter.Application.Languages;
 using MetricHunter.Application.Metrics;
 using MetricHunter.Application.Repositories;
+using MetricHunter.Core;
 using MetricHunter.Desktop.Core;
 using MetricHunter.Desktop.Views;
 using Microsoft.Extensions.DependencyInjection;
@@ -89,18 +90,28 @@ public class ViewMainPresenter : IViewMainPresenter
         View.SetProgressBar(0);
         foreach (var item in repositoryList)
         {
-            var language = GitConsts.LanguagesMap[item.Repository.Language];
-            var manager = _metricCalculatorManager.FindMetricCalculator(language);
-            var projectPath = await GetLastMetricHunterInfoPath(item);
-            var metric = await manager.CalculateMetricsAsync(item,
-                projectPath,
-                View.CalculateMetricsByLocalResultsPath,
-                cancellationToken);
-            if (metric.IsEmpty())
-                continue;
-            var dictList = metric.ToDictionaryListByTopics();
-            metrics.AddRange(dictList);
-            View.SetProgressBar((int)((double)metrics.Count / repositoryList.Length * 100));
+            if(cancellationToken.IsCancellationRequested)
+                break;
+            try
+            {
+                var language = GitConsts.LanguagesMap[item.Repository.Language];
+                var manager = _metricCalculatorManager.FindMetricCalculator(language);
+                var projectPath = await GetLastMetricHunterInfoPath(item);
+                var metric = await manager.CalculateMetricsAsync(item,
+                    projectPath,
+                    View.CalculateMetricsByLocalResultsPath,
+                    cancellationToken);
+                if (metric.IsEmpty())
+                    continue;
+                var dictList = metric.ToDictionaryListByTopics();
+                metrics.AddRange(dictList);
+                View.SetProgressBar((int)((double)metrics.Count / repositoryList.Length * 100));
+                View.CompleteRepository(item.Key);
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, $"Error calculating metrics for {item.Repository.FullName}");
+            }
         }
 
         View.SetProgressBar(100);
@@ -179,6 +190,7 @@ public class ViewMainPresenter : IViewMainPresenter
             currentProgressValue += amount;
 
             View.SetProgressBar(currentProgressValue);
+            View.CompleteRepository(item.Key);
         }
 
         stopwatch.Stop();
@@ -224,20 +236,54 @@ public class ViewMainPresenter : IViewMainPresenter
         var stopwatch = new Stopwatch();
         stopwatch.Start();
         var metrics = new List<Dictionary<string, string>>();
+        var funcs = new List<Func<Task>>();
         foreach (var item in Repositories)
-            if (await _gitProvider.CloneRepositoryAsync(item, cancellationToken: cancellationToken))
+        {
+            if(cancellationToken.IsCancellationRequested)
+                break;
+            funcs.Add(async () =>
             {
-                var language = GitConsts.LanguagesMap[item.Repository.Language];
-                var manager = _metricCalculatorManager.FindMetricCalculator(language);
-                var metric = await manager.CalculateMetricsAsync(item, token: cancellationToken);
-                var dictList = metric.ToDictionaryListByTopics();
-                metrics.AddRange(dictList);
-                await _gitProvider.DeleteLocalRepositoryAsync(item, token: cancellationToken);
+                var cancellationTokenSource = new CancellationTokenSource();
+                var token = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken,
+                    cancellationTokenSource.Token).Token;
+                try
+                {
+                    if (!await _gitProvider.CloneRepositoryAsync(item, cancellationToken: token))
+                    {
+                        _logger.LogError($"Error in {item.Repository.FullName}");
+                        return;
+                    }
 
-                currentProgressValue += amount;
+                    var language = GitConsts.LanguagesMap[item.Repository.Language];
+                    var manager = _metricCalculatorManager.FindMetricCalculator(language);
+                    var metric = await manager.CalculateMetricsAsync(item, token: token);
+                    var dictList = metric.ToDictionaryListByTopics();
+                    metrics.AddRange(dictList);
+                    await _gitProvider.DeleteLocalRepositoryAsync(item, token: token);
 
-                View.SetProgressBar(currentProgressValue);
+                    currentProgressValue += amount;
+
+                    View.SetProgressBar(currentProgressValue);
+                    View.CompleteRepository(item.Key);
+                }
+                catch (Exception e)
+                {
+                    _logger.LogError(e, $"Error in {item.Repository.FullName}");
+                }
+            });
+        }
+
+        if (MetricHunterConsts.HuntModeIsSync)
+        {
+            foreach (var func in funcs.TakeWhile(_ => !cancellationToken.IsCancellationRequested))
+            {
+                await func();
             }
+        }else
+        {
+            var tasks = funcs.Select(x => Task.Run(x, cancellationToken));
+            await Task.WhenAll(tasks);
+        }
 
         stopwatch.Stop();
         _logger.LogInformation($"Repositories hunted in {stopwatch.Elapsed:hh\\:mm\\:ss}");

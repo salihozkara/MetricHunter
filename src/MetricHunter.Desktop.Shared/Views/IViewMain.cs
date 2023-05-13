@@ -32,4 +32,6 @@ public interface IViewMain : IView<IViewMainPresenter>
     void ShowCommits(IEnumerable<GitHubCommit> gitHubCommits);
     
     void ShowReleases(IEnumerable<Release> releases);
+    
+    void CompleteRepository(string id);
 }
