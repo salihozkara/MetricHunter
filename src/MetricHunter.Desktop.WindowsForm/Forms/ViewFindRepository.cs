@@ -12,9 +12,7 @@ namespace MetricHunter.Desktop.Forms {
         private IReadOnlyList<Repository> _repositories;
 
         public void Run() {
-            FormBorderStyle = FormBorderStyle.FixedSingle;
             Show();
-
         }
 
         public IViewFindRepositoryPresenter Presenter { get; set; }
