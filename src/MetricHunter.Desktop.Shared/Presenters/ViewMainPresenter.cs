@@ -22,7 +22,7 @@ public class ViewMainPresenter : IViewMainPresenter
     private readonly ILogger<ViewMainPresenter> _logger;
     private readonly IMetricCalculatorManager _metricCalculatorManager;
     private readonly IRepositoryAppService _repositoryAppService;
-    
+
     private List<RepositoryWithBranchNameDto> _repositories;
 
     public ViewMainPresenter(IViewMain view, IApplicationController controller)
@@ -41,10 +41,10 @@ public class ViewMainPresenter : IViewMainPresenter
         _logger = _controller.ServiceProvider.GetRequiredService<ILogger<ViewMainPresenter>>();
 
         Authenticate();
-        
+
         LoadFromArgsAsync();
     }
-    
+
     public Repository FoundRepository { get; set; }
 
     public IEnumerable<RepositoryWithBranchNameDto> Repositories
@@ -62,7 +62,7 @@ public class ViewMainPresenter : IViewMainPresenter
             View.ShowRepositories(_repositories);
         }
     }
-    
+
     public IViewMain View { get; }
 
     public void Run()
@@ -75,7 +75,7 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller.ShowGithubLogin();
         Authenticate();
     }
-    
+
     public async Task<string> CalculateMetricsAsync(CancellationToken cancellationToken = default)
     {
         var repositoryList =
@@ -91,8 +91,9 @@ public class ViewMainPresenter : IViewMainPresenter
         {
             var language = GitConsts.LanguagesMap[item.Repository.Language];
             var manager = _metricCalculatorManager.FindMetricCalculator(language);
+            var projectPath = await GetLastMetricHunterInfoPath(item);
             var metric = await manager.CalculateMetricsAsync(item,
-                View.CalculateMetricsRepositoryPath.ToFilePathString().ParentDirectory,
+                projectPath,
                 View.CalculateMetricsByLocalResultsPath,
                 cancellationToken);
             if (metric.IsEmpty())
@@ -108,22 +109,72 @@ public class ViewMainPresenter : IViewMainPresenter
         return _csvHelper.MetricsToCsv(metrics);
     }
 
+    private async Task<DirectoryPathString> GetLastMetricHunterInfoPath(RepositoryWithBranchNameDto dto)
+    {
+        var path = View.CalculateMetricsRepositoryPath.ToFilePathString().ParentDirectory;
+        var dirs = GetDirs(path, dto.Repository.Owner.Login, dto.Repository.Name, dto.BranchName);
+        var files = dirs.SelectMany(x => x.GetFiles(GitConsts.RepositoryInfoFileExtension, SearchOption.AllDirectories))
+            .ToArray();
+        switch (files.Length)
+        {
+            case 1:
+                return files.First().FullName.ToFilePathString().ParentDirectory;
+            case > 1:
+            {
+                foreach (var fileInfo in files)
+                {
+                    var info = await _repositoryAppService.ReadRepositoryAsync(fileInfo.FullName);
+                    if (dto.Equals(info))
+                    {
+                        return fileInfo.FullName.ToFilePathString().ParentDirectory;
+                    }
+                }
+
+                break;
+            }
+            default:
+            {
+                if (path.Name.Equals(dto.BranchName, StringComparison.OrdinalIgnoreCase) &&
+                    path.ParentDirectory.Name.Equals(dto.Repository.Name,
+                        StringComparison.OrdinalIgnoreCase) &&
+                    path.ParentDirectory.ParentDirectory.Name.Equals(dto.Repository.Owner.Login,
+                        StringComparison.OrdinalIgnoreCase))
+                    return path;
+                break;
+            }
+        }
+
+        throw new Exception($"No {GitConsts.RepositoryInfoFileExtension} found");
+    }
+
+    private IEnumerable<DirectoryInfo> GetDirs(string path, string owner, string repoName, string branchName)
+    {
+        var branchNameSplit = branchName.Split('/');
+        IEnumerable<DirectoryInfo> dirs =
+            new DirectoryInfo(path).GetDirectories($"{branchNameSplit.First()}*", SearchOption.AllDirectories);
+        dirs = dirs.Where(x => x.FullName.Contains(owner.ToDirectoryPathString() + repoName + branchName)).ToArray();
+        // dirs = dirs.Where(x => x.Name.Equals(repoName, StringComparison.OrdinalIgnoreCase) &&
+        //                        x.Parent.Name.Equals(owner, StringComparison.OrdinalIgnoreCase)).ToArray();
+        return dirs;
+    }
+
     public async Task DownloadRepositoriesAsync(CancellationToken cancellationToken = default)
     {
         if (!CheckSelectRepositories())
             return;
-        
+
         var currentProgressValue = 0;
         View.SetProgressBar(0);
 
         var stopwatch = new Stopwatch();
         stopwatch.Start();
-        
+
         var amount = 100 / Repositories.Count();
-        
+
         foreach (var item in Repositories)
         {
-            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath, cancellationToken: cancellationToken);
+            await _gitProvider.CloneRepositoryAsync(item, View.DownloadRepositoryPath,
+                cancellationToken: cancellationToken);
 
             currentProgressValue += amount;
 
@@ -166,7 +217,7 @@ public class ViewMainPresenter : IViewMainPresenter
         var currentProgressValue = 0;
         var amount = 100 / Repositories.Count();
         View.SetProgressBar(0);
-        
+
         if (!CheckSelectRepositories())
             return string.Empty;
 
@@ -184,7 +235,7 @@ public class ViewMainPresenter : IViewMainPresenter
                 await _gitProvider.DeleteLocalRepositoryAsync(item, token: cancellationToken);
 
                 currentProgressValue += amount;
-                
+
                 View.SetProgressBar(currentProgressValue);
             }
 
@@ -222,6 +273,13 @@ public class ViewMainPresenter : IViewMainPresenter
         _controller.ShowFindRepository();
     }
 
+    public void ExploreRepository(string id)
+    {
+        var repository = _repositories.FirstOrDefault(x => x.Key == id)?.Repository;
+        if (repository != null)
+            _controller.ExploreRepository(repository);
+    }
+
     private void Authenticate()
     {
         if (!string.IsNullOrWhiteSpace(View.GithubToken))
@@ -233,6 +291,5 @@ public class ViewMainPresenter : IViewMainPresenter
         if (Repositories.Any()) return true;
         _controller.ErrorMessage("No repositories selected");
         return false;
-
     }
 }

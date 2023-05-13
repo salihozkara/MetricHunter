@@ -163,9 +163,9 @@
             label7.Location = new Point(279, 7);
             label7.Margin = new Padding(2, 0, 2, 0);
             label7.Name = "label7";
-            label7.Size = new Size(59, 15);
+            label7.Size = new Size(33, 15);
             label7.TabIndex = 50;
-            label7.Text = "Commits:";
+            label7.Text = "Size:";
             // 
             // label5
             // 
@@ -260,7 +260,7 @@
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(606, 416);
+            ClientSize = new Size(606, 136);
             Controls.Add(_commitsButton);
             Controls.Add(_releasesButton);
             Controls.Add(_repositoryPanel);
@@ -270,7 +270,6 @@
             Controls.Add(_repositoryNameLabel);
             Margin = new Padding(2);
             MaximizeBox = false;
-            MinimizeBox = false;
             Name = "ViewFindRepository";
             ShowIcon = false;
             StartPosition = FormStartPosition.CenterScreen;

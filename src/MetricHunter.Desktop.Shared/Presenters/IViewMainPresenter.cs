@@ -26,4 +26,6 @@ public interface IViewMainPresenter : IPresenter<IViewMain>
     void ShowExploreRepositories();
     
     void ShowFindRepository();
+    
+    void ExploreRepository(string id);
 }

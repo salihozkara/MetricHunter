@@ -8,6 +8,7 @@ namespace MetricHunter.Desktop.Presenters;
 public interface IViewFindRepositoryPresenter : IPresenter<IViewFindRepository>
 {
     public IGitManager GitManager { get; }
+    Repository Repository { get; set; }
 
     Task FindRepository();
     

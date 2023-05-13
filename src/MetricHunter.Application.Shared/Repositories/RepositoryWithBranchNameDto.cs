@@ -30,7 +30,7 @@ public class RepositoryWithBranchNameDto
     
     public override string ToString()
     {
-        return $"{Repository.FullName} {BranchName}";
+        return $"{Repository.FullName} {BranchName} {Key}";
     }
     
     public override bool Equals(object? obj)

@@ -12,6 +12,12 @@ public class RepositoryAppService : IRepositoryAppService, ISingletonDependency
         return await JsonHelper.ReadJsonAsync<RepositoryWithBranchNameDto[]>(path, cancellationToken) ?? Array.Empty<RepositoryWithBranchNameDto>();
     }
 
+    public Task<RepositoryWithBranchNameDto?> ReadRepositoryAsync(string path, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        return JsonHelper.ReadJsonAsync<RepositoryWithBranchNameDto>(path, cancellationToken);
+    }
+
     public Task WriteRepositoriesAsync(IEnumerable<RepositoryWithBranchNameDto> repositories, string path,
         CancellationToken cancellationToken = default)
     {

@@ -22,5 +22,7 @@ public interface IApplicationController
     
     void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories);
     
+    void ExploreRepository(Repository repository);
+    
     void SetProgressBar(int i);
 }

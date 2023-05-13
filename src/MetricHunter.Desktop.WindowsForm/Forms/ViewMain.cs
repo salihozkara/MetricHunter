@@ -100,6 +100,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
     }
 
     private int _checkBoxColumnIndex = 0;
+    private int _exploreButtonColumnIndex = -1;
 
     public IEnumerable<string> SelectedRepositories {
         get {
@@ -133,6 +134,19 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             MinimumWidth = 150
         });
     }
+    
+    private void AddExploreColumn()
+    {
+        var exploreColumn = new DataGridViewImageColumn()
+        {
+            Name = "Explore",
+            HeaderText = "Explore",
+            DataPropertyName = "Explore",
+            ReadOnly = true,
+            AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader
+        };
+        _exploreButtonColumnIndex = _repositoryDataGridView.Columns.Add(exploreColumn);
+    }
 
     public void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories) {
         AddSelectColumn();
@@ -142,6 +156,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         var repositoryModelCount = 0;
         var commitModelCount = 0;
         var releaseModelCount = 0;
+        var exploreButtonEnabled = false;
 
         foreach (var repositoryWithBranchNameDto in repositories) {
             switch (repositoryWithBranchNameDto.OtherData) {
@@ -158,6 +173,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
                         Size = ToSizeString(repositoryWithBranchNameDto.Repository.Size)
                     });
                     repositoryModelCount++;
+                    exploreButtonEnabled = true;
                     break;
                 case GitHubCommit commit:
                     repositoryModelList.Add(new CommitModel {
@@ -205,6 +221,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         else
         {
             _repositoryDataGridView.DataSource = repositoryModelList;
+        }
+
+        if (exploreButtonEnabled)
+        {
+            AddExploreColumn();
         }
 
         // if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
@@ -385,6 +406,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             Process.Start(ps);
         }
     }
+    
 
     private void _repositoryDataGridView_CellClick(object sender, DataGridViewCellEventArgs e) {
         switch (e) {
@@ -396,13 +418,20 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
                 SelectAllRepositories();
                 _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = "Unselect All";
                 return;
-            case { ColumnIndex: >= 0, RowIndex: >= 0 }: {
+            case { RowIndex: >= 0 } when e.ColumnIndex == _checkBoxColumnIndex : 
+            {
                     if (_repositoryDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex] is DataGridViewCheckBoxCell cell) {
                         cell.Value = (bool?)cell.Value != true;
                         return;
                     }
                     break;
                 }
+            case { RowIndex: > -1 } when e.ColumnIndex == _exploreButtonColumnIndex:
+            {
+                var repository = _repositoryDataGridView.Rows[e.RowIndex].DataBoundItem as dynamic;
+                Presenter.ExploreRepository(repository.Id.ToString());
+                return;
+            }
         }
         _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = IsAllSelected ? "Unselect All" : "Select All";
     }
@@ -463,14 +492,6 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         _logger.LogInformation("This process may take some time. Please wait...");
         ButtonDisable();
         CancellationTokenSource = new CancellationTokenSource();
-
-        // Func<CancellationToken,Task<string>> huntFunc = _repositoryDataGridView.DataSource switch
-        // {
-        //     IEnumerable<RepositoryModel> => Presenter.HuntRepositoriesAsync,
-        //     IEnumerable<CommitModel> => Presenter.HuntCommitsAsync,
-        //     IEnumerable<ReleaseModel> => Presenter.HuntReleasesAsync,
-        //     _ => throw new ArgumentException("Invalid data source")
-        // };
 
         var result = await Presenter.HuntRepositoriesAsync(CancellationTokenSource.Token)
             .MaybeCanceled(CancellationTokenSource.Token);

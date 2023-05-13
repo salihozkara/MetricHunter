@@ -61,7 +61,15 @@ public class ApplicationController : IApplicationController, ISingletonDependenc
 
     public void ShowRepositories(IEnumerable<RepositoryWithBranchNameDto> repositories)
     {
-        ViewMain.ShowRepositories(repositories);
+        ViewMain.Presenter.Repositories = repositories;
+    }
+
+    public void ExploreRepository(Repository repository)
+    {
+        _viewFindRepository = new ViewFindRepository();
+        var presenter = new ViewFindRepositoryPresenter(this, _viewFindRepository);
+        presenter.Run();
+        presenter.View.ShowRepository(repository);
     }
 
     public void SetProgressBar(int i)

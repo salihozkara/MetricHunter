@@ -35,7 +35,7 @@ public static class JsonHelper
         ContractResolver = new PrivateSetterContractResolver()
     };
 
-    public static Task WriteJsonAsync<T>(T obj, FilePathString path, CancellationToken cancellationToken = default)
+    private static Task WriteJsonAsync<T>(T obj, FilePathString path, CancellationToken cancellationToken = default)
     {
         cancellationToken.ThrowIfCancellationRequested();
         var json = obj is IEnumerable ? JsonConvert.SerializeObject(obj, JsonSerializerSettings) : JsonConvert.SerializeObject(new [] { obj }, JsonSerializerSettings);
@@ -47,48 +47,72 @@ public static class JsonHelper
         where T : class
     {
         cancellationToken.ThrowIfCancellationRequested();
-        if (!path.Exists) return default;
-        var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T)) && typeof(T) != typeof(string);
-        var json = await File.ReadAllTextAsync(path, cancellationToken);
-        
-        var jToken = JToken.Parse(json);
-        if (isEnumerable)
+        try
         {
-            if (jToken is JArray jArray)
-                return jArray.ToObject<T>(JsonSerializer.Create(JsonSerializerSettings));
-
-            var type = typeof(T);
-            var itemType =
-                (type.HasElementType ? type.GetElementType() :
-                    type.IsGenericType ? type.GetGenericArguments()[0] : typeof(object)) ?? typeof(object);
-            var value = jToken.ToObject(itemType, JsonSerializer.Create(JsonSerializerSettings));
-            try
-            {
-                var array = Array.CreateInstance(itemType, 1);
-                array.SetValue(value, 0);
-                if (array is T result) return result;
-                if (type.IsClass)
-                    result = (T)Activator.CreateInstance(type, array)!;
-                else if (type.IsInterface)
-                    result = (T)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType), array)!;
-                else
-                    throw new NotSupportedException($"Type {type} is not supported");
-                return result;
-            }
-            catch (Exception e)
+            if (!path.Exists)
             {
                 return default;
             }
-        }
-        else
-        {
-            if (jToken is JArray jArray)
+
+            var isEnumerable = typeof(IEnumerable).IsAssignableFrom(typeof(T)) && typeof(T) != typeof(string);
+            var json = await File.ReadAllTextAsync(path, cancellationToken);
+            var jToken = JToken.Parse(json);
+            if (isEnumerable)
             {
+                if (jToken is JArray jArray)
+                {
+                    return jArray.ToObject<T>(JsonSerializer.Create(JsonSerializerSettings));
+                }
+
+                var type = typeof(T);
+                var itemType =
+                    (type.HasElementType ? type.GetElementType() :
+                        type.IsGenericType ? type.GetGenericArguments()[0] : typeof(object)) ?? typeof(object);
+                var value = jToken.ToObject(itemType, JsonSerializer.Create(JsonSerializerSettings));
+                try
+                {
+                    var array = Array.CreateInstance(itemType, 1);
+                    array.SetValue(value, 0);
+                    if (array is T result)
+                    {
+                        return result;
+                    }
+
+                    if (type.IsClass)
+                    {
+                        result = (T)Activator.CreateInstance(type, array)!;
+                    }
+                    else if (type.IsInterface)
+                    {
+                        result = (T)Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType), array)!;
+                    }
+                    else
+                    {
+                        throw new NotSupportedException($"Type {type} is not supported");
+                    }
+
+                    return result;
+                }
+                catch (Exception e)
+                {
+                    return default;
+                }
+            }
+            else
+            {
+                if (jToken is not JArray jArray)
+                {
+                    return jToken.ToObject<T>(JsonSerializer.Create(JsonSerializerSettings));
+                }
+
                 var array = jArray.ToObject<T[]>(JsonSerializer.Create(JsonSerializerSettings));
                 return array is not null && array.Length > 0 ? array[0] : default;
-            }
 
-            return jToken.ToObject<T>(JsonSerializer.Create(JsonSerializerSettings));
+            }
+        }
+        catch
+        {
+            return default;
         }
     }
 

@@ -327,7 +327,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
         var repositoryInfoFilePath = (repositoryPath + repositoryWithBranchNameDto.BranchName + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
         while (repositoryInfoFilePath >= cloneBaseDirectoryPath)
         {
-            await JsonHelper.AppendJsonAsync(repositoryWithBranchNameDto, repositoryInfoFilePath, x => new {x.Repository, x.BranchName});
+            await JsonHelper.AppendJsonAsync(repositoryWithBranchNameDto, repositoryInfoFilePath, x => x.ToString());
             repositoryInfoFilePath = repositoryInfoFilePath.ParentDirectory.ParentDirectory + GitConsts.RepositoryInfoFileExtension.ToFilePathString();
         }
     }

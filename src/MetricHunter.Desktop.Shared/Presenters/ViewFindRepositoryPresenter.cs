@@ -12,7 +12,7 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
     private readonly IApplicationController _controller;
     public IGitManager GitManager { get; }
 
-    private Repository _repository;
+    public Repository Repository { get; set; }
     
     public ViewFindRepositoryPresenter(IApplicationController controller, IViewFindRepository viewFindRepository)
     {
@@ -29,8 +29,8 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
     {
         try
         {
-            _repository = await GitManager.GetRepositoryAsync(View.RepositoryFullNameOrUrl);
-            View.ShowRepository(_repository);
+            Repository = await GitManager.GetRepositoryAsync(View.RepositoryFullNameOrUrl);
+            View.ShowRepository(Repository);
         }
         catch (Exception e)
         {
@@ -40,17 +40,17 @@ public class ViewFindRepositoryPresenter : IViewFindRepositoryPresenter
 
     public async Task GetCommits()
     {
-        var commits = await GitManager.GetCommitsAsync(_repository.FullName);
+        var commits = await GitManager.GetCommitsAsync(Repository.FullName);
 
-        _controller.ShowRepositories(commits.Select(x => new RepositoryWithBranchNameDto(_repository, x.Sha, x))
+        _controller.ShowRepositories(commits.Select(x => new RepositoryWithBranchNameDto(Repository, x.Sha, x))
             .ToList());
     }
 
     public async Task GetReleases()
     {
-        var releases = await GitManager.GetReleasesAsync(_repository.FullName);
+        var releases = await GitManager.GetReleasesAsync(Repository.FullName);
 
-        _controller.ShowRepositories(releases.Select(x => new RepositoryWithBranchNameDto(_repository, x.TagName, x))
+        _controller.ShowRepositories(releases.Select(x => new RepositoryWithBranchNameDto(Repository, x.TagName, x))
             .ToList());
     }
 

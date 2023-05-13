@@ -34,7 +34,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
     private readonly string _xmlTemplate;
 
 
-    private string? _projectsPath;
+    private string _projectsPath;
 
     private string? _reportsPath;
     
@@ -58,7 +58,7 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         if (string.IsNullOrWhiteSpace(branchName)) branchName = repository.DefaultBranch;
         _reportsPath = string.IsNullOrEmpty(baseReportsDirectoryPath) ? PathHelper.TempPath : baseReportsDirectoryPath;
         _projectsPath = string.IsNullOrEmpty(baseRepositoriesDirectoryPath)
-            ? PathHelper.TempPath
+            ? PathHelper.BuildRepositoryDirectoryPath(PathHelper.TempPath, repository.Language, repository.FullName, branchName)
             : baseRepositoriesDirectoryPath;
         await ProcessRepositoryAsync(repository, branchName, cancellationToken);
         var reportsPath =
@@ -161,19 +161,17 @@ public class SourceMonitorMetricCalculator : IMetricCalculator
         
         reportsPath.CreateIfNotExists();
 
-        var projectDirectory =
-            PathHelper.BuildRepositoryDirectoryPath(_projectsPath!, repository.Language, repository.FullName, branchName);
 
         var projectName = $"{repository.Name}-{branchName.Replace('/', '-')}";
         var xmlPath = xmlDirectory + $"{projectName}.xml".ToFilePathString();
 
         xmlPath.DeleteIfExists();
 
-        await ContentErrorHandleRepositoryAsync(projectDirectory, repository.Language, cancellationToken);
+        await ContentErrorHandleRepositoryAsync(_projectsPath, repository.Language, cancellationToken);
 
         var xml = _xmlTemplate
             .Replace(ProjectNameReplacement, projectName)
-            .Replace(ProjectDirectoryReplacement, projectDirectory)
+            .Replace(ProjectDirectoryReplacement, _projectsPath)
             .Replace(ProjectFileDirectoryReplacement, xmlDirectory)
             .Replace(ProjectLanguageReplacement, GitConsts.LanguagesMap[repository.Language].GetNormalizedLanguage())
             .Replace(ReportsPathReplacement, reportsPath);
