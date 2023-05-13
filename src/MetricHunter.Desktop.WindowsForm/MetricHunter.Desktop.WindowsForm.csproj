@@ -15,11 +15,14 @@
         <ProjectReference Include="..\MetricHunter.Application\MetricHunter.Application.csproj" />
         <ProjectReference Include="..\MetricHunter.Desktop.Shared\MetricHunter.Desktop.Shared.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <PackageReference Include="Microsoft.Extensions.FileProviders.Embedded" Version="7.0.0" />
+    </ItemGroup>
 
     <ItemGroup>
-        <Content Include="Res\**\*.*">
-            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-        </Content>
+        <EmbeddedResource Include="Res\**\*.*">
+        </EmbeddedResource>
     </ItemGroup>
 
     <ItemGroup>

@@ -42,11 +42,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         value = value > 100 ? 100 : value;
         value = value < 0 ? 0 : value;
         _progressBar.Value = value;
-        
+
         if (value == 100) {
             _progressBar.Value = 0;
             ButtonEnable();
-        }else {
+        }
+        else if (!_cancelButton.Enabled) {
             ButtonDisable();
         }
     }
@@ -88,13 +89,11 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         if (_repositoryDataGridView.Columns["Id"] != null) _repositoryDataGridView.Columns["Id"]!.Visible = false;
     }
 
-    public void CompleteRepository(string id)
-    {
+    public void CompleteRepository(string id) {
         var row = _repositoryDataGridView.Rows.Cast<DataGridViewRow>()
             .FirstOrDefault(r => r.Cells["Id"].Value.ToString() == id);
 
-        if (row != null)
-        {
+        if (row != null) {
             row.Cells[_completeCheckBoxColumnIndex].Value = true;
         }
     }
@@ -146,11 +145,9 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             MinimumWidth = 150
         });
     }
-    
-    private void AddExploreColumn()
-    {
-        var exploreColumn = new DataGridViewImageColumn()
-        {
+
+    private void AddExploreColumn() {
+        var exploreColumn = new DataGridViewImageColumn() {
             Name = "Explore",
             HeaderText = "Explore",
             DataPropertyName = "Explore",
@@ -160,10 +157,8 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         _exploreButtonColumnIndex = _repositoryDataGridView.Columns.Add(exploreColumn);
     }
 
-    private void AddCompleteColumn()
-    {
-        var completeColumn = new DataGridViewCheckBoxColumn()
-        {
+    private void AddCompleteColumn() {
+        var completeColumn = new DataGridViewCheckBoxColumn() {
             Name = "Complete",
             HeaderText = "Complete",
             DataPropertyName = "Complete",
@@ -171,7 +166,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             ReadOnly = true,
             AutoSizeMode = DataGridViewAutoSizeColumnMode.ColumnHeader
         };
-        
+
         _completeCheckBoxColumnIndex = _repositoryDataGridView.Columns.Add(completeColumn);
     }
 
@@ -235,23 +230,19 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         // _repositoryDataGridView.Columns[8].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
         // _repositoryDataGridView.Columns[9].AutoSizeMode = DataGridViewAutoSizeColumnMode.DisplayedCells;
 
-        if (new[] { commitModelCount, repositoryModelCount, releaseModelCount }.Count(x => x > 0) > 1)
-        {
-            _repositoryDataGridView.DataSource = repositoryModelList.Select(x => new CommandModel
-            {
+        if (new[] { commitModelCount, repositoryModelCount, releaseModelCount }.Count(x => x > 0) > 1) {
+            _repositoryDataGridView.DataSource = repositoryModelList.Select(x => new CommandModel {
                 Id = x.Id.ToString(),
                 Index = x.Index,
                 Name = x.Name,
                 Url = x.Url
             }).ToList();
         }
-        else
-        {
+        else {
             _repositoryDataGridView.DataSource = repositoryModelList;
         }
 
-        if (exploreButtonEnabled)
-        {
+        if (exploreButtonEnabled) {
             AddExploreColumn();
         }
 
@@ -284,8 +275,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
     private void _viewMain_Load(object sender, EventArgs e) {
         DesktopSink.LogAction += (s, logEvent) => {
             if (logEvent.Level != LogEventLevel.Information) return;
-            logTextBox.BeginInvoke(() =>
-            {
+            logTextBox.BeginInvoke(() => {
                 logTextBox.Text += s;
                 LogScrollToBottom();
             });
@@ -306,14 +296,12 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
         _calculateMetricsButton.Enabled = false;
         _huntButton.Enabled = false;
         _cancelButton.Enabled = true;
-        
+
         // all not complete
-        foreach (DataGridViewRow row in _repositoryDataGridView.Rows)
-        {
+        foreach (DataGridViewRow row in _repositoryDataGridView.Rows) {
             var cell = row.Cells[_completeCheckBoxColumnIndex];
-            
-            if (cell is DataGridViewCheckBoxCell checkBoxCell)
-            {
+
+            if (cell is DataGridViewCheckBoxCell checkBoxCell) {
                 checkBoxCell.Value = false;
             }
         }
@@ -448,7 +436,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
             Process.Start(ps);
         }
     }
-    
+
 
     private void _repositoryDataGridView_CellClick(object sender, DataGridViewCellEventArgs e) {
         switch (e) {
@@ -460,20 +448,17 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
                 SelectAllRepositories();
                 _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = "Unselect All";
                 return;
-            case { RowIndex: >= 0 } when e.ColumnIndex == _checkBoxColumnIndex : 
-            {
+            case { RowIndex: >= 0 } when e.ColumnIndex == _checkBoxColumnIndex: {
                     if (_repositoryDataGridView.Rows[e.RowIndex].Cells[e.ColumnIndex] is DataGridViewCheckBoxCell cell) {
                         cell.Value = (bool?)cell.Value != true;
-                        return;
                     }
                     break;
                 }
-            case { RowIndex: > -1 } when e.ColumnIndex == _exploreButtonColumnIndex:
-            {
-                var repository = _repositoryDataGridView.Rows[e.RowIndex].DataBoundItem as dynamic;
-                Presenter.ExploreRepository(repository.Id.ToString());
-                return;
-            }
+            case { RowIndex: > -1 } when e.ColumnIndex == _exploreButtonColumnIndex: {
+                    var repository = _repositoryDataGridView.Rows[e.RowIndex].DataBoundItem as dynamic;
+                    Presenter.ExploreRepository(repository.Id.ToString());
+                    return;
+                }
         }
         _repositoryDataGridView.Columns[_checkBoxColumnIndex].HeaderCell.Value = IsAllSelected ? "Unselect All" : "Select All";
     }

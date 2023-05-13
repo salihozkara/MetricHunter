@@ -240,7 +240,7 @@ partial class ViewMain {
         basePanel.Controls.Add(layoutPanel);
         basePanel.Dock = DockStyle.Fill;
         basePanel.Location = new Point(0, 30);
-        basePanel.Margin = new Padding(2, 2, 2, 2);
+        basePanel.Margin = new Padding(2);
         basePanel.Name = "basePanel";
         basePanel.Padding = new Padding(21, 18, 21, 18);
         basePanel.Size = new Size(829, 727);
@@ -255,7 +255,7 @@ partial class ViewMain {
         layoutPanel.Controls.Add(bottomPanel, 0, 2);
         layoutPanel.Dock = DockStyle.Fill;
         layoutPanel.Location = new Point(21, 18);
-        layoutPanel.Margin = new Padding(2, 2, 2, 2);
+        layoutPanel.Margin = new Padding(2);
         layoutPanel.Name = "layoutPanel";
         layoutPanel.RowCount = 3;
         layoutPanel.RowStyles.Add(new RowStyle(SizeType.Absolute, 150F));
@@ -271,7 +271,7 @@ partial class ViewMain {
         searchRepositoryPanel.Controls.Add(operationGroupBox);
         searchRepositoryPanel.Dock = DockStyle.Fill;
         searchRepositoryPanel.Location = new Point(2, 2);
-        searchRepositoryPanel.Margin = new Padding(2, 2, 2, 2);
+        searchRepositoryPanel.Margin = new Padding(2);
         searchRepositoryPanel.Name = "searchRepositoryPanel";
         searchRepositoryPanel.Size = new Size(783, 146);
         searchRepositoryPanel.TabIndex = 5;
@@ -295,9 +295,9 @@ partial class ViewMain {
         operationGroupBox.Controls.Add(_calculateMetricsButton);
         operationGroupBox.Font = new Font("Dubai", 12F, FontStyle.Bold, GraphicsUnit.Point);
         operationGroupBox.Location = new Point(147, 19);
-        operationGroupBox.Margin = new Padding(2, 2, 2, 2);
+        operationGroupBox.Margin = new Padding(2);
         operationGroupBox.Name = "operationGroupBox";
-        operationGroupBox.Padding = new Padding(2, 2, 2, 2);
+        operationGroupBox.Padding = new Padding(2);
         operationGroupBox.Size = new Size(504, 101);
         operationGroupBox.TabIndex = 17;
         operationGroupBox.TabStop = false;
@@ -309,7 +309,7 @@ partial class ViewMain {
         _huntButton.ImageKey = "knife.png";
         _huntButton.ImageList = IconList;
         _huntButton.Location = new Point(386, 37);
-        _huntButton.Margin = new Padding(2, 2, 2, 2);
+        _huntButton.Margin = new Padding(2);
         _huntButton.Name = "_huntButton";
         _huntButton.Size = new Size(85, 25);
         _huntButton.TabIndex = 8;
@@ -324,7 +324,7 @@ partial class ViewMain {
         _downloadButton.ImageKey = "download.png";
         _downloadButton.ImageList = IconList;
         _downloadButton.Location = new Point(15, 37);
-        _downloadButton.Margin = new Padding(2, 2, 2, 2);
+        _downloadButton.Margin = new Padding(2);
         _downloadButton.Name = "_downloadButton";
         _downloadButton.Size = new Size(99, 25);
         _downloadButton.TabIndex = 6;
@@ -339,7 +339,7 @@ partial class ViewMain {
         _calculateMetricsButton.ImageKey = "calculation.png";
         _calculateMetricsButton.ImageList = IconList;
         _calculateMetricsButton.Location = new Point(173, 37);
-        _calculateMetricsButton.Margin = new Padding(2, 2, 2, 2);
+        _calculateMetricsButton.Margin = new Padding(2);
         _calculateMetricsButton.Name = "_calculateMetricsButton";
         _calculateMetricsButton.Size = new Size(149, 25);
         _calculateMetricsButton.TabIndex = 7;
@@ -353,7 +353,7 @@ partial class ViewMain {
         bottomPanel.Controls.Add(bottomLayoutPanel);
         bottomPanel.Dock = DockStyle.Fill;
         bottomPanel.Location = new Point(2, 461);
-        bottomPanel.Margin = new Padding(2, 2, 2, 2);
+        bottomPanel.Margin = new Padding(2);
         bottomPanel.Name = "bottomPanel";
         bottomPanel.Size = new Size(783, 228);
         bottomPanel.TabIndex = 6;
@@ -366,7 +366,7 @@ partial class ViewMain {
         bottomLayoutPanel.Controls.Add(panel1, 2, 1);
         bottomLayoutPanel.Dock = DockStyle.Fill;
         bottomLayoutPanel.Location = new Point(0, 0);
-        bottomLayoutPanel.Margin = new Padding(2, 2, 2, 2);
+        bottomLayoutPanel.Margin = new Padding(2);
         bottomLayoutPanel.Name = "bottomLayoutPanel";
         bottomLayoutPanel.RowCount = 2;
         bottomLayoutPanel.RowStyles.Add(new RowStyle(SizeType.Percent, 100F));
@@ -380,7 +380,7 @@ partial class ViewMain {
         logTextBox.Dock = DockStyle.Fill;
         logTextBox.Font = new Font("Dubai", 12F, FontStyle.Bold, GraphicsUnit.Point);
         logTextBox.Location = new Point(2, 2);
-        logTextBox.Margin = new Padding(2, 2, 2, 2);
+        logTextBox.Margin = new Padding(2);
         logTextBox.Name = "logTextBox";
         logTextBox.ReadOnly = true;
         logTextBox.Size = new Size(779, 209);
@@ -393,7 +393,7 @@ partial class ViewMain {
         panel1.Controls.Add(_progressBar);
         panel1.Dock = DockStyle.Fill;
         panel1.Location = new Point(2, 215);
-        panel1.Margin = new Padding(2, 2, 2, 2);
+        panel1.Margin = new Padding(2);
         panel1.Name = "panel1";
         panel1.Size = new Size(779, 11);
         panel1.TabIndex = 20;
@@ -404,7 +404,7 @@ partial class ViewMain {
         _cancelButton.ImageKey = "close.png";
         _cancelButton.ImageList = IconList;
         _cancelButton.Location = new Point(751, -5);
-        _cancelButton.Margin = new Padding(2, 2, 2, 2);
+        _cancelButton.Margin = new Padding(2);
         _cancelButton.Name = "_cancelButton";
         _cancelButton.Size = new Size(28, 21);
         _cancelButton.TabIndex = 19;
@@ -415,7 +415,7 @@ partial class ViewMain {
         // 
         _progressBar.Anchor = AnchorStyles.Left | AnchorStyles.Right;
         _progressBar.Location = new Point(0, -5);
-        _progressBar.Margin = new Padding(2, 2, 2, 2);
+        _progressBar.Margin = new Padding(2);
         _progressBar.Name = "_progressBar";
         _progressBar.Size = new Size(755, 20);
         _progressBar.TabIndex = 18;
@@ -431,7 +431,7 @@ partial class ViewMain {
         ForeColor = Color.Black;
         Icon = (Icon)resources.GetObject("$this.Icon");
         MainMenuStrip = menu;
-        Margin = new Padding(2, 2, 2, 2);
+        Margin = new Padding(2);
         MinimumSize = new Size(845, 796);
         Name = "ViewMain";
         Text = "MetricHunter";

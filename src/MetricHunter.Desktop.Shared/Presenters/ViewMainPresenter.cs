@@ -329,7 +329,13 @@ public class ViewMainPresenter : IViewMainPresenter
     private void Authenticate()
     {
         if (!string.IsNullOrWhiteSpace(View.GithubToken))
-            _gitManager.Authenticate(View.GithubToken);
+            if (_gitManager.Authenticate(View.GithubToken))
+            {
+                _controller.SuccessMessage("Authenticated");
+            }else
+            {
+                _controller.ErrorMessage("Authentication failed");
+            }
     }
 
     private bool CheckSelectRepositories()

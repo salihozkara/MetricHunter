@@ -16,6 +16,7 @@ public partial class ViewGithubLogin : Form, IViewGithubLogin
 
     public void Run()
     {
+        _githubToken.Text = Settings.Default.GithubToken;
         ShowDialog();
     }
 
