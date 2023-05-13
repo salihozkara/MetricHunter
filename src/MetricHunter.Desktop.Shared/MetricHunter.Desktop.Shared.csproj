@@ -1,5 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
+    <Import Project="..\common.props" />
+    
     <PropertyGroup>
         <TargetFramework>net7.0</TargetFramework>
         <RootNamespace>MetricHunter.Desktop</RootNamespace>
