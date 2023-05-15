@@ -5,36 +5,30 @@ using MetricHunter.Desktop.Views;
 
 namespace MetricHunter.Desktop.Forms;
 
-public partial class ViewGithubLogin : Form, IViewGithubLogin
-{
-    public ViewGithubLogin()
-    {
+public partial class ViewGithubLogin : Form, IViewGithubLogin {
+    public ViewGithubLogin() {
         InitializeComponent();
     }
 
     public IViewGithubLoginPresenter Presenter { get; set; }
 
-    public void Run()
-    {
+    public void Run() {
         _githubToken.Text = Settings.Default.GithubToken;
         ShowDialog();
     }
 
-    private void AuthenticateButton_Click(object sender, EventArgs e)
-    {
+    private void AuthenticateButton_Click(object sender, EventArgs e) {
         Settings.Default.GithubToken = _githubToken.Text;
         Settings.Default.Save();
 
         Close();
     }
 
-    private void githubTokenHelp_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
-    {
+    private void githubTokenHelp_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
         var githubTokenHelpLink =
             "https://github.com/salihozkara/MetricHunter/blob/master/doc/UserGuide.md#how-to-authenticate";
 
-        var ps = new ProcessStartInfo(githubTokenHelpLink)
-        {
+        var ps = new ProcessStartInfo(githubTokenHelpLink) {
             UseShellExecute = true,
             Verb = "open"
         };

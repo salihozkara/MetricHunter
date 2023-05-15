@@ -26,12 +26,10 @@ partial class ViewMain {
     /// </summary>
     private void InitializeComponent() {
         components = new System.ComponentModel.Container();
-        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
         DataGridViewCellStyle dataGridViewCellStyle1 = new DataGridViewCellStyle();
         DataGridViewCellStyle dataGridViewCellStyle2 = new DataGridViewCellStyle();
         DataGridViewCellStyle dataGridViewCellStyle3 = new DataGridViewCellStyle();
-        SearchButton = new ImageList(components);
-        IconList = new ImageList(components);
+        System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(ViewMain));
         _repositoryDataGridView = new DataGridView();
         menu = new MenuStrip();
         savedRepositoriesToolStripMenuItem = new ToolStripMenuItem();
@@ -59,6 +57,7 @@ partial class ViewMain {
         panel1 = new Panel();
         _cancelButton = new Button();
         _progressBar = new ProgressBar();
+        IconList = new ImageList(components);
         ((System.ComponentModel.ISupportInitialize)_repositoryDataGridView).BeginInit();
         menu.SuspendLayout();
         basePanel.SuspendLayout();
@@ -69,24 +68,6 @@ partial class ViewMain {
         bottomLayoutPanel.SuspendLayout();
         panel1.SuspendLayout();
         SuspendLayout();
-        // 
-        // SearchButton
-        // 
-        SearchButton.ColorDepth = ColorDepth.Depth8Bit;
-        SearchButton.ImageStream = (ImageListStreamer)resources.GetObject("SearchButton.ImageStream");
-        SearchButton.TransparentColor = Color.Transparent;
-        SearchButton.Images.SetKeyName(0, "search.png");
-        // 
-        // IconList
-        // 
-        IconList.ColorDepth = ColorDepth.Depth8Bit;
-        IconList.ImageStream = (ImageListStreamer)resources.GetObject("IconList.ImageStream");
-        IconList.TransparentColor = Color.Transparent;
-        IconList.Images.SetKeyName(0, "search.png");
-        IconList.Images.SetKeyName(1, "knife.png");
-        IconList.Images.SetKeyName(2, "calculation.png");
-        IconList.Images.SetKeyName(3, "download.png");
-        IconList.Images.SetKeyName(4, "close.png");
         // 
         // _repositoryDataGridView
         // 
@@ -420,6 +401,17 @@ partial class ViewMain {
         _progressBar.Size = new Size(755, 20);
         _progressBar.TabIndex = 18;
         // 
+        // IconList
+        // 
+        IconList.ColorDepth = ColorDepth.Depth8Bit;
+        IconList.ImageStream = (ImageListStreamer)resources.GetObject("IconList.ImageStream");
+        IconList.TransparentColor = Color.Transparent;
+        IconList.Images.SetKeyName(0, "search.png");
+        IconList.Images.SetKeyName(1, "knife.png");
+        IconList.Images.SetKeyName(2, "calculation.png");
+        IconList.Images.SetKeyName(3, "download.png");
+        IconList.Images.SetKeyName(4, "close.png");
+        // 
         // ViewMain
         // 
         AutoScaleDimensions = new SizeF(7F, 15F);
@@ -464,8 +456,6 @@ partial class ViewMain {
     private ToolStripMenuItem loginGithubToolStripMenuItem;
     private ToolStripMenuItem showToolStripMenuItem;
     private ToolStripMenuItem saveToolStripMenuItem;
-    private ImageList IconList;
-    private ImageList SearchButton;
     private ToolStripMenuItem helpToolStripMenuItem;
     private Panel bottomPanel;
     private GroupBox operationGroupBox;
@@ -482,4 +472,5 @@ partial class ViewMain {
     private ToolStripMenuItem exploreRepositoriesToolStripMenuItem;
     private ToolStripMenuItem findRepositoryToolStripMenuItem;
     private Label label1;
+    private ImageList IconList;
 }

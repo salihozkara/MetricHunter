@@ -1,7 +1,5 @@
-﻿namespace MetricHunter.Desktop.Forms
-{
-    partial class ViewGithubLogin
-    {
+﻿namespace MetricHunter.Desktop.Forms {
+    partial class ViewGithubLogin {
         /// <summary>
         /// Required designer variable.
         /// </summary>
@@ -11,10 +9,8 @@
         /// Clean up any resources being used.
         /// </summary>
         /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
-        protected override void Dispose(bool disposing)
-        {
-            if (disposing && (components != null))
-            {
+        protected override void Dispose(bool disposing) {
+            if (disposing && (components != null)) {
                 components.Dispose();
             }
             base.Dispose(disposing);
@@ -26,89 +22,85 @@
         /// Required method for Designer support - do not modify
         /// the contents of this method with the code editor.
         /// </summary>
-        private void InitializeComponent()
-        {
-            this._githubToken = new System.Windows.Forms.TextBox();
-            this.GithubLoginLabel = new System.Windows.Forms.Label();
-            this.AuthenticateButton = new System.Windows.Forms.Button();
-            this.label1 = new System.Windows.Forms.Label();
-            this.fileSystemWatcher1 = new System.IO.FileSystemWatcher();
-            this.githubTokenHelp = new System.Windows.Forms.LinkLabel();
-            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).BeginInit();
-            this.SuspendLayout();
+        private void InitializeComponent() {
+            _githubToken = new TextBox();
+            GithubLoginLabel = new Label();
+            AuthenticateButton = new Button();
+            label1 = new Label();
+            githubTokenHelp = new LinkLabel();
+            SuspendLayout();
             // 
             // _githubToken
             // 
-            this._githubToken.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this._githubToken.Location = new System.Drawing.Point(177, 228);
-            this._githubToken.Name = "_githubToken";
-            this._githubToken.Size = new System.Drawing.Size(414, 41);
-            this._githubToken.TabIndex = 0;
+            _githubToken.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            _githubToken.Location = new Point(124, 137);
+            _githubToken.Margin = new Padding(2, 2, 2, 2);
+            _githubToken.Name = "_githubToken";
+            _githubToken.Size = new Size(291, 30);
+            _githubToken.TabIndex = 0;
             // 
             // GithubLoginLabel
             // 
-            this.GithubLoginLabel.AutoSize = true;
-            this.GithubLoginLabel.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.GithubLoginLabel.Location = new System.Drawing.Point(37, 228);
-            this.GithubLoginLabel.Name = "GithubLoginLabel";
-            this.GithubLoginLabel.Size = new System.Drawing.Size(125, 34);
-            this.GithubLoginLabel.TabIndex = 1;
-            this.GithubLoginLabel.Text = "Github Token";
+            GithubLoginLabel.AutoSize = true;
+            GithubLoginLabel.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            GithubLoginLabel.Location = new Point(26, 137);
+            GithubLoginLabel.Margin = new Padding(2, 0, 2, 0);
+            GithubLoginLabel.Name = "GithubLoginLabel";
+            GithubLoginLabel.Size = new Size(85, 24);
+            GithubLoginLabel.TabIndex = 1;
+            GithubLoginLabel.Text = "Github Token";
             // 
             // AuthenticateButton
             // 
-            this.AuthenticateButton.Font = new System.Drawing.Font("Dubai", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.AuthenticateButton.Location = new System.Drawing.Point(448, 294);
-            this.AuthenticateButton.Name = "AuthenticateButton";
-            this.AuthenticateButton.Size = new System.Drawing.Size(143, 40);
-            this.AuthenticateButton.TabIndex = 2;
-            this.AuthenticateButton.Text = "Authenticate";
-            this.AuthenticateButton.UseVisualStyleBackColor = true;
-            this.AuthenticateButton.Click += new System.EventHandler(this.AuthenticateButton_Click);
+            AuthenticateButton.Font = new Font("Dubai", 10F, FontStyle.Regular, GraphicsUnit.Point);
+            AuthenticateButton.Location = new Point(314, 176);
+            AuthenticateButton.Margin = new Padding(2, 2, 2, 2);
+            AuthenticateButton.Name = "AuthenticateButton";
+            AuthenticateButton.Size = new Size(100, 24);
+            AuthenticateButton.TabIndex = 2;
+            AuthenticateButton.Text = "Authenticate";
+            AuthenticateButton.UseVisualStyleBackColor = true;
+            AuthenticateButton.Click += AuthenticateButton_Click;
             // 
             // label1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe UI", 24F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.label1.Location = new System.Drawing.Point(162, 70);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(302, 65);
-            this.label1.TabIndex = 3;
-            this.label1.Text = "Github Login";
-            // 
-            // fileSystemWatcher1
-            // 
-            this.fileSystemWatcher1.EnableRaisingEvents = true;
-            this.fileSystemWatcher1.SynchronizingObject = this;
+            label1.AutoSize = true;
+            label1.Font = new Font("Segoe UI", 24F, FontStyle.Regular, GraphicsUnit.Point);
+            label1.Location = new Point(113, 42);
+            label1.Margin = new Padding(2, 0, 2, 0);
+            label1.Name = "label1";
+            label1.Size = new Size(204, 45);
+            label1.TabIndex = 3;
+            label1.Text = "Github Login";
             // 
             // githubTokenHelp
             // 
-            this.githubTokenHelp.AutoSize = true;
-            this.githubTokenHelp.Location = new System.Drawing.Point(34, 359);
-            this.githubTokenHelp.Name = "githubTokenHelp";
-            this.githubTokenHelp.Size = new System.Drawing.Size(257, 25);
-            this.githubTokenHelp.TabIndex = 4;
-            this.githubTokenHelp.TabStop = true;
-            this.githubTokenHelp.Text = "How to retrieve a Github Token";
-            this.githubTokenHelp.LinkClicked += new System.Windows.Forms.LinkLabelLinkClickedEventHandler(this.githubTokenHelp_LinkClicked);
+            githubTokenHelp.AutoSize = true;
+            githubTokenHelp.Location = new Point(24, 215);
+            githubTokenHelp.Margin = new Padding(2, 0, 2, 0);
+            githubTokenHelp.Name = "githubTokenHelp";
+            githubTokenHelp.Size = new Size(170, 15);
+            githubTokenHelp.TabIndex = 4;
+            githubTokenHelp.TabStop = true;
+            githubTokenHelp.Text = "How to retrieve a Github Token";
+            githubTokenHelp.LinkClicked += githubTokenHelp_LinkClicked;
             // 
             // ViewGithubLogin
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
-            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(627, 413);
-            this.Controls.Add(this.githubTokenHelp);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.AuthenticateButton);
-            this.Controls.Add(this.GithubLoginLabel);
-            this.Controls.Add(this._githubToken);
-            this.Name = "ViewGithubLogin";
-            this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "ViewGithubLogin";
-            ((System.ComponentModel.ISupportInitialize)(this.fileSystemWatcher1)).EndInit();
-            this.ResumeLayout(false);
-            this.PerformLayout();
-
+            AutoScaleDimensions = new SizeF(7F, 15F);
+            AutoScaleMode = AutoScaleMode.Font;
+            ClientSize = new Size(439, 248);
+            Controls.Add(githubTokenHelp);
+            Controls.Add(label1);
+            Controls.Add(AuthenticateButton);
+            Controls.Add(GithubLoginLabel);
+            Controls.Add(_githubToken);
+            Margin = new Padding(2, 2, 2, 2);
+            Name = "ViewGithubLogin";
+            StartPosition = FormStartPosition.CenterScreen;
+            Text = "ViewGithubLogin";
+            ResumeLayout(false);
+            PerformLayout();
         }
 
         #endregion
@@ -117,7 +109,6 @@
         private Label GithubLoginLabel;
         private Button AuthenticateButton;
         private Label label1;
-        private FileSystemWatcher fileSystemWatcher1;
         private LinkLabel githubTokenHelp;
     }
 }
