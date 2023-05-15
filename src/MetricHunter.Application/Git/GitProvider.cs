@@ -325,7 +325,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
     private static async void AddRepositoryInfoFile(PathString repositoryPath, RepositoryWithBranchNameDto repositoryWithBranchNameDto, string cloneBaseDirectoryPath)
     {
         var repositoryInfoFilePath = (repositoryPath + repositoryWithBranchNameDto.BranchName + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
-        while (repositoryInfoFilePath >= cloneBaseDirectoryPath)
+        while (repositoryInfoFilePath.FullPath.StartsWith(cloneBaseDirectoryPath, StringComparison.OrdinalIgnoreCase))
         {
             await JsonHelper.AppendJsonAsync(repositoryWithBranchNameDto, repositoryInfoFilePath, x => x.ToString());
             repositoryInfoFilePath = repositoryInfoFilePath.ParentDirectory.ParentDirectory + GitConsts.RepositoryInfoFileExtension.ToFilePathString();
@@ -335,7 +335,7 @@ public class GitProvider : IGitProvider, ISingletonDependency
     private static async Task DeleteRepositoryInfoFile(PathString repositoryPath, RepositoryWithBranchNameDto repositoryWithBranchNameDto, string cloneBaseDirectoryPath)
     {
         var repositoryInfoFilePath = (repositoryPath + repositoryWithBranchNameDto.BranchName + GitConsts.RepositoryInfoFileExtension).ToFilePathString();
-        while (repositoryInfoFilePath >= cloneBaseDirectoryPath)
+        while (repositoryInfoFilePath.FullPath.StartsWith(cloneBaseDirectoryPath, StringComparison.OrdinalIgnoreCase))
         {
             await JsonHelper.RemoveJsonAsync<RepositoryWithBranchNameDto>(repositoryInfoFilePath, x => x.ToString() == repositoryWithBranchNameDto.ToString());
             repositoryInfoFilePath = repositoryInfoFilePath.ParentDirectory.ParentDirectory + GitConsts.RepositoryInfoFileExtension.ToFilePathString();
