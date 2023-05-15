@@ -160,7 +160,7 @@ public partial class ViewMain : Form, ISingletonDependency, IViewMain {
     private void AddCompleteColumn() {
         var completeColumn = new DataGridViewCheckBoxColumn() {
             Name = "Complete",
-            HeaderText = "Complete",
+            HeaderText = "Is Completed",
             DataPropertyName = "Complete",
             ValueType = typeof(bool),
             ReadOnly = true,

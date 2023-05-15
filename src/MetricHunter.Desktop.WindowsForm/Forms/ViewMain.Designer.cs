@@ -435,6 +435,7 @@ partial class ViewMain {
         MinimumSize = new Size(845, 796);
         Name = "ViewMain";
         Text = "MetricHunter";
+        WindowState = FormWindowState.Maximized;
         Load += _viewMain_Load;
         ((System.ComponentModel.ISupportInitialize)_repositoryDataGridView).EndInit();
         menu.ResumeLayout(false);
