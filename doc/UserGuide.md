@@ -44,9 +44,9 @@ repositories to it.
 
 The load repositories button in MetricHunter allows you to load repositories you saved.
 
-### Search Button
+### Explore Button
 
-The search button in MetricHunter allows you to search for repositories based on language, topic.
+The explore button in MetricHunter allows you to search for repositories based on language, topic.
 
 ### Download Button
 
