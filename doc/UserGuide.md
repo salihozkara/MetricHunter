@@ -17,8 +17,8 @@ get the most out of the tool. So let's get started!
 ## Installation
 
 Go to MetricHunter [releases page](https://github.com/salihozkara/MetricHunter/releases), click on Assets at the bottom
-to show the files available in the release. Please use the appropriate the MetricHunter installer that matches your
-machine's architecture. For most, it is x64.
+to show the files available in the release. Please use the appropriate the MetricHunter executable that matches your
+machine's architecture. For most, it is x64. There are also different published executable releases considering the runt-time dependencies. One of them is a larger file that includes the dotnet dependencies embedded whereas the other one is a smaller file. If the smaller file is chosen, then the responsibility of providing a run-time environment with the dotnet dependency delegated to the user. A user can choose to download either one to execute the tool.
 
 After downloading the executable, run it. You can launch MetricHunter by using the exe file.
 
