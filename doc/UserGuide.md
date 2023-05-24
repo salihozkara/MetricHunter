@@ -20,12 +20,29 @@ Go to MetricHunter [releases page](https://github.com/salihozkara/MetricHunter/r
 to show the files available in the release. Please use the appropriate the MetricHunter installer that matches your
 machine's architecture. For most, it is x64.
 
-After downloading the installer, run it. Once the installation is complete, you can launch MetricHunter from the Start
-menu.
+After downloading the executable, run it. You can launch MetricHunter by using the exe file.
 
 ## Overview
 
 ![MetricHunter Overview](images/overview_v2.png)
+
+### Explore Repositories
+
+Explore Repositories option that throws a modal window including a filtering area. The filtering area includes four filtering options to search for the repositories through GitHub API.
+
+### Find Repository
+
+Find Repository option that takes the URL or the name of a specific GitHub repository and allows a user to list the commits or releases over the repository. Once the list of commits or releases is filled, the user can continue with operation selection to construct a dataset.
+
+### Save Search Results
+
+The save search results button in MetricHunter allows you to save the search results you get. (Like add a favourite.)
+The repositories are save to json file. You can load them later. If you have an existing json file, you can add new
+repositories to it.
+
+### Load Repositories
+
+The load repositories button in MetricHunter allows you to load repositories you saved.
 
 ### Search Button
 
@@ -44,16 +61,6 @@ The calculate metrics button in MetricHunter allows you to calculate metrics of 
 The hunt button is special button in MetricHunter. It is combination of download and calculate metrics buttons. It
 allows you to download projects and calculate metrics of them in one click. After completing the operations, it deletes
 the repositories and frees up storage.
-
-### Save Search Results
-
-The save search results button in MetricHunter allows you to save the search results you get. (Like add a favourite.)
-The repositories are save to json file. You can load them later. If you have an existing json file, you can add new
-repositories to it.
-
-### Load Repositories
-
-The load repositories button in MetricHunter allows you to load repositories you saved.
 
 ### Inputs
 
