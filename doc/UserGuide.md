@@ -25,7 +25,7 @@ menu.
 
 ## Overview
 
-![MetricHunter Overview](images/overview.png)
+![MetricHunter Overview](images/overview_v2.png)
 
 ### Search Button
 
